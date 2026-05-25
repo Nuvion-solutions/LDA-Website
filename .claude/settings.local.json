@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd \"C:/Users/djpru/client-newton-lda\" && npm install framer-motion react-hook-form @hookform/resolvers zod lucide-react clsx tailwind-merge 2>&1 | tail -20)",
+      "Bash(cd \"C:/Users/djpru/client-newton-lda\" && npm run build 2>&1 | tail -80)",
+      "Bash(cd \"C:/Users/djpru/client-newton-lda\" && npm run build 2>&1 | tail -50)",
+      "Bash(cd \"C:/Users/djpru/client-newton-lda\" && npm run build 2>&1 | tail -40)",
+      "Bash(cd \"C:/Users/djpru/client-newton-lda\" && npm run build 2>&1 | tail -25)"
+    ]
+  }
+}

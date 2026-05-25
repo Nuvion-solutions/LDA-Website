@@ -1,0 +1,45 @@
+@import "tailwindcss";
+
+@theme {
+  /* Brand palette — Deep Navy + Gold */
+  --color-navy: #0D1B2A;
+  --color-navy-mid: #1B2D42;
+  --color-navy-light: #243B55;
+  --color-gold: #C9A84C;
+  --color-gold-light: #E8D5A3;
+  --color-gold-tint: rgba(201, 168, 76, 0.12);
+  --color-offwhite: #F8F6F1;
+  --color-body-light: #E8E8E8;
+  --color-muted-light: #9BA8B5;
+  --color-body-dark: #2C3E50;
+  --color-border-dark: #2A3F55;
+  --color-border-light: #DDD8D0;
+
+  /* Fonts — wired from next/font CSS variables */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-playfair), Georgia, "Times New Roman", serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: #ffffff;
+  color: var(--color-body-dark);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Focus ring — gold for accessibility on dark and light surfaces */
+:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+}
+
+/* Selection */
+::selection {
+  background: var(--color-gold);
+  color: var(--color-navy);
+}

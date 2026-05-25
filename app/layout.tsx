@@ -1,0 +1,97 @@
+import type { Metadata } from "next";
+import { Inter, Playfair_Display } from "next/font/google";
+import "./globals.css";
+import { Nav } from "@/components/layout/Nav";
+import { Footer } from "@/components/layout/Footer";
+import { StructuredData } from "@/components/seo/StructuredData";
+import { SITE_URL } from "@/lib/site";
+
+const inter = Inter({
+  variable: "--font-inter",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+const playfair = Playfair_Display({
+  variable: "--font-playfair",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+const TITLE = "California Legal Document Excellence, LLC | LDA #87 Sonoma County";
+const DESCRIPTION =
+  "Professional document preparation services in Santa Rosa, CA. Divorce, eviction, immigration, living trust, power of attorney, and more. LDA #87 Sonoma County. Call (707) 909-1240.";
+
+export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: TITLE,
+    template: "%s | California Legal Document Excellence, LLC",
+  },
+  description: DESCRIPTION,
+  keywords: [
+    "legal document assistant",
+    "LDA Sonoma County",
+    "divorce paperwork Santa Rosa",
+    "eviction forms California",
+    "document preparation Santa Rosa CA",
+    "registered LDA California",
+    "living trust preparation",
+    "immigration document preparation",
+  ],
+  authors: [{ name: "California Legal Document Excellence, LLC" }],
+  creator: "California Legal Document Excellence, LLC",
+  publisher: "California Legal Document Excellence, LLC",
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: TITLE,
+    description:
+      "Professional document preparation services in Santa Rosa, CA. LDA #87 Sonoma County. Free consultation.",
+    type: "website",
+    locale: "en_US",
+    url: SITE_URL,
+    siteName: "California Legal Document Excellence, LLC",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: TITLE,
+    description:
+      "Professional document preparation services in Santa Rosa, CA. LDA #87 Sonoma County.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  category: "Legal Services",
+  verification: {
+    // Paste the content value from Google Search Console's HTML tag method
+    // into NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION once the domain is verified.
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
+  },
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
+  return (
+    <html
+      lang="en"
+      className={`${inter.variable} ${playfair.variable} h-full`}
+    >
+      <body className="min-h-full flex flex-col bg-white text-[var(--color-body-dark)]">
+        <StructuredData />
+        <Nav />
+        <main className="flex-1">{children}</main>
+        <Footer />
+      </body>
+    </html>
+  );
+}

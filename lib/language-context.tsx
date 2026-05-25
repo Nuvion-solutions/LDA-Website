@@ -4,7 +4,6 @@ import {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useState,
   type ReactNode,
 } from "react";
@@ -22,29 +21,26 @@ const LanguageContext = createContext<LanguageContextValue>({
   t: (k) => translations.en[k],
 });
 
-const STORAGE_KEY = "clde:lang";
+export const LANG_COOKIE = "clde-lang";
 
-export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [lang, setLangState] = useState<Language>("en");
-
-  // Restore preference on first client render.
-  useEffect(() => {
-    try {
-      const stored = window.localStorage.getItem(STORAGE_KEY);
-      if (stored === "en" || stored === "es") {
-        setLangState(stored);
-      }
-    } catch {
-      // Storage may be unavailable (e.g. SSR-like environments) — ignore.
-    }
-  }, []);
+export function LanguageProvider({
+  children,
+  initialLang = "en",
+}: {
+  children: ReactNode;
+  initialLang?: Language;
+}) {
+  const [lang, setLangState] = useState<Language>(initialLang);
 
   const setLang = useCallback((next: Language) => {
     setLangState(next);
     try {
-      window.localStorage.setItem(STORAGE_KEY, next);
+      // 1 year expiry, lax samesite for typical browsing.
+      const oneYear = 60 * 60 * 24 * 365;
+      document.cookie = `${LANG_COOKIE}=${next}; path=/; max-age=${oneYear}; samesite=lax`;
+      document.documentElement.lang = next;
     } catch {
-      // Ignore storage failures.
+      // Ignore cookie failures (private mode, etc.)
     }
   }, []);
 

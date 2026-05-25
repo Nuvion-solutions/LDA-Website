@@ -30,6 +30,17 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Prevent iOS Safari from auto-zooming when focusing an input.
+   16px is the minimum to suppress the zoom. */
+@media (max-width: 767px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
 }
 
 /* Focus ring — gold for accessibility on dark and light surfaces */
@@ -42,4 +53,9 @@ body {
 ::selection {
   background: var(--color-gold);
   color: var(--color-navy);
+}
+
+/* Tap highlight — subtle gold tint instead of default blue. */
+* {
+  -webkit-tap-highlight-color: rgba(201, 168, 76, 0.15);
 }

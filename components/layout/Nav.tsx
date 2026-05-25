@@ -27,7 +27,7 @@ export function Nav() {
   return (
     <header className="sticky top-0 z-50 bg-[var(--color-navy)] border-b border-[var(--color-gold)]/40">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 md:h-20 items-center justify-between gap-4">
+        <div className="flex h-16 md:h-20 items-center justify-between gap-3">
           <Link
             href="/"
             className="font-serif text-[var(--color-gold)] tracking-[0.18em] uppercase text-sm md:text-base whitespace-nowrap"
@@ -63,7 +63,7 @@ export function Nav() {
                   ? "Cambiar a español"
                   : "Switch to English"
               }
-              className="inline-flex items-center gap-1.5 text-xs font-medium text-[var(--color-gold-light)] border border-[var(--color-gold)]/40 px-3 py-1.5 rounded-sm hover:border-[var(--color-gold)] hover:text-[var(--color-gold)] transition-colors"
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-[var(--color-gold-light)] border border-[var(--color-gold)]/40 px-3 py-2 rounded-sm hover:border-[var(--color-gold)] hover:text-[var(--color-gold)] transition-colors min-h-[40px]"
             >
               <Languages className="h-3.5 w-3.5" aria-hidden />
               {t("nav_lang_toggle")}
@@ -76,23 +76,41 @@ export function Nav() {
             </Link>
           </nav>
 
-          {/* Mobile hamburger */}
-          <button
-            type="button"
-            className="md:hidden text-[var(--color-body-light)] hover:text-[var(--color-gold)] transition-colors p-2 -mr-2"
-            aria-label={open ? t("nav_menu_close") : t("nav_menu_open")}
-            aria-expanded={open}
-            onClick={() => setOpen((v) => !v)}
-          >
-            {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </button>
+          {/* Mobile right-side controls: language toggle + hamburger */}
+          <div className="flex md:hidden items-center gap-1">
+            <button
+              type="button"
+              onClick={toggleLang}
+              aria-label={
+                lang === "en"
+                  ? "Cambiar a español"
+                  : "Switch to English"
+              }
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-[var(--color-gold-light)] border border-[var(--color-gold)]/40 px-2.5 py-2 rounded-sm active:bg-[var(--color-gold)]/10 transition-colors min-h-[40px]"
+            >
+              <Languages className="h-4 w-4" aria-hidden />
+              <span>{t("nav_lang_toggle")}</span>
+            </button>
+            <button
+              type="button"
+              className="text-[var(--color-body-light)] hover:text-[var(--color-gold)] transition-colors p-2 -mr-2 min-w-[44px] min-h-[44px] inline-flex items-center justify-center"
+              aria-label={open ? t("nav_menu_close") : t("nav_menu_open")}
+              aria-expanded={open}
+              onClick={() => setOpen((v) => !v)}
+            >
+              {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Mobile menu overlay */}
       {open && (
-        <div className="md:hidden fixed inset-0 top-16 z-40 bg-[var(--color-navy)] flex flex-col">
-          <nav className="flex flex-col px-6 py-8 gap-1">
+        <div
+          className="md:hidden fixed left-0 right-0 top-16 z-40 bg-[var(--color-navy)] overflow-y-auto"
+          style={{ height: "calc(100dvh - 4rem)" }}
+        >
+          <nav className="flex flex-col px-6 py-6 gap-1">
             {links.map((link) => (
               <Link
                 key={link.href}

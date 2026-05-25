@@ -1,11 +1,13 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
+import { cookies } from "next/headers";
 import "./globals.css";
 import { Nav } from "@/components/layout/Nav";
 import { Footer } from "@/components/layout/Footer";
 import { StructuredData } from "@/components/seo/StructuredData";
 import { SITE_URL } from "@/lib/site";
-import { LanguageProvider } from "@/lib/language-context";
+import { LanguageProvider, LANG_COOKIE } from "@/lib/language-context";
+import type { Language } from "@/lib/translations";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -79,17 +81,28 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: "#0D1B2A",
+};
+
+export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const cookieStore = await cookies();
+  const stored = cookieStore.get(LANG_COOKIE)?.value;
+  const initialLang: Language = stored === "es" ? "es" : "en";
+
   return (
     <html
-      lang="en"
+      lang={initialLang}
       className={`${inter.variable} ${playfair.variable} h-full`}
     >
       <body className="min-h-full flex flex-col bg-white text-[var(--color-body-dark)]">
         <StructuredData />
-        <LanguageProvider>
+        <LanguageProvider initialLang={initialLang}>
           <Nav />
           <main className="flex-1">{children}</main>
           <Footer />

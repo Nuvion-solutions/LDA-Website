@@ -3,21 +3,26 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useForm, Controller } from "react-hook-form";
+import type { Path } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { BUSINESS } from "@/lib/utils";
 
-const DOCUMENT_TYPES = [
-  "Divorce / Family Law Forms",
+// ---------------------------------------------------------------------------
+// Options
+// ---------------------------------------------------------------------------
+
+const PRIMARY_SERVICES = [
+  "Divorce & Family Law Documents",
   "Eviction (Unlawful Detainer) Paperwork",
-  "Immigration Forms",
-  "Living Trust",
+  "Immigration Documents",
+  "Living Trust Documents",
   "Power of Attorney",
   "DMV Form Assistance",
   "Tax Document Organization (Clerical)",
-  "Other (please describe below)",
+  "Other / Not Sure",
 ] as const;
 
 const COUNTIES = [
@@ -28,6 +33,7 @@ const COUNTIES = [
   "Contra Costa",
   "San Francisco",
   "Sacramento",
+  "Solano",
   "Other",
 ] as const;
 
@@ -39,81 +45,512 @@ const REFERRAL_SOURCES = [
   "Other",
 ] as const;
 
-const intakeSchema = z.object({
-  // Step 1
-  firstName: z.string().min(1, "First name is required").max(100),
-  lastName: z.string().min(1, "Last name is required").max(100),
-  phone: z
-    .string()
-    .min(7, "Please enter a valid phone number")
-    .max(30, "Phone number is too long"),
-  email: z.string().email("Please enter a valid email address"),
-  contactMethod: z.enum(["Phone", "Email", "Text"], {
-    message: "Please choose how to reach you",
-  }),
-  bestTime: z.enum(["Morning", "Afternoon", "LateAfternoon"], {
-    message: "Please choose the best time",
-  }),
+const MARRIAGE_LENGTHS = [
+  "Less than 1 year",
+  "1-5 years",
+  "5-10 years",
+  "10-20 years",
+  "20+ years",
+] as const;
 
-  // Step 2
-  documentTypes: z
-    .array(z.string())
-    .min(1, "Please select at least one document type"),
-  otherDocuments: z.string().max(2000).optional().or(z.literal("")),
-  hasStartedPaperwork: z.enum(["Yes", "No", "Not Sure"], {
-    message: "Please choose an option",
-  }),
-  hasDeadline: z.enum(["Yes", "No"], { message: "Please choose an option" }),
-  deadlineDate: z.string().optional().or(z.literal("")),
+const EVICTION_REASONS = [
+  "Non-payment of rent",
+  "Lease violation",
+  "End of lease",
+  "Owner move-in",
+  "Other",
+] as const;
 
-  // Step 3
-  filingCounty: z.enum(COUNTIES, { message: "Please choose a county" }),
-  workingWithOthers: z.enum(["Yes", "No", "Not Sure"], {
-    message: "Please choose an option",
-  }),
-  referralSource: z.enum(REFERRAL_SOURCES, {
-    message: "Please choose how you heard about us",
-  }),
-  referralName: z.string().max(200).optional().or(z.literal("")),
-  additionalNotes: z.string().max(4000).optional().or(z.literal("")),
+const NOTICE_TYPES = [
+  "3-Day Notice to Pay or Quit",
+  "3-Day Notice to Cure",
+  "30-Day Notice",
+  "60-Day Notice",
+  "Other",
+] as const;
 
-  // Step 4
-  consentLDA: z.literal(true, {
-    message: "You must acknowledge this to continue",
-  }),
-  consentContact: z.literal(true, {
-    message: "You must consent to be contacted",
-  }),
-});
+const RENT_RANGES = [
+  "Under $1,000",
+  "$1,000-$2,000",
+  "$2,000-$3,000",
+  "$3,000+",
+  "Prefer not to say",
+] as const;
+
+const IMMIGRATION_FORM_OPTIONS = [
+  "I-130 (Petition for Alien Relative)",
+  "I-485 (Adjustment of Status)",
+  "N-400 (Naturalization Application)",
+  "I-131 (Travel Document/Advance Parole)",
+  "I-765 (Employment Authorization)",
+  "DACA Renewal",
+  "I-751 (Remove Conditions on Residence)",
+  "Other / Not Sure",
+] as const;
+
+const IMMIGRATION_STATUSES = [
+  "US Citizen",
+  "Lawful Permanent Resident",
+  "DACA",
+  "Pending",
+  "Visa holder",
+  "Other",
+  "Prefer not to say",
+] as const;
+
+const POA_TYPES = [
+  "General / Financial Power of Attorney",
+  "Durable Power of Attorney",
+  "Healthcare Directive / Advance Directive",
+  "Limited Power of Attorney (specific purpose)",
+  "Not sure — I need help understanding the options",
+] as const;
+
+const AGENT_OPTIONS = [
+  "Spouse/partner",
+  "Adult child",
+  "Other family member",
+  "Friend",
+  "Professional",
+  "Not sure yet",
+] as const;
+
+const DMV_FORM_OPTIONS = [
+  "Vehicle title transfer",
+  "Registration forms",
+  "Address change",
+  "License plate application",
+  "Disabled placard application",
+  "Other DMV paperwork",
+] as const;
+
+const TAX_TYPE_OPTIONS = [
+  "Organizing/sorting tax documents",
+  "Completing tax forms (clerical preparation only — client submits)",
+  "Prior year document organization",
+  "Other clerical tax assistance",
+] as const;
+
+const TAX_YEARS = [
+  "2024",
+  "2023",
+  "2022",
+  "Multiple years",
+  "Not sure",
+] as const;
+
+const TRUST_SUCCESSOR_OPTIONS = [
+  "Spouse/partner",
+  "Adult child",
+  "Other family member",
+  "Friend",
+  "Not sure yet",
+] as const;
+
+// ---------------------------------------------------------------------------
+// Schema
+// ---------------------------------------------------------------------------
+
+const requiredEnum = <T extends readonly [string, ...string[]]>(
+  values: T,
+  msg: string,
+) => z.enum(values, { message: msg });
+
+const optStr = z.string().max(2000).optional().or(z.literal(""));
+const optDate = z.string().optional().or(z.literal(""));
+
+const intakeSchema = z
+  .object({
+    // Step 1
+    firstName: z.string().min(1, "First name is required").max(100),
+    lastName: z.string().min(1, "Last name is required").max(100),
+    phone: z
+      .string()
+      .min(7, "Please enter a valid phone number")
+      .max(30, "Phone number is too long"),
+    email: z.string().email("Please enter a valid email address"),
+    contactMethod: requiredEnum(
+      ["Phone", "Email", "Text"],
+      "Please choose how to reach you",
+    ),
+    bestTime: requiredEnum(
+      ["Morning", "Afternoon", "LateAfternoon"],
+      "Please choose the best time",
+    ),
+
+    // Step 2
+    primaryService: requiredEnum(PRIMARY_SERVICES, "Please choose a service"),
+    needsMoreServices: requiredEnum(
+      ["Yes", "No"],
+      "Please answer Yes or No",
+    ),
+    additionalServices: z.array(z.string()).optional(),
+
+    // Step 3 — Divorce
+    divorceType: z
+      .enum(["Uncontested", "Contested", "Not sure yet"])
+      .optional(),
+    divorceHasChildren: z.enum(["Yes", "No"]).optional(),
+    divorceChildrenCount: optStr,
+    divorceChildrenAges: optStr,
+    divorceHasProperty: z.enum(["Yes", "No", "Not sure"]).optional(),
+    divorceHasAssets: z.enum(["Yes", "No", "Not sure"]).optional(),
+    divorceMarriageLength: z.enum(MARRIAGE_LENGTHS).optional(),
+    divorceFilingCounty: z.enum(COUNTIES).optional(),
+    divorceFiledPaperwork: z.enum(["Yes", "No"]).optional(),
+
+    // Step 3 — Eviction
+    evictionParty: z.enum(["Landlord", "Tenant"]).optional(),
+    evictionPropertyType: z.enum(["Residential", "Commercial"]).optional(),
+    evictionReason: z.enum(EVICTION_REASONS).optional(),
+    evictionNoticeServed: z.enum(["Yes", "No"]).optional(),
+    evictionNoticeType: z.enum(NOTICE_TYPES).optional(),
+    evictionNoticeDate: optDate,
+    evictionCounty: z.enum(COUNTIES).optional(),
+    evictionTenantVacated: z.enum(["Yes", "No", "Partially"]).optional(),
+    evictionRent: z.enum(RENT_RANGES).optional(),
+
+    // Step 3 — Immigration
+    immigrationForms: z.array(z.string()).optional(),
+    immigrationFormsOther: optStr,
+    immigrationForWhom: z
+      .enum(["Myself", "Family member", "Both"])
+      .optional(),
+    immigrationStatus: z.enum(IMMIGRATION_STATUSES).optional(),
+    immigrationHasDeadline: z.enum(["Yes", "No"]).optional(),
+    immigrationDeadlineDate: optDate,
+    immigrationPreviouslyFiled: z.enum(["Yes", "No", "Not sure"]).optional(),
+
+    // Step 3 — Living Trust
+    trustType: z.enum(["Individual", "Married couple"]).optional(),
+    trustHasMinors: z.enum(["Yes", "No"]).optional(),
+    trustOwnsProperty: z.enum(["Yes", "No"]).optional(),
+    trustPropertyCount: optStr,
+    trustHasAssets: z.enum(["Yes", "No", "Not sure"]).optional(),
+    trustExistingDocs: z.enum(["Yes", "No", "Not sure"]).optional(),
+    trustSuccessor: z.enum(TRUST_SUCCESSOR_OPTIONS).optional(),
+
+    // Step 3 — Power of Attorney
+    poaTypes: z.array(z.string()).optional(),
+    poaAgent: z.enum(AGENT_OPTIONS).optional(),
+    poaHasReason: z.enum(["Yes", "No"]).optional(),
+    poaReason: optStr,
+    poaNotarize: z.enum(["Yes", "No", "Not sure"]).optional(),
+
+    // Step 3 — DMV
+    dmvFormTypes: z.array(z.string()).optional(),
+    dmvHasAppointment: z.enum(["Yes", "No"]).optional(),
+    dmvAppointmentDate: optDate,
+    dmvDetails: optStr,
+
+    // Step 3 — Tax
+    taxTypes: z.array(z.string()).optional(),
+    taxYear: z.enum(TAX_YEARS).optional(),
+    taxHasDeadline: z.enum(["Yes", "No"]).optional(),
+    taxDeadlineDate: optDate,
+    taxNotes: optStr,
+
+    // Step 3 — Other
+    otherDescription: optStr,
+    otherHasDeadline: z.enum(["Yes", "No"]).optional(),
+    otherDeadlineDate: optDate,
+
+    // Step 4
+    clientCounty: requiredEnum(COUNTIES, "Please choose a county"),
+    referralSource: requiredEnum(
+      REFERRAL_SOURCES,
+      "Please choose how you heard about us",
+    ),
+    referralName: optStr,
+    additionalNotes: z.string().max(4000).optional().or(z.literal("")),
+
+    // Step 5
+    consentLDA: z.literal(true, {
+      message: "You must acknowledge this to continue",
+    }),
+    consentContact: z.literal(true, {
+      message: "You must consent to be contacted",
+    }),
+  })
+  .superRefine((data, ctx) => {
+    const need = (path: string, value: unknown, msg = "Required") => {
+      const empty =
+        value === undefined ||
+        value === null ||
+        value === "" ||
+        (Array.isArray(value) && value.length === 0);
+      if (empty) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: [path],
+          message: msg,
+        });
+      }
+    };
+
+    // If "needs more services" = Yes, additionalServices must have at least one
+    if (data.needsMoreServices === "Yes") {
+      if (!data.additionalServices || data.additionalServices.length === 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["additionalServices"],
+          message: "Select at least one additional service",
+        });
+      }
+    }
+
+    switch (data.primaryService) {
+      case "Divorce & Family Law Documents": {
+        need("divorceType", data.divorceType);
+        need("divorceHasChildren", data.divorceHasChildren);
+        if (data.divorceHasChildren === "Yes") {
+          need("divorceChildrenCount", data.divorceChildrenCount);
+          need("divorceChildrenAges", data.divorceChildrenAges);
+        }
+        need("divorceHasProperty", data.divorceHasProperty);
+        need("divorceHasAssets", data.divorceHasAssets);
+        need("divorceMarriageLength", data.divorceMarriageLength);
+        need("divorceFilingCounty", data.divorceFilingCounty);
+        need("divorceFiledPaperwork", data.divorceFiledPaperwork);
+        break;
+      }
+      case "Eviction (Unlawful Detainer) Paperwork": {
+        need("evictionParty", data.evictionParty);
+        need("evictionPropertyType", data.evictionPropertyType);
+        need("evictionReason", data.evictionReason);
+        need("evictionNoticeServed", data.evictionNoticeServed);
+        if (data.evictionNoticeServed === "Yes") {
+          need("evictionNoticeType", data.evictionNoticeType);
+          need("evictionNoticeDate", data.evictionNoticeDate);
+        }
+        need("evictionCounty", data.evictionCounty);
+        need("evictionTenantVacated", data.evictionTenantVacated);
+        need("evictionRent", data.evictionRent);
+        break;
+      }
+      case "Immigration Documents": {
+        if (!data.immigrationForms || data.immigrationForms.length === 0) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["immigrationForms"],
+            message: "Select at least one form",
+          });
+        }
+        need("immigrationForWhom", data.immigrationForWhom);
+        need("immigrationStatus", data.immigrationStatus);
+        need("immigrationHasDeadline", data.immigrationHasDeadline);
+        if (data.immigrationHasDeadline === "Yes") {
+          need("immigrationDeadlineDate", data.immigrationDeadlineDate);
+        }
+        need("immigrationPreviouslyFiled", data.immigrationPreviouslyFiled);
+        break;
+      }
+      case "Living Trust Documents": {
+        need("trustType", data.trustType);
+        need("trustHasMinors", data.trustHasMinors);
+        need("trustOwnsProperty", data.trustOwnsProperty);
+        if (data.trustOwnsProperty === "Yes") {
+          need("trustPropertyCount", data.trustPropertyCount);
+        }
+        need("trustHasAssets", data.trustHasAssets);
+        need("trustExistingDocs", data.trustExistingDocs);
+        need("trustSuccessor", data.trustSuccessor);
+        break;
+      }
+      case "Power of Attorney": {
+        if (!data.poaTypes || data.poaTypes.length === 0) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["poaTypes"],
+            message: "Select at least one type",
+          });
+        }
+        need("poaAgent", data.poaAgent);
+        need("poaHasReason", data.poaHasReason);
+        if (data.poaHasReason === "Yes") {
+          need("poaReason", data.poaReason);
+        }
+        need("poaNotarize", data.poaNotarize);
+        break;
+      }
+      case "DMV Form Assistance": {
+        if (!data.dmvFormTypes || data.dmvFormTypes.length === 0) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["dmvFormTypes"],
+            message: "Select at least one form",
+          });
+        }
+        need("dmvHasAppointment", data.dmvHasAppointment);
+        if (data.dmvHasAppointment === "Yes") {
+          need("dmvAppointmentDate", data.dmvAppointmentDate);
+        }
+        break;
+      }
+      case "Tax Document Organization (Clerical)": {
+        if (!data.taxTypes || data.taxTypes.length === 0) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ["taxTypes"],
+            message: "Select at least one option",
+          });
+        }
+        need("taxYear", data.taxYear);
+        need("taxHasDeadline", data.taxHasDeadline);
+        if (data.taxHasDeadline === "Yes") {
+          need("taxDeadlineDate", data.taxDeadlineDate);
+        }
+        break;
+      }
+      case "Other / Not Sure": {
+        need(
+          "otherDescription",
+          data.otherDescription,
+          "Please describe what you need",
+        );
+        need("otherHasDeadline", data.otherHasDeadline);
+        if (data.otherHasDeadline === "Yes") {
+          need("otherDeadlineDate", data.otherDeadlineDate);
+        }
+        break;
+      }
+    }
+
+    // Referral name conditional
+    if (data.referralSource === "Referral") {
+      need("referralName", data.referralName, "Please tell us who referred you");
+    }
+  });
 
 export type IntakeData = z.infer<typeof intakeSchema>;
+type FieldName = Path<IntakeData>;
 
-const STEPS = ["Contact", "Documents", "Situation", "Confirm"] as const;
+const STEPS = [
+  "Contact",
+  "Service",
+  "Details",
+  "General",
+  "Confirm",
+] as const;
 
-const STEP_FIELDS: Array<Array<keyof IntakeData>> = [
-  ["firstName", "lastName", "phone", "email", "contactMethod", "bestTime"],
-  [
-    "documentTypes",
-    "otherDocuments",
-    "hasStartedPaperwork",
-    "hasDeadline",
-    "deadlineDate",
-  ],
-  [
-    "filingCounty",
-    "workingWithOthers",
-    "referralSource",
-    "referralName",
-    "additionalNotes",
-  ],
-  ["consentLDA", "consentContact"],
+const STEP_1_FIELDS: FieldName[] = [
+  "firstName",
+  "lastName",
+  "phone",
+  "email",
+  "contactMethod",
+  "bestTime",
 ];
+
+const STEP_2_FIELDS: FieldName[] = [
+  "primaryService",
+  "needsMoreServices",
+  "additionalServices",
+];
+
+const STEP_4_FIELDS: FieldName[] = [
+  "clientCounty",
+  "referralSource",
+  "referralName",
+  "additionalNotes",
+];
+
+const STEP_5_FIELDS: FieldName[] = ["consentLDA", "consentContact"];
+
+function step3FieldsFor(
+  service: IntakeData["primaryService"] | undefined,
+): FieldName[] {
+  switch (service) {
+    case "Divorce & Family Law Documents":
+      return [
+        "divorceType",
+        "divorceHasChildren",
+        "divorceChildrenCount",
+        "divorceChildrenAges",
+        "divorceHasProperty",
+        "divorceHasAssets",
+        "divorceMarriageLength",
+        "divorceFilingCounty",
+        "divorceFiledPaperwork",
+      ];
+    case "Eviction (Unlawful Detainer) Paperwork":
+      return [
+        "evictionParty",
+        "evictionPropertyType",
+        "evictionReason",
+        "evictionNoticeServed",
+        "evictionNoticeType",
+        "evictionNoticeDate",
+        "evictionCounty",
+        "evictionTenantVacated",
+        "evictionRent",
+      ];
+    case "Immigration Documents":
+      return [
+        "immigrationForms",
+        "immigrationFormsOther",
+        "immigrationForWhom",
+        "immigrationStatus",
+        "immigrationHasDeadline",
+        "immigrationDeadlineDate",
+        "immigrationPreviouslyFiled",
+      ];
+    case "Living Trust Documents":
+      return [
+        "trustType",
+        "trustHasMinors",
+        "trustOwnsProperty",
+        "trustPropertyCount",
+        "trustHasAssets",
+        "trustExistingDocs",
+        "trustSuccessor",
+      ];
+    case "Power of Attorney":
+      return [
+        "poaTypes",
+        "poaAgent",
+        "poaHasReason",
+        "poaReason",
+        "poaNotarize",
+      ];
+    case "DMV Form Assistance":
+      return [
+        "dmvFormTypes",
+        "dmvHasAppointment",
+        "dmvAppointmentDate",
+        "dmvDetails",
+      ];
+    case "Tax Document Organization (Clerical)":
+      return [
+        "taxTypes",
+        "taxYear",
+        "taxHasDeadline",
+        "taxDeadlineDate",
+        "taxNotes",
+      ];
+    case "Other / Not Sure":
+      return ["otherDescription", "otherHasDeadline", "otherDeadlineDate"];
+    default:
+      return [];
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Styles
+// ---------------------------------------------------------------------------
 
 const inputBase =
   "w-full bg-white border border-[var(--color-border-light)] rounded-sm px-4 py-3 text-[var(--color-body-dark)] focus:border-[var(--color-gold)] focus:outline-none transition-colors";
-const labelBase =
-  "block text-sm font-medium text-[var(--color-navy)] mb-2";
+const labelBase = "block text-sm font-medium text-[var(--color-navy)] mb-2";
 const errorBase = "mt-1.5 text-xs text-red-600";
+const optionCard =
+  "inline-flex items-center gap-2 px-4 py-2.5 border border-[var(--color-border-light)] rounded-sm cursor-pointer hover:border-[var(--color-gold)] transition-colors has-checked:border-[var(--color-gold)] has-checked:bg-[var(--color-gold)]/5";
+const checkCard =
+  "flex items-center gap-3 px-4 py-3 border border-[var(--color-border-light)] rounded-sm cursor-pointer hover:border-[var(--color-gold)] transition-colors has-checked:border-[var(--color-gold)] has-checked:bg-[var(--color-gold)]/5";
+
+// ---------------------------------------------------------------------------
+// Main component
+// ---------------------------------------------------------------------------
 
 export function IntakeForm() {
   const [step, setStep] = useState(0);
@@ -133,10 +570,6 @@ export function IntakeForm() {
     formState: { errors },
   } = useForm<IntakeData>({
     resolver: zodResolver(intakeSchema),
-    // onTouched + reValidate onChange = errors only appear after the user
-    // has interacted with a field, and clear immediately once it becomes
-    // valid. Critical for checkboxes/radios where a "blur" event isn't
-    // intuitive UX.
     mode: "onTouched",
     reValidateMode: "onChange",
     shouldFocusError: true,
@@ -145,19 +578,42 @@ export function IntakeForm() {
       lastName: "",
       phone: "",
       email: "",
-      documentTypes: [],
-      otherDocuments: "",
+      additionalServices: [],
+      immigrationForms: [],
+      immigrationFormsOther: "",
+      poaTypes: [],
+      poaReason: "",
+      dmvFormTypes: [],
+      dmvDetails: "",
+      taxTypes: [],
+      taxNotes: "",
+      otherDescription: "",
+      divorceChildrenCount: "",
+      divorceChildrenAges: "",
+      trustPropertyCount: "",
+      evictionNoticeDate: "",
+      immigrationDeadlineDate: "",
+      dmvAppointmentDate: "",
+      taxDeadlineDate: "",
+      otherDeadlineDate: "",
       referralName: "",
       additionalNotes: "",
-      deadlineDate: "",
     },
   });
 
-  const hasDeadline = watch("hasDeadline");
+  const primaryService = watch("primaryService");
+  const needsMoreServices = watch("needsMoreServices");
   const referralSource = watch("referralSource");
 
   const goNext = async () => {
-    const valid = await trigger(STEP_FIELDS[step]);
+    let fields: FieldName[];
+    if (step === 0) fields = STEP_1_FIELDS;
+    else if (step === 1) fields = STEP_2_FIELDS;
+    else if (step === 2) fields = step3FieldsFor(primaryService);
+    else if (step === 3) fields = STEP_4_FIELDS;
+    else fields = [];
+
+    const valid = await trigger(fields);
     if (valid) {
       setStep((s) => Math.min(s + 1, STEPS.length - 1));
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -257,53 +713,44 @@ export function IntakeForm() {
       <div className="bg-white border border-[var(--color-border-light)] rounded-sm p-6 md:p-10">
         <AnimatePresence mode="wait">
           {step === 0 && (
-            <motion.div
-              key="step-0"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.25 }}
-            >
-              <h2 className="font-serif text-2xl md:text-3xl text-[var(--color-navy)] mb-1">
-                Contact Information
-              </h2>
-              <p className="text-[var(--color-body-dark)] opacity-80 mb-8">
-                How can we reach you?
-              </p>
-
+            <StepWrap key="step-0">
+              <StepHeader
+                title="Contact Information"
+                subtitle="How can we reach you?"
+              />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div>
-                  <label htmlFor="firstName" className={labelBase}>
-                    First Name <span className="text-red-600">*</span>
-                  </label>
+                <Field
+                  id="firstName"
+                  label="First Name"
+                  required
+                  error={errors.firstName?.message}
+                >
                   <input
                     id="firstName"
                     autoComplete="given-name"
                     {...register("firstName")}
                     className={inputBase}
                   />
-                  {errors.firstName && (
-                    <p className={errorBase}>{errors.firstName.message}</p>
-                  )}
-                </div>
-                <div>
-                  <label htmlFor="lastName" className={labelBase}>
-                    Last Name <span className="text-red-600">*</span>
-                  </label>
+                </Field>
+                <Field
+                  id="lastName"
+                  label="Last Name"
+                  required
+                  error={errors.lastName?.message}
+                >
                   <input
                     id="lastName"
                     autoComplete="family-name"
                     {...register("lastName")}
                     className={inputBase}
                   />
-                  {errors.lastName && (
-                    <p className={errorBase}>{errors.lastName.message}</p>
-                  )}
-                </div>
-                <div>
-                  <label htmlFor="phone" className={labelBase}>
-                    Phone Number <span className="text-red-600">*</span>
-                  </label>
+                </Field>
+                <Field
+                  id="phone"
+                  label="Phone Number"
+                  required
+                  error={errors.phone?.message}
+                >
                   <input
                     id="phone"
                     type="tel"
@@ -311,14 +758,13 @@ export function IntakeForm() {
                     {...register("phone")}
                     className={inputBase}
                   />
-                  {errors.phone && (
-                    <p className={errorBase}>{errors.phone.message}</p>
-                  )}
-                </div>
-                <div>
-                  <label htmlFor="email" className={labelBase}>
-                    Email Address <span className="text-red-600">*</span>
-                  </label>
+                </Field>
+                <Field
+                  id="email"
+                  label="Email Address"
+                  required
+                  error={errors.email?.message}
+                >
                   <input
                     id="email"
                     type="email"
@@ -326,40 +772,22 @@ export function IntakeForm() {
                     {...register("email")}
                     className={inputBase}
                   />
-                  {errors.email && (
-                    <p className={errorBase}>{errors.email.message}</p>
-                  )}
-                </div>
+                </Field>
               </div>
 
-              <fieldset className="mt-7">
-                <legend className={labelBase}>
-                  Best way to contact you <span className="text-red-600">*</span>
-                </legend>
-                <div className="flex flex-wrap gap-3 mt-1">
-                  {(["Phone", "Email", "Text"] as const).map((opt) => (
-                    <label
-                      key={opt}
-                      className="inline-flex items-center gap-2 px-4 py-2.5 border border-[var(--color-border-light)] rounded-sm cursor-pointer hover:border-[var(--color-gold)] transition-colors has-checked:border-[var(--color-gold)] has-checked:bg-[var(--color-gold)]/5"
-                    >
-                      <input
-                        type="radio"
-                        value={opt}
-                        {...register("contactMethod")}
-                        className="accent-[var(--color-gold)]"
-                      />
-                      <span className="text-sm">{opt}</span>
-                    </label>
-                  ))}
-                </div>
-                {errors.contactMethod && (
-                  <p className={errorBase}>{errors.contactMethod.message}</p>
-                )}
-              </fieldset>
+              <RadioGroup
+                legend="Best way to contact you"
+                required
+                error={errors.contactMethod?.message}
+                options={["Phone", "Email", "Text"]}
+                name="contactMethod"
+                register={register}
+                className="mt-7"
+              />
 
               <div className="mt-7">
                 <label htmlFor="bestTime" className={labelBase}>
-                  Best time to reach you <span className="text-red-600">*</span>
+                  Best time to reach you <Req />
                 </label>
                 <select
                   id="bestTime"
@@ -380,174 +808,124 @@ export function IntakeForm() {
                   <p className={errorBase}>{errors.bestTime.message}</p>
                 )}
               </div>
-            </motion.div>
+            </StepWrap>
           )}
 
           {step === 1 && (
-            <motion.div
-              key="step-1"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.25 }}
-            >
-              <h2 className="font-serif text-2xl md:text-3xl text-[var(--color-navy)] mb-1">
-                Document Needs
-              </h2>
-              <p className="text-[var(--color-body-dark)] opacity-80 mb-8">
-                What kind of paperwork do you need prepared?
-              </p>
+            <StepWrap key="step-1">
+              <StepHeader
+                title="Service Selection"
+                subtitle="What type of document(s) do you need prepared?"
+              />
 
               <fieldset>
                 <legend className={labelBase}>
-                  Document type(s) <span className="text-red-600">*</span>
+                  Primary service <Req />
                 </legend>
-                <Controller
-                  control={control}
-                  name="documentTypes"
-                  render={({ field }) => (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                      {DOCUMENT_TYPES.map((doc) => {
-                        const checked = field.value?.includes(doc) ?? false;
-                        return (
-                          <label
-                            key={doc}
-                            className="flex items-center gap-3 px-4 py-3 border border-[var(--color-border-light)] rounded-sm cursor-pointer hover:border-[var(--color-gold)] transition-colors has-checked:border-[var(--color-gold)] has-checked:bg-[var(--color-gold)]/5"
-                          >
-                            <input
-                              type="checkbox"
-                              checked={checked}
-                              onChange={(e) => {
-                                const next = e.target.checked
-                                  ? [...(field.value ?? []), doc]
-                                  : (field.value ?? []).filter(
-                                      (v) => v !== doc,
-                                    );
-                                field.onChange(next);
-                              }}
-                              className="accent-[var(--color-gold)] h-4 w-4"
-                            />
-                            <span className="text-sm">{doc}</span>
-                          </label>
-                        );
-                      })}
-                    </div>
-                  )}
-                />
-                {errors.documentTypes && (
-                  <p className={errorBase}>
-                    {errors.documentTypes.message as string}
-                  </p>
-                )}
-              </fieldset>
-
-              <div className="mt-6">
-                <label htmlFor="otherDocuments" className={labelBase}>
-                  Please describe what documents you need prepared
-                </label>
-                <textarea
-                  id="otherDocuments"
-                  rows={4}
-                  {...register("otherDocuments")}
-                  className={inputBase}
-                  placeholder="Optional — add detail if you chose Other or want to give context."
-                />
-              </div>
-
-              <fieldset className="mt-6">
-                <legend className={labelBase}>
-                  Have you already started any paperwork?{" "}
-                  <span className="text-red-600">*</span>
-                </legend>
-                <div className="flex flex-wrap gap-3 mt-1">
-                  {(["Yes", "No", "Not Sure"] as const).map((opt) => (
-                    <label
-                      key={opt}
-                      className="inline-flex items-center gap-2 px-4 py-2.5 border border-[var(--color-border-light)] rounded-sm cursor-pointer hover:border-[var(--color-gold)] transition-colors has-checked:border-[var(--color-gold)] has-checked:bg-[var(--color-gold)]/5"
-                    >
+                <div className="grid grid-cols-1 gap-2.5">
+                  {PRIMARY_SERVICES.map((svc) => (
+                    <label key={svc} className={checkCard}>
                       <input
                         type="radio"
-                        value={opt}
-                        {...register("hasStartedPaperwork")}
-                        className="accent-[var(--color-gold)]"
+                        value={svc}
+                        {...register("primaryService")}
+                        className="accent-[var(--color-gold)] h-4 w-4"
                       />
-                      <span className="text-sm">{opt}</span>
+                      <span className="text-sm">{svc}</span>
                     </label>
                   ))}
                 </div>
-                {errors.hasStartedPaperwork && (
-                  <p className={errorBase}>
-                    {errors.hasStartedPaperwork.message}
-                  </p>
+                {errors.primaryService && (
+                  <p className={errorBase}>{errors.primaryService.message}</p>
                 )}
               </fieldset>
 
-              <fieldset className="mt-6">
-                <legend className={labelBase}>
-                  Do you have a deadline or court date?{" "}
-                  <span className="text-red-600">*</span>
-                </legend>
-                <div className="flex flex-wrap gap-3 mt-1">
-                  {(["Yes", "No"] as const).map((opt) => (
-                    <label
-                      key={opt}
-                      className="inline-flex items-center gap-2 px-4 py-2.5 border border-[var(--color-border-light)] rounded-sm cursor-pointer hover:border-[var(--color-gold)] transition-colors has-checked:border-[var(--color-gold)] has-checked:bg-[var(--color-gold)]/5"
-                    >
-                      <input
-                        type="radio"
-                        value={opt}
-                        {...register("hasDeadline")}
-                        className="accent-[var(--color-gold)]"
-                      />
-                      <span className="text-sm">{opt}</span>
-                    </label>
-                  ))}
-                </div>
-                {errors.hasDeadline && (
-                  <p className={errorBase}>{errors.hasDeadline.message}</p>
-                )}
-              </fieldset>
+              <RadioGroup
+                legend="Do you need help with more than one of the above?"
+                required
+                error={errors.needsMoreServices?.message}
+                options={["Yes", "No"]}
+                name="needsMoreServices"
+                register={register}
+                className="mt-6"
+              />
 
-              {hasDeadline === "Yes" && (
-                <div className="mt-6">
-                  <label htmlFor="deadlineDate" className={labelBase}>
-                    What is your deadline or court date?
-                  </label>
-                  <input
-                    id="deadlineDate"
-                    type="date"
-                    {...register("deadlineDate")}
-                    className={inputBase}
+              {needsMoreServices === "Yes" && (
+                <fieldset className="mt-6">
+                  <legend className={labelBase}>
+                    Additional services <Req />
+                  </legend>
+                  <Controller
+                    control={control}
+                    name="additionalServices"
+                    render={({ field }) => (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        {PRIMARY_SERVICES.filter(
+                          (s) => s !== primaryService,
+                        ).map((svc) => {
+                          const checked = field.value?.includes(svc) ?? false;
+                          return (
+                            <label key={svc} className={checkCard}>
+                              <input
+                                type="checkbox"
+                                checked={checked}
+                                onChange={(e) => {
+                                  const next = e.target.checked
+                                    ? [...(field.value ?? []), svc]
+                                    : (field.value ?? []).filter(
+                                        (v) => v !== svc,
+                                      );
+                                  field.onChange(next);
+                                }}
+                                className="accent-[var(--color-gold)] h-4 w-4"
+                              />
+                              <span className="text-sm">{svc}</span>
+                            </label>
+                          );
+                        })}
+                      </div>
+                    )}
                   />
-                </div>
+                  {errors.additionalServices && (
+                    <p className={errorBase}>
+                      {errors.additionalServices.message as string}
+                    </p>
+                  )}
+                </fieldset>
               )}
-            </motion.div>
+            </StepWrap>
           )}
 
           {step === 2 && (
-            <motion.div
-              key="step-2"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.25 }}
-            >
-              <h2 className="font-serif text-2xl md:text-3xl text-[var(--color-navy)] mb-1">
-                Your Situation
-              </h2>
-              <p className="text-[var(--color-body-dark)] opacity-80 mb-8">
-                A few details about your matter help us prepare a fast,
-                accurate response.
-              </p>
+            <StepWrap key="step-2">
+              <StepHeader
+                title="Service Details"
+                subtitle="A few specifics so we can quote and prepare accurately."
+              />
+              <BranchFields
+                service={primaryService}
+                register={register}
+                control={control}
+                watch={watch}
+                errors={errors}
+              />
+            </StepWrap>
+          )}
+
+          {step === 3 && (
+            <StepWrap key="step-3">
+              <StepHeader
+                title="General Information"
+                subtitle="A few last details to round out your intake."
+              />
 
               <div>
-                <label htmlFor="filingCounty" className={labelBase}>
-                  County where documents will be filed{" "}
-                  <span className="text-red-600">*</span>
+                <label htmlFor="clientCounty" className={labelBase}>
+                  What county are you located in? <Req />
                 </label>
                 <select
-                  id="filingCounty"
-                  {...register("filingCounty")}
+                  id="clientCounty"
+                  {...register("clientCounty")}
                   className={inputBase}
                   defaultValue=""
                 >
@@ -560,43 +938,14 @@ export function IntakeForm() {
                     </option>
                   ))}
                 </select>
-                {errors.filingCounty && (
-                  <p className={errorBase}>{errors.filingCounty.message}</p>
+                {errors.clientCounty && (
+                  <p className={errorBase}>{errors.clientCounty.message}</p>
                 )}
               </div>
 
-              <fieldset className="mt-6">
-                <legend className={labelBase}>
-                  Are you working with any other professionals on this matter?{" "}
-                  <span className="text-red-600">*</span>
-                </legend>
-                <div className="flex flex-wrap gap-3 mt-1">
-                  {(["Yes", "No", "Not Sure"] as const).map((opt) => (
-                    <label
-                      key={opt}
-                      className="inline-flex items-center gap-2 px-4 py-2.5 border border-[var(--color-border-light)] rounded-sm cursor-pointer hover:border-[var(--color-gold)] transition-colors has-checked:border-[var(--color-gold)] has-checked:bg-[var(--color-gold)]/5"
-                    >
-                      <input
-                        type="radio"
-                        value={opt}
-                        {...register("workingWithOthers")}
-                        className="accent-[var(--color-gold)]"
-                      />
-                      <span className="text-sm">{opt}</span>
-                    </label>
-                  ))}
-                </div>
-                {errors.workingWithOthers && (
-                  <p className={errorBase}>
-                    {errors.workingWithOthers.message}
-                  </p>
-                )}
-              </fieldset>
-
               <div className="mt-6">
                 <label htmlFor="referralSource" className={labelBase}>
-                  How did you hear about us?{" "}
-                  <span className="text-red-600">*</span>
+                  How did you hear about us? <Req />
                 </label>
                 <select
                   id="referralSource"
@@ -621,19 +970,22 @@ export function IntakeForm() {
               {referralSource === "Referral" && (
                 <div className="mt-6">
                   <label htmlFor="referralName" className={labelBase}>
-                    Who referred you?
+                    Who referred you? <Req />
                   </label>
                   <input
                     id="referralName"
                     {...register("referralName")}
                     className={inputBase}
                   />
+                  {errors.referralName && (
+                    <p className={errorBase}>{errors.referralName.message}</p>
+                  )}
                 </div>
               )}
 
               <div className="mt-6">
                 <label htmlFor="additionalNotes" className={labelBase}>
-                  Anything else you&apos;d like us to know about your situation?
+                  Is there anything else you&apos;d like us to know?
                 </label>
                 <textarea
                   id="additionalNotes"
@@ -643,24 +995,15 @@ export function IntakeForm() {
                   placeholder="Optional — share any background that will help us serve you."
                 />
               </div>
-            </motion.div>
+            </StepWrap>
           )}
 
-          {step === 3 && (
-            <motion.div
-              key="step-3"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-              transition={{ duration: 0.25 }}
-            >
-              <h2 className="font-serif text-2xl md:text-3xl text-[var(--color-navy)] mb-1">
-                Review &amp; Confirm
-              </h2>
-              <p className="text-[var(--color-body-dark)] opacity-80 mb-8">
-                Quick review of what you&apos;ve told us, then two
-                acknowledgments before you submit.
-              </p>
+          {step === 4 && (
+            <StepWrap key="step-4">
+              <StepHeader
+                title="Review & Confirm"
+                subtitle="Quick review of what you've told us, then two acknowledgments before you submit."
+              />
 
               <ReviewSummary data={getValues()} />
 
@@ -674,8 +1017,7 @@ export function IntakeForm() {
                   <span className="text-sm text-[var(--color-body-dark)] leading-relaxed">
                     I understand that {BUSINESS.name} is not a law firm and does
                     not provide legal advice or legal representation. I am
-                    directing the preparation of my own documents.{" "}
-                    <span className="text-red-600">*</span>
+                    directing the preparation of my own documents. <Req />
                   </span>
                 </label>
                 {errors.consentLDA && (
@@ -690,7 +1032,7 @@ export function IntakeForm() {
                   />
                   <span className="text-sm text-[var(--color-body-dark)] leading-relaxed">
                     I consent to be contacted by phone, email, or text regarding
-                    my inquiry. <span className="text-red-600">*</span>
+                    my inquiry. <Req />
                   </span>
                 </label>
                 {errors.consentContact && (
@@ -718,7 +1060,7 @@ export function IntakeForm() {
                   and we&apos;ll take it from there.
                 </div>
               )}
-            </motion.div>
+            </StepWrap>
           )}
         </AnimatePresence>
       </div>
@@ -775,6 +1117,875 @@ export function IntakeForm() {
   );
 }
 
+// ---------------------------------------------------------------------------
+// Small UI helpers
+// ---------------------------------------------------------------------------
+
+function Req() {
+  return <span className="text-red-600">*</span>;
+}
+
+function StepWrap({
+  children,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+}: { children: React.ReactNode } & Record<string, any>) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -20 }}
+      transition={{ duration: 0.25 }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+function StepHeader({ title, subtitle }: { title: string; subtitle: string }) {
+  return (
+    <>
+      <h2 className="font-serif text-2xl md:text-3xl text-[var(--color-navy)] mb-1">
+        {title}
+      </h2>
+      <p className="text-[var(--color-body-dark)] opacity-80 mb-8">{subtitle}</p>
+    </>
+  );
+}
+
+function Field({
+  id,
+  label,
+  required,
+  error,
+  children,
+}: {
+  id: string;
+  label: string;
+  required?: boolean;
+  error?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div>
+      <label htmlFor={id} className={labelBase}>
+        {label} {required && <Req />}
+      </label>
+      {children}
+      {error && <p className={errorBase}>{error}</p>}
+    </div>
+  );
+}
+
+type RegisterFn = ReturnType<typeof useForm<IntakeData>>["register"];
+
+function RadioGroup({
+  legend,
+  options,
+  name,
+  register,
+  required,
+  error,
+  className,
+}: {
+  legend: string;
+  options: readonly string[];
+  name: FieldName;
+  register: RegisterFn;
+  required?: boolean;
+  error?: string;
+  className?: string;
+}) {
+  return (
+    <fieldset className={className}>
+      <legend className={labelBase}>
+        {legend} {required && <Req />}
+      </legend>
+      <div className="flex flex-wrap gap-3 mt-1">
+        {options.map((opt) => (
+          <label key={opt} className={optionCard}>
+            <input
+              type="radio"
+              value={opt}
+              {...register(name)}
+              className="accent-[var(--color-gold)]"
+            />
+            <span className="text-sm">{opt}</span>
+          </label>
+        ))}
+      </div>
+      {error && <p className={errorBase}>{error}</p>}
+    </fieldset>
+  );
+}
+
+function Select({
+  id,
+  label,
+  required,
+  error,
+  options,
+  register,
+  name,
+  placeholder = "Select…",
+  className,
+}: {
+  id: string;
+  label: string;
+  required?: boolean;
+  error?: string;
+  options: readonly string[];
+  register: RegisterFn;
+  name: FieldName;
+  placeholder?: string;
+  className?: string;
+}) {
+  return (
+    <div className={className}>
+      <label htmlFor={id} className={labelBase}>
+        {label} {required && <Req />}
+      </label>
+      <select
+        id={id}
+        {...register(name)}
+        className={inputBase}
+        defaultValue=""
+      >
+        <option value="" disabled>
+          {placeholder}
+        </option>
+        {options.map((o) => (
+          <option key={o} value={o}>
+            {o}
+          </option>
+        ))}
+      </select>
+      {error && <p className={errorBase}>{error}</p>}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Branch fields
+// ---------------------------------------------------------------------------
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type BranchProps = {
+  service: IntakeData["primaryService"] | undefined;
+  register: RegisterFn;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  control: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  watch: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  errors: any;
+};
+
+function BranchFields({
+  service,
+  register,
+  control,
+  watch,
+  errors,
+}: BranchProps) {
+  if (!service) {
+    return (
+      <p className="text-sm text-[var(--color-body-dark)] opacity-70">
+        Please select a service on the previous step.
+      </p>
+    );
+  }
+
+  switch (service) {
+    case "Divorce & Family Law Documents":
+      return (
+        <DivorceBranch register={register} watch={watch} errors={errors} />
+      );
+    case "Eviction (Unlawful Detainer) Paperwork":
+      return (
+        <EvictionBranch register={register} watch={watch} errors={errors} />
+      );
+    case "Immigration Documents":
+      return (
+        <ImmigrationBranch
+          register={register}
+          control={control}
+          watch={watch}
+          errors={errors}
+        />
+      );
+    case "Living Trust Documents":
+      return (
+        <TrustBranch register={register} watch={watch} errors={errors} />
+      );
+    case "Power of Attorney":
+      return (
+        <PoaBranch
+          register={register}
+          control={control}
+          watch={watch}
+          errors={errors}
+        />
+      );
+    case "DMV Form Assistance":
+      return (
+        <DmvBranch
+          register={register}
+          control={control}
+          watch={watch}
+          errors={errors}
+        />
+      );
+    case "Tax Document Organization (Clerical)":
+      return (
+        <TaxBranch
+          register={register}
+          control={control}
+          watch={watch}
+          errors={errors}
+        />
+      );
+    case "Other / Not Sure":
+      return (
+        <OtherBranch register={register} watch={watch} errors={errors} />
+      );
+  }
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function DivorceBranch({ register, watch, errors }: any) {
+  const hasChildren = watch("divorceHasChildren");
+  return (
+    <div className="space-y-6">
+      <RadioGroup
+        legend="Is this a joint/uncontested divorce or is the other party contesting?"
+        required
+        options={[
+          "Uncontested",
+          "Contested",
+          "Not sure yet",
+        ]}
+        name="divorceType"
+        register={register}
+        error={errors.divorceType?.message}
+      />
+      <RadioGroup
+        legend="Do you and your spouse have minor children together?"
+        required
+        options={["Yes", "No"]}
+        name="divorceHasChildren"
+        register={register}
+        error={errors.divorceHasChildren?.message}
+      />
+      {hasChildren === "Yes" && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <Field
+            id="divorceChildrenCount"
+            label="How many children?"
+            required
+            error={errors.divorceChildrenCount?.message}
+          >
+            <input
+              id="divorceChildrenCount"
+              type="number"
+              min={1}
+              {...register("divorceChildrenCount")}
+              className={inputBase}
+            />
+          </Field>
+          <Field
+            id="divorceChildrenAges"
+            label="Ages of children"
+            required
+            error={errors.divorceChildrenAges?.message}
+          >
+            <input
+              id="divorceChildrenAges"
+              {...register("divorceChildrenAges")}
+              className={inputBase}
+              placeholder="e.g. 5, 8, 12"
+            />
+          </Field>
+        </div>
+      )}
+      <RadioGroup
+        legend="Do you own real property together (home, land)?"
+        required
+        options={["Yes", "No", "Not sure"]}
+        name="divorceHasProperty"
+        register={register}
+        error={errors.divorceHasProperty?.message}
+      />
+      <RadioGroup
+        legend="Do you have retirement accounts, pensions, or significant assets to divide?"
+        required
+        options={["Yes", "No", "Not sure"]}
+        name="divorceHasAssets"
+        register={register}
+        error={errors.divorceHasAssets?.message}
+      />
+      <Select
+        id="divorceMarriageLength"
+        label="Approximately how long were you married?"
+        required
+        options={MARRIAGE_LENGTHS}
+        register={register}
+        name="divorceMarriageLength"
+        placeholder="Select length…"
+        error={errors.divorceMarriageLength?.message}
+      />
+      <Select
+        id="divorceFilingCounty"
+        label="What county will you be filing in?"
+        required
+        options={COUNTIES}
+        register={register}
+        name="divorceFilingCounty"
+        placeholder="Select county…"
+        error={errors.divorceFilingCounty?.message}
+      />
+      <RadioGroup
+        legend="Have you already filed any paperwork with the court?"
+        required
+        options={["Yes", "No"]}
+        name="divorceFiledPaperwork"
+        register={register}
+        error={errors.divorceFiledPaperwork?.message}
+      />
+    </div>
+  );
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function EvictionBranch({ register, watch, errors }: any) {
+  const noticeServed = watch("evictionNoticeServed");
+  return (
+    <div className="space-y-6">
+      <RadioGroup
+        legend="Are you the landlord or the tenant?"
+        required
+        options={["Landlord", "Tenant"]}
+        name="evictionParty"
+        register={register}
+        error={errors.evictionParty?.message}
+      />
+      <RadioGroup
+        legend="Is this a residential or commercial property?"
+        required
+        options={["Residential", "Commercial"]}
+        name="evictionPropertyType"
+        register={register}
+        error={errors.evictionPropertyType?.message}
+      />
+      <Select
+        id="evictionReason"
+        label="What is the reason for the eviction?"
+        required
+        options={EVICTION_REASONS}
+        register={register}
+        name="evictionReason"
+        placeholder="Select reason…"
+        error={errors.evictionReason?.message}
+      />
+      <RadioGroup
+        legend="Has a written notice already been served to the tenant?"
+        required
+        options={["Yes", "No"]}
+        name="evictionNoticeServed"
+        register={register}
+        error={errors.evictionNoticeServed?.message}
+      />
+      {noticeServed === "Yes" && (
+        <>
+          <Select
+            id="evictionNoticeType"
+            label="What type of notice?"
+            required
+            options={NOTICE_TYPES}
+            register={register}
+            name="evictionNoticeType"
+            placeholder="Select notice type…"
+            error={errors.evictionNoticeType?.message}
+          />
+          <Field
+            id="evictionNoticeDate"
+            label="Date the notice was served"
+            required
+            error={errors.evictionNoticeDate?.message}
+          >
+            <input
+              id="evictionNoticeDate"
+              type="date"
+              {...register("evictionNoticeDate")}
+              className={inputBase}
+            />
+          </Field>
+        </>
+      )}
+      <Select
+        id="evictionCounty"
+        label="What county is the property located in?"
+        required
+        options={COUNTIES}
+        register={register}
+        name="evictionCounty"
+        placeholder="Select county…"
+        error={errors.evictionCounty?.message}
+      />
+      <RadioGroup
+        legend="Has the tenant already vacated?"
+        required
+        options={["Yes", "No", "Partially"]}
+        name="evictionTenantVacated"
+        register={register}
+        error={errors.evictionTenantVacated?.message}
+      />
+      <Select
+        id="evictionRent"
+        label="Approximate monthly rent amount"
+        required
+        options={RENT_RANGES}
+        register={register}
+        name="evictionRent"
+        placeholder="Select range…"
+        error={errors.evictionRent?.message}
+      />
+    </div>
+  );
+}
+
+function CheckboxGrid({
+  legend,
+  options,
+  name,
+  control,
+  required,
+  error,
+}: {
+  legend: string;
+  options: readonly string[];
+  name: FieldName;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  control: any;
+  required?: boolean;
+  error?: string;
+}) {
+  return (
+    <fieldset>
+      <legend className={labelBase}>
+        {legend} {required && <Req />}
+      </legend>
+      <Controller
+        control={control}
+        name={name}
+        render={({ field }) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            {options.map((opt) => {
+              const value: string[] = Array.isArray(field.value)
+                ? field.value
+                : [];
+              const checked = value.includes(opt);
+              return (
+                <label key={opt} className={checkCard}>
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={(e) => {
+                      const next = e.target.checked
+                        ? [...value, opt]
+                        : value.filter((v) => v !== opt);
+                      field.onChange(next);
+                    }}
+                    className="accent-[var(--color-gold)] h-4 w-4"
+                  />
+                  <span className="text-sm">{opt}</span>
+                </label>
+              );
+            })}
+          </div>
+        )}
+      />
+      {error && <p className={errorBase}>{error}</p>}
+    </fieldset>
+  );
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function ImmigrationBranch({ register, control, watch, errors }: any) {
+  const hasDeadline = watch("immigrationHasDeadline");
+  const forms: string[] = watch("immigrationForms") ?? [];
+  const showOther = forms.includes("Other / Not Sure");
+  return (
+    <div className="space-y-6">
+      <CheckboxGrid
+        legend="What type of immigration form do you need help preparing?"
+        required
+        options={IMMIGRATION_FORM_OPTIONS}
+        name="immigrationForms"
+        control={control}
+        error={errors.immigrationForms?.message as string | undefined}
+      />
+      {showOther && (
+        <Field
+          id="immigrationFormsOther"
+          label="Please describe which other form(s)"
+          error={errors.immigrationFormsOther?.message}
+        >
+          <textarea
+            id="immigrationFormsOther"
+            rows={3}
+            {...register("immigrationFormsOther")}
+            className={inputBase}
+          />
+        </Field>
+      )}
+      <RadioGroup
+        legend="Is this application for yourself or a family member?"
+        required
+        options={["Myself", "Family member", "Both"]}
+        name="immigrationForWhom"
+        register={register}
+        error={errors.immigrationForWhom?.message}
+      />
+      <Select
+        id="immigrationStatus"
+        label="What is your current immigration status?"
+        required
+        options={IMMIGRATION_STATUSES}
+        register={register}
+        name="immigrationStatus"
+        placeholder="Select status…"
+        error={errors.immigrationStatus?.message}
+      />
+      <RadioGroup
+        legend="Do you have a filing deadline or appointment date?"
+        required
+        options={["Yes", "No"]}
+        name="immigrationHasDeadline"
+        register={register}
+        error={errors.immigrationHasDeadline?.message}
+      />
+      {hasDeadline === "Yes" && (
+        <Field
+          id="immigrationDeadlineDate"
+          label="What is the date?"
+          required
+          error={errors.immigrationDeadlineDate?.message}
+        >
+          <input
+            id="immigrationDeadlineDate"
+            type="date"
+            {...register("immigrationDeadlineDate")}
+            className={inputBase}
+          />
+        </Field>
+      )}
+      <RadioGroup
+        legend="Have you previously filed any immigration forms?"
+        required
+        options={["Yes", "No", "Not sure"]}
+        name="immigrationPreviouslyFiled"
+        register={register}
+        error={errors.immigrationPreviouslyFiled?.message}
+      />
+    </div>
+  );
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function TrustBranch({ register, watch, errors }: any) {
+  const ownsProperty = watch("trustOwnsProperty");
+  return (
+    <div className="space-y-6">
+      <RadioGroup
+        legend="Is this trust for an individual or a couple?"
+        required
+        options={["Individual", "Married couple"]}
+        name="trustType"
+        register={register}
+        error={errors.trustType?.message}
+      />
+      <RadioGroup
+        legend="Do you have minor children or grandchildren you want to include as beneficiaries?"
+        required
+        options={["Yes", "No"]}
+        name="trustHasMinors"
+        register={register}
+        error={errors.trustHasMinors?.message}
+      />
+      <RadioGroup
+        legend="Do you own real property (home, land, rental property)?"
+        required
+        options={["Yes", "No"]}
+        name="trustOwnsProperty"
+        register={register}
+        error={errors.trustOwnsProperty?.message}
+      />
+      {ownsProperty === "Yes" && (
+        <Field
+          id="trustPropertyCount"
+          label="How many properties?"
+          required
+          error={errors.trustPropertyCount?.message}
+        >
+          <input
+            id="trustPropertyCount"
+            type="number"
+            min={1}
+            {...register("trustPropertyCount")}
+            className={inputBase}
+          />
+        </Field>
+      )}
+      <RadioGroup
+        legend="Do you have significant financial accounts or assets to include?"
+        required
+        options={["Yes", "No", "Not sure"]}
+        name="trustHasAssets"
+        register={register}
+        error={errors.trustHasAssets?.message}
+      />
+      <RadioGroup
+        legend="Do you already have a will or existing estate planning documents?"
+        required
+        options={["Yes", "No", "Not sure"]}
+        name="trustExistingDocs"
+        register={register}
+        error={errors.trustExistingDocs?.message}
+      />
+      <RadioGroup
+        legend="Who would you like to name as your successor trustee?"
+        required
+        options={TRUST_SUCCESSOR_OPTIONS}
+        name="trustSuccessor"
+        register={register}
+        error={errors.trustSuccessor?.message}
+      />
+    </div>
+  );
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function PoaBranch({ register, control, watch, errors }: any) {
+  const hasReason = watch("poaHasReason");
+  return (
+    <div className="space-y-6">
+      <CheckboxGrid
+        legend="What type of Power of Attorney do you need?"
+        required
+        options={POA_TYPES}
+        name="poaTypes"
+        control={control}
+        error={errors.poaTypes?.message as string | undefined}
+      />
+      <RadioGroup
+        legend="Who will be the agent (the person given authority)?"
+        required
+        options={AGENT_OPTIONS}
+        name="poaAgent"
+        register={register}
+        error={errors.poaAgent?.message}
+      />
+      <RadioGroup
+        legend="Is there a specific reason or deadline for needing this document?"
+        required
+        options={["Yes", "No"]}
+        name="poaHasReason"
+        register={register}
+        error={errors.poaHasReason?.message}
+      />
+      {hasReason === "Yes" && (
+        <Field
+          id="poaReason"
+          label="Please describe"
+          required
+          error={errors.poaReason?.message}
+        >
+          <textarea
+            id="poaReason"
+            rows={3}
+            {...register("poaReason")}
+            className={inputBase}
+            placeholder='e.g. "upcoming surgery", "traveling abroad"'
+          />
+        </Field>
+      )}
+      <RadioGroup
+        legend="Do you need this document notarized?"
+        required
+        options={["Yes", "No", "Not sure"]}
+        name="poaNotarize"
+        register={register}
+        error={errors.poaNotarize?.message}
+      />
+    </div>
+  );
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function DmvBranch({ register, control, watch, errors }: any) {
+  const hasAppt = watch("dmvHasAppointment");
+  return (
+    <div className="space-y-6">
+      <CheckboxGrid
+        legend="What type of DMV form do you need help completing?"
+        required
+        options={DMV_FORM_OPTIONS}
+        name="dmvFormTypes"
+        control={control}
+        error={errors.dmvFormTypes?.message as string | undefined}
+      />
+      <RadioGroup
+        legend="Do you have a DMV appointment scheduled?"
+        required
+        options={["Yes", "No"]}
+        name="dmvHasAppointment"
+        register={register}
+        error={errors.dmvHasAppointment?.message}
+      />
+      {hasAppt === "Yes" && (
+        <Field
+          id="dmvAppointmentDate"
+          label="What is the appointment date?"
+          required
+          error={errors.dmvAppointmentDate?.message}
+        >
+          <input
+            id="dmvAppointmentDate"
+            type="date"
+            {...register("dmvAppointmentDate")}
+            className={inputBase}
+          />
+        </Field>
+      )}
+      <Field
+        id="dmvDetails"
+        label="Additional details about what you need"
+        error={errors.dmvDetails?.message}
+      >
+        <textarea
+          id="dmvDetails"
+          rows={4}
+          {...register("dmvDetails")}
+          className={inputBase}
+          placeholder="Optional"
+        />
+      </Field>
+    </div>
+  );
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function TaxBranch({ register, control, watch, errors }: any) {
+  const hasDeadline = watch("taxHasDeadline");
+  return (
+    <div className="space-y-6">
+      <CheckboxGrid
+        legend="What type of tax document assistance do you need?"
+        required
+        options={TAX_TYPE_OPTIONS}
+        name="taxTypes"
+        control={control}
+        error={errors.taxTypes?.message as string | undefined}
+      />
+      <Select
+        id="taxYear"
+        label="What tax year(s) are involved?"
+        required
+        options={TAX_YEARS}
+        register={register}
+        name="taxYear"
+        placeholder="Select year…"
+        error={errors.taxYear?.message}
+      />
+      <RadioGroup
+        legend="Do you have a filing deadline?"
+        required
+        options={["Yes", "No"]}
+        name="taxHasDeadline"
+        register={register}
+        error={errors.taxHasDeadline?.message}
+      />
+      {hasDeadline === "Yes" && (
+        <Field
+          id="taxDeadlineDate"
+          label="What is the deadline?"
+          required
+          error={errors.taxDeadlineDate?.message}
+        >
+          <input
+            id="taxDeadlineDate"
+            type="date"
+            {...register("taxDeadlineDate")}
+            className={inputBase}
+          />
+        </Field>
+      )}
+      <Field
+        id="taxNotes"
+        label="Additional notes"
+        error={errors.taxNotes?.message}
+      >
+        <textarea
+          id="taxNotes"
+          rows={4}
+          {...register("taxNotes")}
+          className={inputBase}
+          placeholder="Optional"
+        />
+      </Field>
+    </div>
+  );
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function OtherBranch({ register, watch, errors }: any) {
+  const hasDeadline = watch("otherHasDeadline");
+  return (
+    <div className="space-y-6">
+      <Field
+        id="otherDescription"
+        label="Please describe what documents you need help preparing"
+        required
+        error={errors.otherDescription?.message}
+      >
+        <textarea
+          id="otherDescription"
+          rows={5}
+          {...register("otherDescription")}
+          className={inputBase}
+        />
+      </Field>
+      <RadioGroup
+        legend="Do you have a deadline or court date?"
+        required
+        options={["Yes", "No"]}
+        name="otherHasDeadline"
+        register={register}
+        error={errors.otherHasDeadline?.message}
+      />
+      {hasDeadline === "Yes" && (
+        <Field
+          id="otherDeadlineDate"
+          label="What is the date?"
+          required
+          error={errors.otherDeadlineDate?.message}
+        >
+          <input
+            id="otherDeadlineDate"
+            type="date"
+            {...register("otherDeadlineDate")}
+            className={inputBase}
+          />
+        </Field>
+      )}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Review summary
+// ---------------------------------------------------------------------------
+
 function ReviewSummary({ data }: { data: Partial<IntakeData> }) {
   const rows: Array<[string, string | undefined]> = [
     ["Name", [data.firstName, data.lastName].filter(Boolean).join(" ")],
@@ -785,17 +1996,99 @@ function ReviewSummary({ data }: { data: Partial<IntakeData> }) {
       "Best time",
       data.bestTime === "LateAfternoon" ? "Late Afternoon" : data.bestTime,
     ],
-    ["Documents needed", data.documentTypes?.join(", ")],
-    ["Other / details", data.otherDocuments],
-    ["Started paperwork", data.hasStartedPaperwork],
+    ["Primary service", data.primaryService],
+    [
+      "Additional services",
+      data.needsMoreServices === "Yes"
+        ? data.additionalServices?.join(", ")
+        : undefined,
+    ],
+
+    // Divorce
+    ["Divorce type", data.divorceType],
+    ["Minor children", data.divorceHasChildren],
+    ["Number of children", data.divorceChildrenCount],
+    ["Ages of children", data.divorceChildrenAges],
+    ["Real property", data.divorceHasProperty],
+    ["Significant assets", data.divorceHasAssets],
+    ["Marriage length", data.divorceMarriageLength],
+    ["Filing county", data.divorceFilingCounty],
+    ["Already filed", data.divorceFiledPaperwork],
+
+    // Eviction
+    ["Party", data.evictionParty],
+    ["Property type", data.evictionPropertyType],
+    ["Eviction reason", data.evictionReason],
+    ["Notice served", data.evictionNoticeServed],
+    ["Notice type", data.evictionNoticeType],
+    ["Notice date", data.evictionNoticeDate],
+    ["Property county", data.evictionCounty],
+    ["Tenant vacated", data.evictionTenantVacated],
+    ["Monthly rent", data.evictionRent],
+
+    // Immigration
+    ["Immigration forms", data.immigrationForms?.join(", ")],
+    ["Other forms detail", data.immigrationFormsOther],
+    ["Application for", data.immigrationForWhom],
+    ["Immigration status", data.immigrationStatus],
     [
       "Deadline",
-      data.hasDeadline === "Yes"
-        ? data.deadlineDate || "Yes (date not provided)"
-        : data.hasDeadline,
+      data.immigrationHasDeadline === "Yes"
+        ? data.immigrationDeadlineDate || "Yes"
+        : data.immigrationHasDeadline,
     ],
-    ["Filing county", data.filingCounty],
-    ["Working with others", data.workingWithOthers],
+    ["Previously filed", data.immigrationPreviouslyFiled],
+
+    // Trust
+    ["Trust for", data.trustType],
+    ["Minor beneficiaries", data.trustHasMinors],
+    ["Owns real property", data.trustOwnsProperty],
+    ["Number of properties", data.trustPropertyCount],
+    ["Significant assets", data.trustHasAssets],
+    ["Existing estate docs", data.trustExistingDocs],
+    ["Successor trustee", data.trustSuccessor],
+
+    // POA
+    ["POA types", data.poaTypes?.join(", ")],
+    ["POA agent", data.poaAgent],
+    [
+      "POA reason",
+      data.poaHasReason === "Yes" ? data.poaReason || "Yes" : data.poaHasReason,
+    ],
+    ["Notarize", data.poaNotarize],
+
+    // DMV
+    ["DMV forms", data.dmvFormTypes?.join(", ")],
+    [
+      "DMV appointment",
+      data.dmvHasAppointment === "Yes"
+        ? data.dmvAppointmentDate || "Yes"
+        : data.dmvHasAppointment,
+    ],
+    ["DMV details", data.dmvDetails],
+
+    // Tax
+    ["Tax assistance", data.taxTypes?.join(", ")],
+    ["Tax year", data.taxYear],
+    [
+      "Tax deadline",
+      data.taxHasDeadline === "Yes"
+        ? data.taxDeadlineDate || "Yes"
+        : data.taxHasDeadline,
+    ],
+    ["Tax notes", data.taxNotes],
+
+    // Other
+    ["Description", data.otherDescription],
+    [
+      "Deadline",
+      data.otherHasDeadline === "Yes"
+        ? data.otherDeadlineDate || "Yes"
+        : data.otherHasDeadline,
+    ],
+
+    // General
+    ["Your county", data.clientCounty],
     ["Heard about us via", data.referralSource],
     ["Referred by", data.referralName],
     ["Additional notes", data.additionalNotes],

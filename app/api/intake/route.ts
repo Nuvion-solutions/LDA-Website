@@ -5,22 +5,91 @@
 export const dynamic = "force-dynamic";
 
 type IntakeBody = {
+  // Step 1
   firstName?: string;
   lastName?: string;
   phone?: string;
   email?: string;
   contactMethod?: string;
   bestTime?: string;
-  documentTypes?: string[];
-  otherDocuments?: string;
-  hasStartedPaperwork?: string;
-  hasDeadline?: string;
-  deadlineDate?: string;
-  filingCounty?: string;
-  workingWithOthers?: string;
+
+  // Step 2
+  primaryService?: string;
+  needsMoreServices?: string;
+  additionalServices?: string[];
+
+  // Step 3 — Divorce
+  divorceType?: string;
+  divorceHasChildren?: string;
+  divorceChildrenCount?: string;
+  divorceChildrenAges?: string;
+  divorceHasProperty?: string;
+  divorceHasAssets?: string;
+  divorceMarriageLength?: string;
+  divorceFilingCounty?: string;
+  divorceFiledPaperwork?: string;
+
+  // Step 3 — Eviction
+  evictionParty?: string;
+  evictionPropertyType?: string;
+  evictionReason?: string;
+  evictionNoticeServed?: string;
+  evictionNoticeType?: string;
+  evictionNoticeDate?: string;
+  evictionCounty?: string;
+  evictionTenantVacated?: string;
+  evictionRent?: string;
+
+  // Step 3 — Immigration
+  immigrationForms?: string[];
+  immigrationFormsOther?: string;
+  immigrationForWhom?: string;
+  immigrationStatus?: string;
+  immigrationHasDeadline?: string;
+  immigrationDeadlineDate?: string;
+  immigrationPreviouslyFiled?: string;
+
+  // Step 3 — Living Trust
+  trustType?: string;
+  trustHasMinors?: string;
+  trustOwnsProperty?: string;
+  trustPropertyCount?: string;
+  trustHasAssets?: string;
+  trustExistingDocs?: string;
+  trustSuccessor?: string;
+
+  // Step 3 — POA
+  poaTypes?: string[];
+  poaAgent?: string;
+  poaHasReason?: string;
+  poaReason?: string;
+  poaNotarize?: string;
+
+  // Step 3 — DMV
+  dmvFormTypes?: string[];
+  dmvHasAppointment?: string;
+  dmvAppointmentDate?: string;
+  dmvDetails?: string;
+
+  // Step 3 — Tax
+  taxTypes?: string[];
+  taxYear?: string;
+  taxHasDeadline?: string;
+  taxDeadlineDate?: string;
+  taxNotes?: string;
+
+  // Step 3 — Other
+  otherDescription?: string;
+  otherHasDeadline?: string;
+  otherDeadlineDate?: string;
+
+  // Step 4
+  clientCounty?: string;
   referralSource?: string;
   referralName?: string;
   additionalNotes?: string;
+
+  // Step 5
   consentLDA?: boolean;
   consentContact?: boolean;
 };
@@ -46,8 +115,8 @@ export async function POST(req: Request) {
       lastName: data.lastName,
       email: data.email,
       phone: data.phone,
-      documentTypes: data.documentTypes,
-      filingCounty: data.filingCounty,
+      primaryService: data.primaryService,
+      clientCounty: data.clientCounty,
     });
     return Response.json({ success: true, mode: "local" });
   }
@@ -59,30 +128,91 @@ export async function POST(req: Request) {
     email: data.email,
     contactMethod: data.contactMethod,
     bestTime: data.bestTime,
-    documentTypes: data.documentTypes?.join(", "),
-    otherDocuments: data.otherDocuments,
-    hasStartedPaperwork: data.hasStartedPaperwork,
-    hasDeadline: data.hasDeadline,
-    deadlineDate: data.deadlineDate,
-    filingCounty: data.filingCounty,
-    workingWithOthers: data.workingWithOthers,
-    referralSource: data.referralSource,
-    referralName: data.referralName,
-    additionalNotes: data.additionalNotes,
+    primaryService: data.primaryService,
+    additionalServices: data.additionalServices?.join(", "),
     consentLDA: data.consentLDA,
     consentContact: data.consentContact,
     source: "Website Intake Form",
     tags: [
       "website-lead",
       "intake-form",
-      data.documentTypes?.[0] ?? "general",
+      data.primaryService ?? "general",
     ],
     customFields: {
-      lda_document_types: data.documentTypes?.join(", "),
-      lda_filing_county: data.filingCounty,
-      lda_has_deadline: data.hasDeadline,
-      lda_deadline_date: data.deadlineDate,
-      lda_referral_source: data.referralSource,
+      // Primary
+      lda_primary_service: data.primaryService,
+      lda_additional_services: data.additionalServices?.join(", "),
+
+      // Divorce
+      lda_divorce_type: data.divorceType,
+      lda_has_children: data.divorceHasChildren,
+      lda_children_count: data.divorceChildrenCount,
+      lda_children_ages: data.divorceChildrenAges,
+      lda_has_property: data.divorceHasProperty,
+      lda_has_assets: data.divorceHasAssets,
+      lda_marriage_length: data.divorceMarriageLength,
+      lda_filing_county: data.divorceFilingCounty,
+      lda_filed_paperwork: data.divorceFiledPaperwork,
+
+      // Eviction
+      lda_eviction_party: data.evictionParty,
+      lda_property_type: data.evictionPropertyType,
+      lda_eviction_reason: data.evictionReason,
+      lda_notice_served: data.evictionNoticeServed,
+      lda_notice_type: data.evictionNoticeType,
+      lda_notice_date: data.evictionNoticeDate,
+      lda_eviction_county: data.evictionCounty,
+      lda_tenant_vacated: data.evictionTenantVacated,
+      lda_monthly_rent: data.evictionRent,
+
+      // Immigration
+      lda_immigration_forms: data.immigrationForms?.join(", "),
+      lda_immigration_forms_other: data.immigrationFormsOther,
+      lda_immigration_for_whom: data.immigrationForWhom,
+      lda_immigration_status: data.immigrationStatus,
+      lda_immigration_deadline: data.immigrationHasDeadline,
+      lda_immigration_deadline_date: data.immigrationDeadlineDate,
+      lda_immigration_previously_filed: data.immigrationPreviouslyFiled,
+
+      // Living Trust
+      lda_trust_type: data.trustType,
+      lda_has_minor_children: data.trustHasMinors,
+      lda_owns_property: data.trustOwnsProperty,
+      lda_property_count: data.trustPropertyCount,
+      lda_trust_has_assets: data.trustHasAssets,
+      lda_trust_existing_docs: data.trustExistingDocs,
+      lda_trust_successor: data.trustSuccessor,
+
+      // POA
+      lda_poa_types: data.poaTypes?.join(", "),
+      lda_poa_agent: data.poaAgent,
+      lda_poa_has_reason: data.poaHasReason,
+      lda_poa_reason: data.poaReason,
+      lda_poa_notarize: data.poaNotarize,
+
+      // DMV
+      lda_dmv_form_types: data.dmvFormTypes?.join(", "),
+      lda_dmv_has_appointment: data.dmvHasAppointment,
+      lda_dmv_appointment_date: data.dmvAppointmentDate,
+      lda_dmv_details: data.dmvDetails,
+
+      // Tax
+      lda_tax_types: data.taxTypes?.join(", "),
+      lda_tax_year: data.taxYear,
+      lda_tax_has_deadline: data.taxHasDeadline,
+      lda_tax_deadline_date: data.taxDeadlineDate,
+      lda_tax_notes: data.taxNotes,
+
+      // Other
+      lda_other_description: data.otherDescription,
+      lda_other_has_deadline: data.otherHasDeadline,
+      lda_other_deadline_date: data.otherDeadlineDate,
+
+      // General
+      lda_client_county: data.clientCounty,
+      lda_source: data.referralSource,
+      lda_referral_name: data.referralName,
+      lda_notes: data.additionalNotes,
     },
   };
 
@@ -96,8 +226,6 @@ export async function POST(req: Request) {
     return Response.json({ success: true, status: response.status });
   } catch (error) {
     console.error("[intake] GHL webhook error:", error);
-    // Don't block the user on a webhook failure — surface success so the
-    // lead is captured by the team via the local log and follow-up channels.
     return Response.json({ success: true, mode: "fallback" });
   }
 }

@@ -1,10 +1,14 @@
+"use client";
+
 import Link from "next/link";
 import { MapPin, Phone, Mail, Clock } from "lucide-react";
-import { BUSINESS, FULL_DISCLAIMER } from "@/lib/utils";
+import { BUSINESS } from "@/lib/utils";
 import { SERVICES } from "@/lib/services";
+import { useLanguage } from "@/lib/language-context";
 
 export function Footer() {
   const year = new Date().getFullYear();
+  const { t } = useLanguage();
 
   return (
     <footer className="bg-[var(--color-navy)] text-[var(--color-body-light)] border-t border-[var(--color-gold)]/30">
@@ -44,26 +48,28 @@ export function Footer() {
 
           {/* Column 2 — Quick links */}
           <div>
-            <h3 className="font-serif text-[var(--color-gold)] text-lg mb-4">Quick Links</h3>
+            <h3 className="font-serif text-[var(--color-gold)] text-lg mb-4">
+              {t("footer_col_quicklinks")}
+            </h3>
             <ul className="space-y-3 text-sm">
               <li>
                 <Link href="/services" className="hover:text-[var(--color-gold)]">
-                  Services
+                  {t("footer_link_services")}
                 </Link>
               </li>
               <li>
                 <Link href="/about" className="hover:text-[var(--color-gold)]">
-                  About
+                  {t("footer_link_about")}
                 </Link>
               </li>
               <li>
                 <Link href="/intake" className="hover:text-[var(--color-gold)]">
-                  Start Your Intake
+                  {t("footer_link_intake")}
                 </Link>
               </li>
               <li>
                 <Link href="/#faq" className="hover:text-[var(--color-gold)]">
-                  FAQ
+                  {t("footer_link_faq")}
                 </Link>
               </li>
             </ul>
@@ -71,7 +77,9 @@ export function Footer() {
 
           {/* Column 3 — Services */}
           <div>
-            <h3 className="font-serif text-[var(--color-gold)] text-lg mb-4">Services</h3>
+            <h3 className="font-serif text-[var(--color-gold)] text-lg mb-4">
+              {t("footer_col_services")}
+            </h3>
             <ul className="space-y-3 text-sm">
               {SERVICES.map((s) => (
                 <li key={s.id}>
@@ -90,7 +98,7 @@ export function Footer() {
         {/* Payments */}
         <div className="mt-12 pt-8 border-t border-[var(--color-border-dark)]">
           <p className="text-xs uppercase tracking-[0.15em] text-[var(--color-muted-light)] mb-3">
-            Payment Methods Accepted
+            {t("footer_payment_heading")}
           </p>
           <div className="flex flex-wrap gap-2">
             {["Credit / Debit", "Zelle", "Venmo"].map((p) => (
@@ -107,11 +115,13 @@ export function Footer() {
         {/* Disclaimer + copyright */}
         <div className="mt-10 pt-8 border-t border-[var(--color-border-dark)] space-y-4">
           <p className="text-xs leading-relaxed text-[var(--color-muted-light)]">
-            <strong className="text-[var(--color-gold-light)]">Important Disclosure: </strong>
-            {FULL_DISCLAIMER}
+            <strong className="text-[var(--color-gold-light)]">
+              {t("footer_disclosure_label")}{" "}
+            </strong>
+            {t("full_disclaimer")}
           </p>
           <p className="text-xs text-[var(--color-muted-light)]">
-            © {year} {BUSINESS.name}. All rights reserved. {BUSINESS.lda},{" "}
+            © {year} {BUSINESS.name}. {t("footer_rights")} {BUSINESS.lda},{" "}
             {BUSINESS.county}.
           </p>
         </div>

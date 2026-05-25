@@ -7,8 +7,22 @@ import type { Path } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
+import {
+  AlertTriangle,
+  CalendarClock,
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  Loader2,
+} from "lucide-react";
 import { BUSINESS } from "@/lib/utils";
+import {
+  getDeadlineDate,
+  daysUntil,
+} from "@/lib/urgency";
+import { SERVICE_CHECKLISTS } from "@/lib/checklists";
+import { useLanguage } from "@/lib/language-context";
+import { SERVICE_NAME_TRANSLATIONS } from "@/lib/translations";
 
 // ---------------------------------------------------------------------------
 // Options
@@ -555,10 +569,23 @@ const checkCard =
 export function IntakeForm() {
   const [step, setStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState<{ firstName: string } | null>(
-    null,
-  );
+  const [submitted, setSubmitted] = useState<{
+    firstName: string;
+    service: string;
+  } | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const { lang, t } = useLanguage();
+
+  const stepLabels = [
+    t("intake_step_1"),
+    t("intake_step_2"),
+    t("intake_step_3"),
+    t("intake_step_4"),
+    t("intake_step_5"),
+  ];
+
+  const serviceLabel = (value: string) =>
+    SERVICE_NAME_TRANSLATIONS[value]?.[lang] ?? value;
 
   const {
     register,
@@ -605,6 +632,22 @@ export function IntakeForm() {
   const needsMoreServices = watch("needsMoreServices");
   const referralSource = watch("referralSource");
 
+  // Watch all possible deadline-driving fields so the urgency banner
+  // updates live as the client fills out Step 3.
+  const watchedDeadline = {
+    primaryService,
+    immigrationHasDeadline: watch("immigrationHasDeadline"),
+    immigrationDeadlineDate: watch("immigrationDeadlineDate"),
+    dmvHasAppointment: watch("dmvHasAppointment"),
+    dmvAppointmentDate: watch("dmvAppointmentDate"),
+    taxHasDeadline: watch("taxHasDeadline"),
+    taxDeadlineDate: watch("taxDeadlineDate"),
+    otherHasDeadline: watch("otherHasDeadline"),
+    otherDeadlineDate: watch("otherDeadlineDate"),
+  };
+  const deadlineDate = getDeadlineDate(watchedDeadline);
+  const daysToDeadline = daysUntil(deadlineDate);
+
   const goNext = async () => {
     let fields: FieldName[];
     if (step === 0) fields = STEP_1_FIELDS;
@@ -635,7 +678,10 @@ export function IntakeForm() {
         body: JSON.stringify(data),
       });
       if (!res.ok) throw new Error("Submission failed");
-      setSubmitted({ firstName: data.firstName });
+      setSubmitted({
+        firstName: data.firstName,
+        service: data.primaryService,
+      });
     } catch {
       setSubmitError("network");
     } finally {
@@ -644,44 +690,73 @@ export function IntakeForm() {
   };
 
   if (submitted) {
+    const checklist =
+      SERVICE_CHECKLISTS[submitted.service] ?? SERVICE_CHECKLISTS["default"];
     return (
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white border border-[var(--color-border-light)] rounded-sm p-8 md:p-12 text-center"
       >
-        <div className="mx-auto w-20 h-20 rounded-full bg-[var(--color-gold)] flex items-center justify-center mb-6">
-          <Check
-            className="h-10 w-10 text-[var(--color-navy)]"
-            aria-hidden
-            strokeWidth={2.5}
-          />
+        <div className="bg-white border border-[var(--color-border-light)] rounded-sm p-8 md:p-12 text-center">
+          <div className="mx-auto w-20 h-20 rounded-full bg-[var(--color-gold)] flex items-center justify-center mb-6">
+            <Check
+              className="h-10 w-10 text-[var(--color-navy)]"
+              aria-hidden
+              strokeWidth={2.5}
+            />
+          </div>
+          <h2 className="font-serif text-3xl md:text-4xl text-[var(--color-navy)] mb-4">
+            {t("success_thank_you_lead")} {submitted.firstName}.{" "}
+            {t("success_thank_you_tail")}
+          </h2>
+          <p className="text-[var(--color-body-dark)] text-lg leading-relaxed max-w-2xl mx-auto mb-6">
+            {t("success_body")}
+          </p>
+          <p className="text-[var(--color-body-dark)] opacity-80">
+            {t("success_contact_lead")}{" "}
+            <a
+              href={`tel:${BUSINESS.phoneTel}`}
+              className="text-[var(--color-navy)] font-medium underline decoration-[var(--color-gold)] underline-offset-4"
+            >
+              {BUSINESS.phone}
+            </a>{" "}
+            {t("success_contact_mid")}{" "}
+            <a
+              href={`mailto:${BUSINESS.email}`}
+              className="text-[var(--color-navy)] font-medium underline decoration-[var(--color-gold)] underline-offset-4 break-all"
+            >
+              {BUSINESS.email}
+            </a>
+            .
+          </p>
         </div>
-        <h2 className="font-serif text-3xl md:text-4xl text-[var(--color-navy)] mb-4">
-          Thank you, {submitted.firstName}. Your intake has been received.
-        </h2>
-        <p className="text-[var(--color-body-dark)] text-lg leading-relaxed max-w-2xl mx-auto mb-6">
-          A member of our team will review your request and follow up within 1
-          business day with pricing, next steps, and any additional information
-          needed.
-        </p>
-        <p className="text-[var(--color-body-dark)] opacity-80">
-          Questions in the meantime? Call us at{" "}
-          <a
-            href={`tel:${BUSINESS.phoneTel}`}
-            className="text-[var(--color-navy)] font-medium underline decoration-[var(--color-gold)] underline-offset-4"
-          >
-            {BUSINESS.phone}
-          </a>{" "}
-          or email{" "}
-          <a
-            href={`mailto:${BUSINESS.email}`}
-            className="text-[var(--color-navy)] font-medium underline decoration-[var(--color-gold)] underline-offset-4 break-all"
-          >
-            {BUSINESS.email}
-          </a>
-          .
-        </p>
+
+        <div className="mt-6 border border-[var(--color-gold)]/40 rounded-sm bg-[var(--color-navy-mid)] p-6 md:p-8">
+          <h3 className="font-serif text-xl md:text-2xl text-[var(--color-gold)] mb-2">
+            {checklist.title}
+          </h3>
+          <p className="text-sm text-[var(--color-body-light)] mb-5">
+            {checklist.intro}
+          </p>
+          <ul className="space-y-2.5">
+            {checklist.items.map((item) => (
+              <li
+                key={item}
+                className="flex items-start gap-2.5 text-sm text-[var(--color-body-light)]"
+              >
+                <Check
+                  className="h-4 w-4 text-[var(--color-gold)] mt-0.5 shrink-0"
+                  aria-hidden
+                  strokeWidth={2.5}
+                />
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+          <p className="text-xs text-[var(--color-muted-light)] mt-5 italic leading-relaxed">
+            {checklist.note}
+          </p>
+        </div>
       </motion.div>
     );
   }
@@ -694,7 +769,8 @@ export function IntakeForm() {
       <div className="mb-8">
         <div className="flex items-center justify-between mb-3">
           <p className="text-xs uppercase tracking-[0.18em] text-[var(--color-navy)] opacity-70">
-            Step {step + 1} of {STEPS.length} — {STEPS[step]}
+            {t("intake_step_label")} {step + 1} {t("intake_step_of")}{" "}
+            {STEPS.length} — {stepLabels[step]}
           </p>
           <p className="text-xs text-[var(--color-navy)] opacity-70">
             {Math.round(progressPct)}%
@@ -715,13 +791,13 @@ export function IntakeForm() {
           {step === 0 && (
             <StepWrap key="step-0">
               <StepHeader
-                title="Contact Information"
-                subtitle="How can we reach you?"
+                title={t("intake_h_contact")}
+                subtitle={t("intake_sub_contact")}
               />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <Field
                   id="firstName"
-                  label="First Name"
+                  label={t("intake_f_first")}
                   required
                   error={errors.firstName?.message}
                 >
@@ -734,7 +810,7 @@ export function IntakeForm() {
                 </Field>
                 <Field
                   id="lastName"
-                  label="Last Name"
+                  label={t("intake_f_last")}
                   required
                   error={errors.lastName?.message}
                 >
@@ -747,7 +823,7 @@ export function IntakeForm() {
                 </Field>
                 <Field
                   id="phone"
-                  label="Phone Number"
+                  label={t("intake_f_phone")}
                   required
                   error={errors.phone?.message}
                 >
@@ -761,7 +837,7 @@ export function IntakeForm() {
                 </Field>
                 <Field
                   id="email"
-                  label="Email Address"
+                  label={t("intake_f_email")}
                   required
                   error={errors.email?.message}
                 >
@@ -775,19 +851,37 @@ export function IntakeForm() {
                 </Field>
               </div>
 
-              <RadioGroup
-                legend="Best way to contact you"
-                required
-                error={errors.contactMethod?.message}
-                options={["Phone", "Email", "Text"]}
-                name="contactMethod"
-                register={register}
-                className="mt-7"
-              />
+              <fieldset className="mt-7">
+                <legend className={labelBase}>
+                  {t("intake_f_contact_method")} <Req />
+                </legend>
+                <div className="flex flex-wrap gap-3 mt-1">
+                  {(
+                    [
+                      ["Phone", t("intake_opt_phone")],
+                      ["Email", t("intake_opt_email")],
+                      ["Text", t("intake_opt_text")],
+                    ] as const
+                  ).map(([value, label]) => (
+                    <label key={value} className={optionCard}>
+                      <input
+                        type="radio"
+                        value={value}
+                        {...register("contactMethod")}
+                        className="accent-[var(--color-gold)]"
+                      />
+                      <span className="text-sm">{label}</span>
+                    </label>
+                  ))}
+                </div>
+                {errors.contactMethod && (
+                  <p className={errorBase}>{errors.contactMethod.message}</p>
+                )}
+              </fieldset>
 
               <div className="mt-7">
                 <label htmlFor="bestTime" className={labelBase}>
-                  Best time to reach you <Req />
+                  {t("intake_f_best_time")} <Req />
                 </label>
                 <select
                   id="bestTime"
@@ -796,13 +890,11 @@ export function IntakeForm() {
                   defaultValue=""
                 >
                   <option value="" disabled>
-                    Select a time…
+                    {t("intake_select_time")}
                   </option>
-                  <option value="Morning">Morning (9am – 12pm)</option>
-                  <option value="Afternoon">Afternoon (12pm – 3pm)</option>
-                  <option value="LateAfternoon">
-                    Late Afternoon (3pm – 5pm)
-                  </option>
+                  <option value="Morning">{t("intake_opt_morning")}</option>
+                  <option value="Afternoon">{t("intake_opt_afternoon")}</option>
+                  <option value="LateAfternoon">{t("intake_opt_late")}</option>
                 </select>
                 {errors.bestTime && (
                   <p className={errorBase}>{errors.bestTime.message}</p>
@@ -814,13 +906,13 @@ export function IntakeForm() {
           {step === 1 && (
             <StepWrap key="step-1">
               <StepHeader
-                title="Service Selection"
-                subtitle="What type of document(s) do you need prepared?"
+                title={t("intake_h_service")}
+                subtitle={t("intake_sub_service")}
               />
 
               <fieldset>
                 <legend className={labelBase}>
-                  Primary service <Req />
+                  {t("intake_f_primary_service")} <Req />
                 </legend>
                 <div className="grid grid-cols-1 gap-2.5">
                   {PRIMARY_SERVICES.map((svc) => (
@@ -831,7 +923,7 @@ export function IntakeForm() {
                         {...register("primaryService")}
                         className="accent-[var(--color-gold)] h-4 w-4"
                       />
-                      <span className="text-sm">{svc}</span>
+                      <span className="text-sm">{serviceLabel(svc)}</span>
                     </label>
                   ))}
                 </div>
@@ -840,20 +932,37 @@ export function IntakeForm() {
                 )}
               </fieldset>
 
-              <RadioGroup
-                legend="Do you need help with more than one of the above?"
-                required
-                error={errors.needsMoreServices?.message}
-                options={["Yes", "No"]}
-                name="needsMoreServices"
-                register={register}
-                className="mt-6"
-              />
+              <fieldset className="mt-6">
+                <legend className={labelBase}>
+                  {t("intake_f_needs_more")} <Req />
+                </legend>
+                <div className="flex flex-wrap gap-3 mt-1">
+                  {(
+                    [
+                      ["Yes", t("intake_yes")],
+                      ["No", t("intake_no")],
+                    ] as const
+                  ).map(([value, label]) => (
+                    <label key={value} className={optionCard}>
+                      <input
+                        type="radio"
+                        value={value}
+                        {...register("needsMoreServices")}
+                        className="accent-[var(--color-gold)]"
+                      />
+                      <span className="text-sm">{label}</span>
+                    </label>
+                  ))}
+                </div>
+                {errors.needsMoreServices && (
+                  <p className={errorBase}>{errors.needsMoreServices.message}</p>
+                )}
+              </fieldset>
 
               {needsMoreServices === "Yes" && (
                 <fieldset className="mt-6">
                   <legend className={labelBase}>
-                    Additional services <Req />
+                    {t("intake_f_additional_services")} <Req />
                   </legend>
                   <Controller
                     control={control}
@@ -879,7 +988,7 @@ export function IntakeForm() {
                                 }}
                                 className="accent-[var(--color-gold)] h-4 w-4"
                               />
-                              <span className="text-sm">{svc}</span>
+                              <span className="text-sm">{serviceLabel(svc)}</span>
                             </label>
                           );
                         })}
@@ -899,9 +1008,10 @@ export function IntakeForm() {
           {step === 2 && (
             <StepWrap key="step-2">
               <StepHeader
-                title="Service Details"
-                subtitle="A few specifics so we can quote and prepare accurately."
+                title={t("intake_h_details")}
+                subtitle={t("intake_sub_details")}
               />
+              <UrgencyBanner days={daysToDeadline} t={t} />
               <BranchFields
                 service={primaryService}
                 register={register}
@@ -915,13 +1025,13 @@ export function IntakeForm() {
           {step === 3 && (
             <StepWrap key="step-3">
               <StepHeader
-                title="General Information"
-                subtitle="A few last details to round out your intake."
+                title={t("intake_h_general")}
+                subtitle={t("intake_sub_general")}
               />
 
               <div>
                 <label htmlFor="clientCounty" className={labelBase}>
-                  What county are you located in? <Req />
+                  {t("intake_f_client_county")} <Req />
                 </label>
                 <select
                   id="clientCounty"
@@ -930,7 +1040,7 @@ export function IntakeForm() {
                   defaultValue=""
                 >
                   <option value="" disabled>
-                    Select a county…
+                    {t("intake_select_county")}
                   </option>
                   {COUNTIES.map((c) => (
                     <option key={c} value={c}>
@@ -945,7 +1055,7 @@ export function IntakeForm() {
 
               <div className="mt-6">
                 <label htmlFor="referralSource" className={labelBase}>
-                  How did you hear about us? <Req />
+                  {t("intake_f_referral_source")} <Req />
                 </label>
                 <select
                   id="referralSource"
@@ -954,7 +1064,7 @@ export function IntakeForm() {
                   defaultValue=""
                 >
                   <option value="" disabled>
-                    Select a source…
+                    {t("intake_select_source")}
                   </option>
                   {REFERRAL_SOURCES.map((s) => (
                     <option key={s} value={s}>
@@ -970,7 +1080,7 @@ export function IntakeForm() {
               {referralSource === "Referral" && (
                 <div className="mt-6">
                   <label htmlFor="referralName" className={labelBase}>
-                    Who referred you? <Req />
+                    {t("intake_f_referral_name")} <Req />
                   </label>
                   <input
                     id="referralName"
@@ -985,14 +1095,13 @@ export function IntakeForm() {
 
               <div className="mt-6">
                 <label htmlFor="additionalNotes" className={labelBase}>
-                  Is there anything else you&apos;d like us to know?
+                  {t("intake_f_additional_notes")}
                 </label>
                 <textarea
                   id="additionalNotes"
                   rows={5}
                   {...register("additionalNotes")}
                   className={inputBase}
-                  placeholder="Optional — share any background that will help us serve you."
                 />
               </div>
             </StepWrap>
@@ -1001,8 +1110,8 @@ export function IntakeForm() {
           {step === 4 && (
             <StepWrap key="step-4">
               <StepHeader
-                title="Review & Confirm"
-                subtitle="Quick review of what you've told us, then two acknowledgments before you submit."
+                title={t("intake_h_confirm")}
+                subtitle={t("intake_sub_confirm")}
               />
 
               <ReviewSummary data={getValues()} />
@@ -1015,9 +1124,7 @@ export function IntakeForm() {
                     className="accent-[var(--color-gold)] h-4 w-4 mt-1 shrink-0"
                   />
                   <span className="text-sm text-[var(--color-body-dark)] leading-relaxed">
-                    I understand that {BUSINESS.name} is not a law firm and does
-                    not provide legal advice or legal representation. I am
-                    directing the preparation of my own documents. <Req />
+                    {t("intake_consent_lda")} <Req />
                   </span>
                 </label>
                 {errors.consentLDA && (
@@ -1031,8 +1138,7 @@ export function IntakeForm() {
                     className="accent-[var(--color-gold)] h-4 w-4 mt-1 shrink-0"
                   />
                   <span className="text-sm text-[var(--color-body-dark)] leading-relaxed">
-                    I consent to be contacted by phone, email, or text regarding
-                    my inquiry. <Req />
+                    {t("intake_consent_contact")} <Req />
                   </span>
                 </label>
                 {errors.consentContact && (
@@ -1042,22 +1148,21 @@ export function IntakeForm() {
 
               {submitError && (
                 <div className="mt-6 border-l-2 border-red-600 bg-red-50 px-4 py-3 text-sm text-red-900">
-                  We couldn&apos;t submit your intake automatically. Please call
-                  us at{" "}
+                  {t("intake_submit_error_lead")}{" "}
                   <a
                     href={`tel:${BUSINESS.phoneTel}`}
                     className="font-medium underline underline-offset-2"
                   >
                     {BUSINESS.phone}
                   </a>{" "}
-                  or email{" "}
+                  {t("intake_submit_error_mid")}{" "}
                   <a
                     href={`mailto:${BUSINESS.email}`}
                     className="font-medium underline underline-offset-2 break-all"
                   >
                     {BUSINESS.email}
                   </a>{" "}
-                  and we&apos;ll take it from there.
+                  {t("intake_submit_error_tail")}
                 </div>
               )}
             </StepWrap>
@@ -1073,7 +1178,7 @@ export function IntakeForm() {
             className="inline-flex items-center gap-2 px-5 py-3 text-[var(--color-navy)] hover:text-[var(--color-gold)] transition-colors text-sm font-medium"
           >
             <ChevronLeft className="h-4 w-4" aria-hidden />
-            Back to home
+            {t("intake_btn_back_home")}
           </Link>
         ) : (
           <button
@@ -1083,7 +1188,7 @@ export function IntakeForm() {
             className="inline-flex items-center gap-2 px-5 py-3 text-[var(--color-navy)] hover:text-[var(--color-gold)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-sm font-medium"
           >
             <ChevronLeft className="h-4 w-4" aria-hidden />
-            Back
+            {t("intake_btn_back")}
           </button>
         )}
 
@@ -1093,7 +1198,7 @@ export function IntakeForm() {
             onClick={goNext}
             className="inline-flex items-center gap-2 bg-[var(--color-navy)] hover:bg-[var(--color-navy-mid)] text-white px-6 py-3 rounded-sm text-sm font-medium tracking-wide transition-colors"
           >
-            Continue
+            {t("intake_btn_continue")}
             <ChevronRight className="h-4 w-4" aria-hidden />
           </button>
         ) : (
@@ -1105,10 +1210,10 @@ export function IntakeForm() {
             {submitting ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" aria-hidden />
-                Submitting…
+                {t("intake_btn_submitting")}
               </>
             ) : (
-              "Submit Intake Request"
+              t("intake_btn_submit")
             )}
           </button>
         )}
@@ -1123,6 +1228,50 @@ export function IntakeForm() {
 
 function Req() {
   return <span className="text-red-600">*</span>;
+}
+
+function UrgencyBanner({
+  days,
+  t,
+}: {
+  days: number | null;
+  t: (key: import("@/lib/translations").TranslationKey) => string;
+}) {
+  if (days === null || days < 0) return null;
+  if (days <= 7) {
+    return (
+      <div className="mb-6 flex items-start gap-3 border-l-4 border-red-600 bg-red-50 p-4 rounded-sm">
+        <AlertTriangle
+          className="h-5 w-5 text-red-600 shrink-0 mt-0.5"
+          aria-hidden
+        />
+        <div className="text-sm text-red-900 leading-relaxed">
+          <strong>{t("urgency_red_strong")}</strong> {t("urgency_red_body_1")}{" "}
+          <a
+            href={`tel:${BUSINESS.phoneTel}`}
+            className="font-semibold underline underline-offset-2"
+          >
+            {BUSINESS.phone}
+          </a>{" "}
+          {t("urgency_red_body_2")}
+        </div>
+      </div>
+    );
+  }
+  if (days <= 14) {
+    return (
+      <div className="mb-6 flex items-start gap-3 border-l-4 border-amber-500 bg-amber-50 p-4 rounded-sm">
+        <CalendarClock
+          className="h-5 w-5 text-amber-700 shrink-0 mt-0.5"
+          aria-hidden
+        />
+        <div className="text-sm text-amber-900 leading-relaxed">
+          <strong>{t("urgency_amber_strong")}</strong> {t("urgency_amber_body")}
+        </div>
+      </div>
+    );
+  }
+  return null;
 }
 
 function StepWrap({

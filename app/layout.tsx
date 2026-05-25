@@ -5,6 +5,7 @@ import { Nav } from "@/components/layout/Nav";
 import { Footer } from "@/components/layout/Footer";
 import { StructuredData } from "@/components/seo/StructuredData";
 import { SITE_URL } from "@/lib/site";
+import { LanguageProvider } from "@/lib/language-context";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -88,9 +89,11 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-white text-[var(--color-body-dark)]">
         <StructuredData />
-        <Nav />
-        <main className="flex-1">{children}</main>
-        <Footer />
+        <LanguageProvider>
+          <Nav />
+          <main className="flex-1">{children}</main>
+          <Footer />
+        </LanguageProvider>
       </body>
     </html>
   );

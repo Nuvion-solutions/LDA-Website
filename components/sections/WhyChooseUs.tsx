@@ -3,26 +3,24 @@
 import { motion } from "framer-motion";
 import { Sparkles, BadgeDollarSign, MessageSquareText } from "lucide-react";
 import { fadeUp, staggerContainer, viewportOnce } from "@/lib/animations";
-
-const PILLARS = [
-  {
-    icon: Sparkles,
-    title: "Detail-Oriented",
-    body: "We take time to prepare documents carefully, with clean formatting and accurate information.",
-  },
-  {
-    icon: BadgeDollarSign,
-    title: "Affordable",
-    body: "Professional document preparation at a fraction of the cost of doing it through other channels.",
-  },
-  {
-    icon: MessageSquareText,
-    title: "Clear Communication",
-    body: "We keep you informed at every step so you always know where your documents stand.",
-  },
-];
+import { useLanguage } from "@/lib/language-context";
 
 export function WhyChooseUs() {
+  const { t } = useLanguage();
+  const pillars = [
+    { icon: Sparkles, title: t("why_1_title"), body: t("why_1_body") },
+    {
+      icon: BadgeDollarSign,
+      title: t("why_2_title"),
+      body: t("why_2_body"),
+    },
+    {
+      icon: MessageSquareText,
+      title: t("why_3_title"),
+      body: t("why_3_body"),
+    },
+  ];
+
   return (
     <section className="bg-white py-20 md:py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -34,10 +32,10 @@ export function WhyChooseUs() {
           className="max-w-2xl mb-12 md:mb-16"
         >
           <p className="text-[var(--color-navy)] text-xs tracking-[0.22em] uppercase mb-4 opacity-70">
-            Why Choose Us
+            {t("why_eyebrow")}
           </p>
           <h2 className="font-serif text-3xl md:text-5xl text-[var(--color-navy)] leading-tight">
-            Trusted Document Preparation
+            {t("why_heading")}
           </h2>
         </motion.div>
 
@@ -48,7 +46,7 @@ export function WhyChooseUs() {
           variants={staggerContainer}
           className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10"
         >
-          {PILLARS.map((p) => {
+          {pillars.map((p) => {
             const Icon = p.icon;
             return (
               <motion.div

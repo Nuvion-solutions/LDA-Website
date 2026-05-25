@@ -5,8 +5,10 @@ import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { HOMEPAGE_SERVICES } from "@/lib/services";
 import { fadeUp, staggerContainer, viewportOnce } from "@/lib/animations";
+import { useLanguage } from "@/lib/language-context";
 
 export function ServicesPreview() {
+  const { t } = useLanguage();
   return (
     <section className="bg-[var(--color-navy)] text-white py-20 md:py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -18,14 +20,13 @@ export function ServicesPreview() {
           className="max-w-2xl mb-12 md:mb-16"
         >
           <p className="text-[var(--color-gold)] text-xs tracking-[0.22em] uppercase mb-4">
-            Our Services
+            {t("services_eyebrow")}
           </p>
           <h2 className="font-serif text-3xl md:text-5xl leading-tight">
-            How We Can Help
+            {t("services_heading")}
           </h2>
           <p className="mt-5 text-[var(--color-body-light)] text-base md:text-lg leading-relaxed">
-            We prepare a wide range of court and administrative documents at your
-            direction — clean, polished, and ready for your review.
+            {t("services_sub")}
           </p>
         </motion.div>
 
@@ -56,7 +57,7 @@ export function ServicesPreview() {
                     {service.short}
                   </p>
                   <span className="inline-flex items-center gap-1.5 text-sm text-[var(--color-gold)] group-hover:gap-2.5 transition-all">
-                    Learn More
+                    {t("services_learn_more")}
                     <ArrowRight className="h-4 w-4" aria-hidden />
                   </span>
                 </Link>

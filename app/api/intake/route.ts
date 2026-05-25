@@ -2,6 +2,8 @@
 // Receives form submissions from the intake form and forwards to GoHighLevel
 // via a server-side webhook URL. Falls back to local logging if no URL is set.
 
+import { getDeadlineDate, daysUntil, urgencyTagFor } from "@/lib/urgency";
+
 export const dynamic = "force-dynamic";
 
 type IntakeBody = {
@@ -121,6 +123,11 @@ export async function POST(req: Request) {
     return Response.json({ success: true, mode: "local" });
   }
 
+  // Urgency calculation — feed deadline-bearing fields to the shared helper.
+  const deadlineDate = getDeadlineDate(data);
+  const daysUntilDeadline = daysUntil(deadlineDate);
+  const urgencyTag = urgencyTagFor(daysUntilDeadline);
+
   const ghlPayload = {
     firstName: data.firstName,
     lastName: data.lastName,
@@ -136,9 +143,15 @@ export async function POST(req: Request) {
     tags: [
       "website-lead",
       "intake-form",
+      urgencyTag,
       data.primaryService ?? "general",
     ],
     customFields: {
+      // Urgency
+      lda_urgency_level: urgencyTag,
+      lda_days_until_deadline: daysUntilDeadline?.toString(),
+      lda_deadline_date: deadlineDate,
+
       // Primary
       lda_primary_service: data.primaryService,
       lda_additional_services: data.additionalServices?.join(", "),

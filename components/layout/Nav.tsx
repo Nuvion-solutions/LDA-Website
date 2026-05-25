@@ -2,16 +2,13 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { Menu, X, Phone } from "lucide-react";
+import { Menu, X, Phone, Languages } from "lucide-react";
 import { BUSINESS } from "@/lib/utils";
-
-const LINKS = [
-  { href: "/services", label: "Services" },
-  { href: "/about", label: "About" },
-] as const;
+import { useLanguage } from "@/lib/language-context";
 
 export function Nav() {
   const [open, setOpen] = useState(false);
+  const { lang, setLang, t } = useLanguage();
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
@@ -19,6 +16,13 @@ export function Nav() {
       document.body.style.overflow = "";
     };
   }, [open]);
+
+  const toggleLang = () => setLang(lang === "en" ? "es" : "en");
+
+  const links = [
+    { href: "/services", label: t("nav_services") },
+    { href: "/about", label: t("nav_about") },
+  ];
 
   return (
     <header className="sticky top-0 z-50 bg-[var(--color-navy)] border-b border-[var(--color-gold)]/40">
@@ -34,8 +38,8 @@ export function Nav() {
           </Link>
 
           {/* Desktop nav */}
-          <nav className="hidden md:flex items-center gap-8">
-            {LINKS.map((link) => (
+          <nav className="hidden md:flex items-center gap-6">
+            {links.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
@@ -51,11 +55,24 @@ export function Nav() {
               <Phone className="h-4 w-4" aria-hidden />
               {BUSINESS.phone}
             </a>
+            <button
+              type="button"
+              onClick={toggleLang}
+              aria-label={
+                lang === "en"
+                  ? "Cambiar a español"
+                  : "Switch to English"
+              }
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-[var(--color-gold-light)] border border-[var(--color-gold)]/40 px-3 py-1.5 rounded-sm hover:border-[var(--color-gold)] hover:text-[var(--color-gold)] transition-colors"
+            >
+              <Languages className="h-3.5 w-3.5" aria-hidden />
+              {t("nav_lang_toggle")}
+            </button>
             <Link
               href="/intake"
               className="bg-[var(--color-gold)] hover:bg-[var(--color-gold-light)] text-[var(--color-navy)] font-medium px-5 py-2.5 rounded-sm text-sm tracking-wide transition-colors"
             >
-              Start Your Intake
+              {t("nav_cta")}
             </Link>
           </nav>
 
@@ -63,7 +80,7 @@ export function Nav() {
           <button
             type="button"
             className="md:hidden text-[var(--color-body-light)] hover:text-[var(--color-gold)] transition-colors p-2 -mr-2"
-            aria-label={open ? "Close menu" : "Open menu"}
+            aria-label={open ? t("nav_menu_close") : t("nav_menu_open")}
             aria-expanded={open}
             onClick={() => setOpen((v) => !v)}
           >
@@ -76,7 +93,7 @@ export function Nav() {
       {open && (
         <div className="md:hidden fixed inset-0 top-16 z-40 bg-[var(--color-navy)] flex flex-col">
           <nav className="flex flex-col px-6 py-8 gap-1">
-            {LINKS.map((link) => (
+            {links.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
@@ -94,12 +111,23 @@ export function Nav() {
               <Phone className="h-5 w-5" aria-hidden />
               {BUSINESS.phone}
             </a>
+            <button
+              type="button"
+              onClick={() => {
+                toggleLang();
+                setOpen(false);
+              }}
+              className="flex items-center gap-3 text-[var(--color-body-light)] hover:text-[var(--color-gold)] py-4 text-lg border-b border-[var(--color-border-dark)]"
+            >
+              <Languages className="h-5 w-5" aria-hidden />
+              {t("nav_lang_toggle")}
+            </button>
             <Link
               href="/intake"
               onClick={() => setOpen(false)}
               className="mt-6 bg-[var(--color-gold)] hover:bg-[var(--color-gold-light)] text-[var(--color-navy)] font-medium px-6 py-4 rounded-sm text-center tracking-wide"
             >
-              Start Your Intake
+              {t("nav_cta")}
             </Link>
           </nav>
         </div>

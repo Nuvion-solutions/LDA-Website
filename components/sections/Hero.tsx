@@ -3,17 +3,19 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Phone, CheckCircle2 } from "lucide-react";
-import { BUSINESS, SHORT_DISCLAIMER } from "@/lib/utils";
+import { BUSINESS } from "@/lib/utils";
 import { fadeUp, staggerContainer } from "@/lib/animations";
-
-const TRUST_ITEMS = [
-  "LDA #87 Registered",
-  "Sonoma County",
-  "Free Consultation",
-  "Remote Services Available",
-];
+import { useLanguage } from "@/lib/language-context";
 
 export function Hero() {
+  const { t } = useLanguage();
+  const trustItems = [
+    t("hero_trust_1"),
+    t("hero_trust_2"),
+    t("hero_trust_3"),
+    t("hero_trust_4"),
+  ];
+
   return (
     <section className="relative bg-[var(--color-navy)] text-white overflow-hidden">
       {/* Subtle gold glow accent */}
@@ -36,27 +38,27 @@ export function Hero() {
             variants={fadeUp}
             className="text-[var(--color-gold)] text-xs md:text-sm tracking-[0.22em] uppercase mb-6 md:mb-8"
           >
-            Registered Legal Document Assistant · LDA #87 · Sonoma County
+            {t("hero_label")}
           </motion.p>
 
           <motion.h1
             variants={fadeUp}
             className="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl leading-[1.1] tracking-tight mb-6 md:mb-8"
           >
-            Professional Document
+            {t("hero_headline_1")}
             <br />
-            Preparation You Can
+            {t("hero_headline_2")}
             <br />
-            <span className="text-[var(--color-gold)]">Count On.</span>
+            <span className="text-[var(--color-gold)]">
+              {t("hero_headline_3")}
+            </span>
           </motion.h1>
 
           <motion.p
             variants={fadeUp}
             className="text-base md:text-xl text-[var(--color-body-light)] max-w-2xl leading-relaxed mb-8 md:mb-10"
           >
-            {BUSINESS.name} helps individuals and families prepare court forms,
-            documents, and administrative paperwork — accurately, professionally,
-            and at your direction.
+            {t("hero_subhead")}
           </motion.p>
 
           <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-10">
@@ -64,14 +66,14 @@ export function Hero() {
               href="/intake"
               className="inline-flex items-center justify-center bg-[var(--color-gold)] hover:bg-[var(--color-gold-light)] text-[var(--color-navy)] font-medium px-7 py-3.5 rounded-sm tracking-wide transition-colors"
             >
-              Start Your Intake
+              {t("hero_cta_primary")}
             </Link>
             <a
               href={`tel:${BUSINESS.phoneTel}`}
               className="inline-flex items-center justify-center gap-2 border border-white/70 hover:border-[var(--color-gold)] hover:text-[var(--color-gold)] text-white px-7 py-3.5 rounded-sm tracking-wide transition-colors"
             >
               <Phone className="h-4 w-4" aria-hidden />
-              Call {BUSINESS.phone}
+              {t("hero_cta_secondary")} {BUSINESS.phone}
             </a>
           </motion.div>
 
@@ -79,7 +81,7 @@ export function Hero() {
             variants={fadeUp}
             className="flex flex-wrap gap-x-6 gap-y-3 text-sm text-[var(--color-body-light)] mb-6"
           >
-            {TRUST_ITEMS.map((item) => (
+            {trustItems.map((item) => (
               <li key={item} className="flex items-center gap-2">
                 <CheckCircle2 className="h-4 w-4 text-[var(--color-gold)]" aria-hidden />
                 {item}
@@ -91,7 +93,7 @@ export function Hero() {
             variants={fadeUp}
             className="text-xs text-[var(--color-muted-light)] max-w-2xl leading-relaxed"
           >
-            {SHORT_DISCLAIMER}
+            {t("short_disclaimer")}
           </motion.p>
         </motion.div>
       </div>

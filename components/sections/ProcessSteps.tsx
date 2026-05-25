@@ -2,31 +2,17 @@
 
 import { motion } from "framer-motion";
 import { fadeUp, staggerContainer, viewportOnce } from "@/lib/animations";
-
-const STEPS = [
-  {
-    n: 1,
-    title: "Free Consultation",
-    body: "Tell us what documents you need prepared.",
-  },
-  {
-    n: 2,
-    title: "Document Preparation",
-    body: "We prepare your paperwork carefully and professionally.",
-  },
-  {
-    n: 3,
-    title: "Client Review & Signing",
-    body: "You review, approve, and sign your documents.",
-  },
-  {
-    n: 4,
-    title: "You Submit",
-    body: "You file and submit your documents directly.",
-  },
-];
+import { useLanguage } from "@/lib/language-context";
 
 export function ProcessSteps() {
+  const { t } = useLanguage();
+  const steps = [
+    { n: 1, title: t("process_1_title"), body: t("process_1_body") },
+    { n: 2, title: t("process_2_title"), body: t("process_2_body") },
+    { n: 3, title: t("process_3_title"), body: t("process_3_body") },
+    { n: 4, title: t("process_4_title"), body: t("process_4_body") },
+  ];
+
   return (
     <section className="bg-[var(--color-offwhite)] py-20 md:py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -38,14 +24,13 @@ export function ProcessSteps() {
           className="max-w-2xl mb-12 md:mb-16 text-center mx-auto"
         >
           <p className="text-[var(--color-navy)] text-xs tracking-[0.22em] uppercase mb-4 opacity-70">
-            The Process
+            {t("process_eyebrow")}
           </p>
           <h2 className="font-serif text-3xl md:text-5xl text-[var(--color-navy)] leading-tight">
-            How It Works
+            {t("process_heading")}
           </h2>
           <p className="mt-5 text-[var(--color-body-dark)] text-base md:text-lg leading-relaxed opacity-80">
-            A clear, simple process from your first call to the final filing —
-            so you always know what comes next.
+            {t("process_sub")}
           </p>
         </motion.div>
 
@@ -56,7 +41,7 @@ export function ProcessSteps() {
           variants={staggerContainer}
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8"
         >
-          {STEPS.map((step) => (
+          {steps.map((step) => (
             <motion.li key={step.n} variants={fadeUp} className="relative">
               <div className="flex items-center justify-center w-12 h-12 rounded-full bg-[var(--color-gold)] text-[var(--color-navy)] font-serif text-xl font-semibold mb-5">
                 {step.n}

@@ -163,11 +163,11 @@ export async function POST(req: Request) {
   }
 
   const submissionId = crypto.randomUUID();
-  const webhookUrl = process.env.GHL_WEBHOOK_URL;
+  const webhookUrl = process.env.GHL_FORM_WEBHOOK_URL;
 
   // Graceful fallback when webhook URL is not configured.
   if (!webhookUrl) {
-    console.log("[intake] No GHL_WEBHOOK_URL set — logging submission locally:", {
+    console.log("[intake] No GHL_FORM_WEBHOOK_URL set — logging submission locally:", {
       submissionId,
       submittedAt: new Date().toISOString(),
       firstName: data.firstName,

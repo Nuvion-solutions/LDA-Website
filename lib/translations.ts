@@ -10,6 +10,7 @@ export type Language = "en" | "es";
 
 const en = {
   // Nav
+  nav_home: "Home",
   nav_services: "Services",
   nav_about: "About",
   nav_cta: "Start Your Intake",
@@ -391,6 +392,7 @@ type Dict = Record<keyof typeof en, string>;
 
 const es: Dict = {
   // Nav
+  nav_home: "Inicio",
   nav_services: "Servicios",
   nav_about: "Nosotros",
   nav_cta: "Comenzar Solicitud",

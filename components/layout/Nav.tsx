@@ -20,6 +20,7 @@ export function Nav() {
   const toggleLang = () => setLang(lang === "en" ? "es" : "en");
 
   const links = [
+    { href: "/", label: t("nav_home") },
     { href: "/services", label: t("nav_services") },
     { href: "/about", label: t("nav_about") },
   ];

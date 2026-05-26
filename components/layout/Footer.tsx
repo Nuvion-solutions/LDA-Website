@@ -3,12 +3,12 @@
 import Link from "next/link";
 import { MapPin, Phone, Mail, Clock } from "lucide-react";
 import { BUSINESS } from "@/lib/utils";
-import { SERVICES } from "@/lib/services";
+import { SERVICES, localized } from "@/lib/services";
 import { useLanguage } from "@/lib/language-context";
 
 export function Footer() {
   const year = new Date().getFullYear();
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
 
   return (
     <footer className="bg-[var(--color-navy)] text-[var(--color-body-light)] border-t border-[var(--color-gold)]/30">
@@ -87,7 +87,7 @@ export function Footer() {
                     href={`/services#${s.slug}`}
                     className="hover:text-[var(--color-gold)]"
                   >
-                    {s.title}
+                    {localized(s, "title", lang)}
                   </Link>
                 </li>
               ))}

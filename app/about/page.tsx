@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import { ShieldCheck } from "lucide-react";
 import { BUSINESS, FULL_DISCLAIMER } from "@/lib/utils";
 import { CTABanner } from "@/components/sections/CTABanner";
+import { LANG_COOKIE } from "@/lib/language-context";
+import { translations, type Language } from "@/lib/translations";
 
 export const metadata: Metadata = {
   title: "About",
@@ -40,17 +43,22 @@ const TEAM = [
   },
 ];
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const cookieStore = await cookies();
+  const stored = cookieStore.get(LANG_COOKIE)?.value;
+  const lang: Language = stored === "es" ? "es" : "en";
+  const dict = translations[lang];
+
   return (
     <>
       {/* Hero */}
       <section className="bg-[var(--color-navy)] text-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20 md:py-28">
           <p className="text-[var(--color-gold)] text-xs tracking-[0.22em] uppercase mb-5">
-            About Us
+            {dict.about_eyebrow}
           </p>
           <h1 className="font-serif text-4xl md:text-6xl leading-tight max-w-3xl">
-            About {BUSINESS.name}
+            {dict.about_h1_lead} {BUSINESS.name}
           </h1>
         </div>
       </section>
@@ -59,16 +67,13 @@ export default function AboutPage() {
       <section className="bg-white py-16 md:py-24">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
           <p className="text-[var(--color-navy)] text-xs tracking-[0.22em] uppercase mb-4 opacity-70">
-            Our Mission
+            {dict.about_mission_eyebrow}
           </p>
           <h2 className="font-serif text-3xl md:text-4xl text-[var(--color-navy)] leading-tight mb-6">
-            Making professional document preparation accessible.
+            {dict.about_mission_heading}
           </h2>
           <p className="text-[var(--color-body-dark)] text-lg leading-relaxed">
-            Our mission is to make professional document preparation accessible
-            and affordable. We help individuals and families navigate
-            complicated paperwork with confidence — preparing documents that are
-            clean, organized, and ready for submission.
+            {dict.about_mission_body}
           </p>
         </div>
       </section>
@@ -77,10 +82,10 @@ export default function AboutPage() {
       <section className="bg-[var(--color-offwhite)] py-16 md:py-24">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
           <p className="text-[var(--color-navy)] text-xs tracking-[0.22em] uppercase mb-4 opacity-70">
-            Our Team
+            {dict.about_team_eyebrow}
           </p>
           <h2 className="font-serif text-3xl md:text-5xl text-[var(--color-navy)] leading-tight mb-12">
-            The people behind the work.
+            {dict.about_team_heading}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
             {TEAM.map((member) => (
@@ -107,17 +112,13 @@ export default function AboutPage() {
       <section className="bg-white py-16 md:py-24">
         <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
           <p className="text-[var(--color-navy)] text-xs tracking-[0.22em] uppercase mb-4 opacity-70">
-            Why We Started
+            {dict.about_why_eyebrow}
           </p>
           <h2 className="font-serif text-3xl md:text-4xl text-[var(--color-navy)] leading-tight mb-6">
-            Built to serve our community.
+            {dict.about_why_heading}
           </h2>
           <p className="text-[var(--color-body-dark)] text-lg leading-relaxed">
-            {BUSINESS.name} was founded to give individuals and families access
-            to professional document preparation services without the confusion
-            and high cost of doing everything alone. We believe everyone
-            deserves organized, accurate, and professionally prepared paperwork
-            — regardless of their budget.
+            {BUSINESS.name} {dict.about_why_body_tail}
           </p>
         </div>
       </section>
@@ -134,7 +135,7 @@ export default function AboutPage() {
               />
               <div>
                 <h2 className="font-serif text-2xl md:text-3xl text-[var(--color-gold)] mb-4">
-                  LDA Disclosure
+                  {dict.about_disclosure_title}
                 </h2>
                 <p className="text-[var(--color-body-light)] leading-relaxed">
                   {FULL_DISCLAIMER}

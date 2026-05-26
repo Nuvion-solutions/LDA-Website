@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { cookies } from "next/headers";
 import { ArrowRight } from "lucide-react";
-import { SERVICES } from "@/lib/services";
+import { SERVICES, localized } from "@/lib/services";
 import { SHORT_DISCLAIMER } from "@/lib/utils";
 import { CTABanner } from "@/components/sections/CTABanner";
+import { LANG_COOKIE } from "@/lib/language-context";
+import { translations, type Language } from "@/lib/translations";
 
 export const metadata: Metadata = {
   title: "Services",
@@ -19,22 +22,25 @@ export const metadata: Metadata = {
   },
 };
 
-export default function ServicesPage() {
+export default async function ServicesPage() {
+  const cookieStore = await cookies();
+  const stored = cookieStore.get(LANG_COOKIE)?.value;
+  const lang: Language = stored === "es" ? "es" : "en";
+  const dict = translations[lang];
+
   return (
     <>
       {/* Hero */}
       <section className="bg-[var(--color-navy)] text-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20 md:py-28">
           <p className="text-[var(--color-gold)] text-xs tracking-[0.22em] uppercase mb-5">
-            What We Prepare
+            {dict.services_page_eyebrow}
           </p>
           <h1 className="font-serif text-4xl md:text-6xl leading-tight max-w-3xl">
-            Document Preparation Services
+            {dict.services_page_h1}
           </h1>
           <p className="mt-6 text-[var(--color-body-light)] text-base md:text-lg max-w-2xl leading-relaxed">
-            We prepare court forms, administrative paperwork, and other
-            documents at your direction. Below is a complete list of the
-            document types we work with.
+            {dict.services_page_sub}
           </p>
           <p className="mt-4 text-xs text-[var(--color-muted-light)] max-w-2xl">
             {SHORT_DISCLAIMER}
@@ -47,6 +53,7 @@ export default function ServicesPage() {
         <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 space-y-16 md:space-y-20">
           {SERVICES.map((service) => {
             const Icon = service.icon;
+            const title = localized(service, "title", lang);
             return (
               <article
                 key={service.id}
@@ -63,7 +70,7 @@ export default function ServicesPage() {
                   </div>
                   <div>
                     <h2 className="font-serif text-2xl md:text-4xl text-[var(--color-navy)] leading-tight">
-                      {service.title}
+                      {title}
                     </h2>
                   </div>
                 </div>
@@ -71,41 +78,42 @@ export default function ServicesPage() {
                 <div className="grid md:grid-cols-3 gap-8 md:gap-10">
                   <div>
                     <h3 className="text-xs uppercase tracking-[0.18em] text-[var(--color-navy)] opacity-60 mb-2">
-                      What It Is
+                      {dict.services_page_what_it_is}
                     </h3>
                     <p className="text-[var(--color-body-dark)] leading-relaxed">
-                      {service.what}
+                      {localized(service, "what", lang)}
                     </p>
                   </div>
                   <div>
                     <h3 className="text-xs uppercase tracking-[0.18em] text-[var(--color-navy)] opacity-60 mb-2">
-                      Documents We Prepare
+                      {dict.services_page_documents}
                     </h3>
                     <p className="text-[var(--color-body-dark)] leading-relaxed">
-                      {service.documents}
+                      {localized(service, "documents", lang)}
                     </p>
                   </div>
                   <div>
                     <h3 className="text-xs uppercase tracking-[0.18em] text-[var(--color-navy)] opacity-60 mb-2">
-                      Who This Is For
+                      {dict.services_page_who_for}
                     </h3>
                     <p className="text-[var(--color-body-dark)] leading-relaxed">
-                      {service.who}
+                      {localized(service, "who", lang)}
                     </p>
                   </div>
                 </div>
 
                 <div className="mt-6 border-l-2 border-[var(--color-gold)] bg-[var(--color-offwhite)] px-5 py-4 text-sm text-[var(--color-body-dark)]">
-                  <strong className="text-[var(--color-navy)]">Note:</strong>{" "}
-                  We prepare documents at your direction. We do not provide
-                  legal advice.
+                  <strong className="text-[var(--color-navy)]">
+                    {dict.services_page_note_label}
+                  </strong>{" "}
+                  {dict.services_page_note_body}
                 </div>
 
                 <Link
                   href="/intake"
                   className="mt-6 inline-flex items-center gap-2 text-[var(--color-navy)] hover:text-[var(--color-gold)] font-medium border-b border-[var(--color-gold)] pb-1 transition-colors"
                 >
-                  Get Help With {service.title.split(" ")[0]}
+                  {dict.services_page_get_help} {title.split(" ")[0]}
                   <ArrowRight className="h-4 w-4" aria-hidden />
                 </Link>
               </article>

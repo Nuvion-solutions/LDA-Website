@@ -20,9 +20,20 @@ import {
   getDeadlineDate,
   daysUntil,
 } from "@/lib/urgency";
-import { SERVICE_CHECKLISTS } from "@/lib/checklists";
+import {
+  SERVICE_CHECKLISTS,
+  checklistTitle,
+  checklistIntro,
+  checklistItems,
+  checklistNote,
+} from "@/lib/checklists";
 import { useLanguage } from "@/lib/language-context";
-import { SERVICE_NAME_TRANSLATIONS } from "@/lib/translations";
+import {
+  SERVICE_NAME_TRANSLATIONS,
+  optionLabel,
+  type Language,
+  type TranslationKey,
+} from "@/lib/translations";
 
 // ---------------------------------------------------------------------------
 // Options
@@ -733,13 +744,13 @@ export function IntakeForm() {
 
         <div className="mt-6 border border-[var(--color-gold)]/40 rounded-sm bg-[var(--color-navy-mid)] p-6 md:p-8">
           <h3 className="font-serif text-xl md:text-2xl text-[var(--color-gold)] mb-2">
-            {checklist.title}
+            {checklistTitle(checklist, lang)}
           </h3>
           <p className="text-sm text-[var(--color-body-light)] mb-5">
-            {checklist.intro}
+            {checklistIntro(checklist, lang)}
           </p>
           <ul className="space-y-2.5">
-            {checklist.items.map((item) => (
+            {checklistItems(checklist, lang).map((item) => (
               <li
                 key={item}
                 className="flex items-start gap-2.5 text-sm text-[var(--color-body-light)]"
@@ -754,7 +765,7 @@ export function IntakeForm() {
             ))}
           </ul>
           <p className="text-xs text-[var(--color-muted-light)] mt-5 italic leading-relaxed">
-            {checklist.note}
+            {checklistNote(checklist, lang)}
           </p>
         </div>
       </motion.div>
@@ -1018,6 +1029,8 @@ export function IntakeForm() {
                 control={control}
                 watch={watch}
                 errors={errors}
+                t={t}
+                lang={lang}
               />
             </StepWrap>
           )}
@@ -1044,7 +1057,7 @@ export function IntakeForm() {
                   </option>
                   {COUNTIES.map((c) => (
                     <option key={c} value={c}>
-                      {c}
+                      {optionLabel(c, lang)}
                     </option>
                   ))}
                 </select>
@@ -1068,7 +1081,7 @@ export function IntakeForm() {
                   </option>
                   {REFERRAL_SOURCES.map((s) => (
                     <option key={s} value={s}>
-                      {s}
+                      {optionLabel(s, lang)}
                     </option>
                   ))}
                 </select>
@@ -1114,7 +1127,7 @@ export function IntakeForm() {
                 subtitle={t("intake_sub_confirm")}
               />
 
-              <ReviewSummary data={getValues()} />
+              <ReviewSummary data={getValues()} t={t} lang={lang} />
 
               <div className="mt-8 space-y-4">
                 <label className="flex items-start gap-3 p-4 border border-[var(--color-border-light)] rounded-sm cursor-pointer hover:border-[var(--color-gold)] transition-colors has-checked:border-[var(--color-gold)] has-checked:bg-[var(--color-gold)]/5">
@@ -1335,6 +1348,7 @@ function RadioGroup({
   required,
   error,
   className,
+  lang,
 }: {
   legend: string;
   options: readonly string[];
@@ -1343,6 +1357,7 @@ function RadioGroup({
   required?: boolean;
   error?: string;
   className?: string;
+  lang: Language;
 }) {
   return (
     <fieldset className={className}>
@@ -1358,7 +1373,7 @@ function RadioGroup({
               {...register(name)}
               className="accent-[var(--color-gold)]"
             />
-            <span className="text-sm">{opt}</span>
+            <span className="text-sm">{optionLabel(opt, lang)}</span>
           </label>
         ))}
       </div>
@@ -1375,8 +1390,9 @@ function Select({
   options,
   register,
   name,
-  placeholder = "Select…",
+  placeholder,
   className,
+  lang,
 }: {
   id: string;
   label: string;
@@ -1387,6 +1403,7 @@ function Select({
   name: FieldName;
   placeholder?: string;
   className?: string;
+  lang: Language;
 }) {
   return (
     <div className={className}>
@@ -1400,11 +1417,11 @@ function Select({
         defaultValue=""
       >
         <option value="" disabled>
-          {placeholder}
+          {placeholder ?? (lang === "es" ? "Seleccione…" : "Select…")}
         </option>
         {options.map((o) => (
           <option key={o} value={o}>
-            {o}
+            {optionLabel(o, lang)}
           </option>
         ))}
       </select>
@@ -1427,6 +1444,8 @@ type BranchProps = {
   watch: any;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   errors: any;
+  t: (key: TranslationKey) => string;
+  lang: Language;
 };
 
 function BranchFields({
@@ -1435,11 +1454,13 @@ function BranchFields({
   control,
   watch,
   errors,
+  t,
+  lang,
 }: BranchProps) {
   if (!service) {
     return (
       <p className="text-sm text-[var(--color-body-dark)] opacity-70">
-        Please select a service on the previous step.
+        {t("branch_no_service")}
       </p>
     );
   }
@@ -1447,11 +1468,23 @@ function BranchFields({
   switch (service) {
     case "Divorce & Family Law Documents":
       return (
-        <DivorceBranch register={register} watch={watch} errors={errors} />
+        <DivorceBranch
+          register={register}
+          watch={watch}
+          errors={errors}
+          t={t}
+          lang={lang}
+        />
       );
     case "Eviction (Unlawful Detainer) Paperwork":
       return (
-        <EvictionBranch register={register} watch={watch} errors={errors} />
+        <EvictionBranch
+          register={register}
+          watch={watch}
+          errors={errors}
+          t={t}
+          lang={lang}
+        />
       );
     case "Immigration Documents":
       return (
@@ -1460,11 +1493,19 @@ function BranchFields({
           control={control}
           watch={watch}
           errors={errors}
+          t={t}
+          lang={lang}
         />
       );
     case "Living Trust Documents":
       return (
-        <TrustBranch register={register} watch={watch} errors={errors} />
+        <TrustBranch
+          register={register}
+          watch={watch}
+          errors={errors}
+          t={t}
+          lang={lang}
+        />
       );
     case "Power of Attorney":
       return (
@@ -1473,6 +1514,8 @@ function BranchFields({
           control={control}
           watch={watch}
           errors={errors}
+          t={t}
+          lang={lang}
         />
       );
     case "DMV Form Assistance":
@@ -1482,6 +1525,8 @@ function BranchFields({
           control={control}
           watch={watch}
           errors={errors}
+          t={t}
+          lang={lang}
         />
       );
     case "Tax Document Organization (Clerical)":
@@ -1491,45 +1536,51 @@ function BranchFields({
           control={control}
           watch={watch}
           errors={errors}
+          t={t}
+          lang={lang}
         />
       );
     case "Other / Not Sure":
       return (
-        <OtherBranch register={register} watch={watch} errors={errors} />
+        <OtherBranch
+          register={register}
+          watch={watch}
+          errors={errors}
+          t={t}
+          lang={lang}
+        />
       );
   }
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function DivorceBranch({ register, watch, errors }: any) {
+function DivorceBranch({ register, watch, errors, t, lang }: any) {
   const hasChildren = watch("divorceHasChildren");
   return (
     <div className="space-y-6">
       <RadioGroup
-        legend="Is this a joint/uncontested divorce or is the other party contesting?"
+        legend={t("div_q_type")}
         required
-        options={[
-          "Uncontested",
-          "Contested",
-          "Not sure yet",
-        ]}
+        options={["Uncontested", "Contested", "Not sure yet"]}
         name="divorceType"
         register={register}
         error={errors.divorceType?.message}
+        lang={lang}
       />
       <RadioGroup
-        legend="Do you and your spouse have minor children together?"
+        legend={t("div_q_children")}
         required
         options={["Yes", "No"]}
         name="divorceHasChildren"
         register={register}
         error={errors.divorceHasChildren?.message}
+        lang={lang}
       />
       {hasChildren === "Yes" && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <Field
             id="divorceChildrenCount"
-            label="How many children?"
+            label={t("div_q_children_count")}
             required
             error={errors.divorceChildrenCount?.message}
           >
@@ -1543,7 +1594,7 @@ function DivorceBranch({ register, watch, errors }: any) {
           </Field>
           <Field
             id="divorceChildrenAges"
-            label="Ages of children"
+            label={t("div_q_children_ages")}
             required
             error={errors.divorceChildrenAges?.message}
           >
@@ -1551,113 +1602,123 @@ function DivorceBranch({ register, watch, errors }: any) {
               id="divorceChildrenAges"
               {...register("divorceChildrenAges")}
               className={inputBase}
-              placeholder="e.g. 5, 8, 12"
+              placeholder={t("div_q_children_ages_placeholder")}
             />
           </Field>
         </div>
       )}
       <RadioGroup
-        legend="Do you own real property together (home, land)?"
+        legend={t("div_q_property")}
         required
         options={["Yes", "No", "Not sure"]}
         name="divorceHasProperty"
         register={register}
         error={errors.divorceHasProperty?.message}
+        lang={lang}
       />
       <RadioGroup
-        legend="Do you have retirement accounts, pensions, or significant assets to divide?"
+        legend={t("div_q_assets")}
         required
         options={["Yes", "No", "Not sure"]}
         name="divorceHasAssets"
         register={register}
         error={errors.divorceHasAssets?.message}
+        lang={lang}
       />
       <Select
         id="divorceMarriageLength"
-        label="Approximately how long were you married?"
+        label={t("div_q_marriage_length")}
         required
         options={MARRIAGE_LENGTHS}
         register={register}
         name="divorceMarriageLength"
-        placeholder="Select length…"
+        placeholder={t("div_q_marriage_placeholder")}
         error={errors.divorceMarriageLength?.message}
+        lang={lang}
       />
       <Select
         id="divorceFilingCounty"
-        label="What county will you be filing in?"
+        label={t("div_q_filing_county")}
         required
         options={COUNTIES}
         register={register}
         name="divorceFilingCounty"
-        placeholder="Select county…"
+        placeholder={t("div_q_filing_county_placeholder")}
         error={errors.divorceFilingCounty?.message}
+        lang={lang}
       />
       <RadioGroup
-        legend="Have you already filed any paperwork with the court?"
+        legend={t("div_q_filed_paperwork")}
         required
         options={["Yes", "No"]}
         name="divorceFiledPaperwork"
         register={register}
         error={errors.divorceFiledPaperwork?.message}
+        lang={lang}
       />
     </div>
   );
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function EvictionBranch({ register, watch, errors }: any) {
+function EvictionBranch({ register, watch, errors, t, lang }: any) {
   const noticeServed = watch("evictionNoticeServed");
   return (
     <div className="space-y-6">
       <RadioGroup
-        legend="Are you the landlord or the tenant?"
+        legend={t("evi_q_party")}
         required
         options={["Landlord", "Tenant"]}
         name="evictionParty"
         register={register}
         error={errors.evictionParty?.message}
+        lang={lang}
       />
       <RadioGroup
-        legend="Is this a residential or commercial property?"
+        legend={t("evi_q_property_type")}
         required
         options={["Residential", "Commercial"]}
         name="evictionPropertyType"
         register={register}
         error={errors.evictionPropertyType?.message}
+        lang={lang}
       />
       <Select
         id="evictionReason"
-        label="What is the reason for the eviction?"
+        label={t("evi_q_reason")}
         required
         options={EVICTION_REASONS}
         register={register}
         name="evictionReason"
-        placeholder="Select reason…"
+        placeholder={t("evi_q_reason_placeholder")}
         error={errors.evictionReason?.message}
+        lang={lang}
       />
       <RadioGroup
-        legend="Has a written notice already been served to the tenant?"
+        legend={t("evi_q_notice_served")}
         required
         options={["Yes", "No"]}
         name="evictionNoticeServed"
         register={register}
         error={errors.evictionNoticeServed?.message}
+        lang={lang}
       />
       {noticeServed === "Yes" && (
         <>
           <Select
             id="evictionNoticeType"
-            label="What type of notice?"
+            label={t("evi_q_notice_type")}
             required
             options={NOTICE_TYPES}
             register={register}
             name="evictionNoticeType"
-            placeholder="Select notice type…"
+            placeholder={t("evi_q_notice_type_placeholder")}
             error={errors.evictionNoticeType?.message}
+            lang={lang}
           />
           <Field
             id="evictionNoticeDate"
-            label="Date the notice was served"
+            label={t("evi_q_notice_date")}
             required
             error={errors.evictionNoticeDate?.message}
           >
@@ -1672,31 +1733,34 @@ function EvictionBranch({ register, watch, errors }: any) {
       )}
       <Select
         id="evictionCounty"
-        label="What county is the property located in?"
+        label={t("evi_q_county")}
         required
         options={COUNTIES}
         register={register}
         name="evictionCounty"
-        placeholder="Select county…"
+        placeholder={t("evi_q_county_placeholder")}
         error={errors.evictionCounty?.message}
+        lang={lang}
       />
       <RadioGroup
-        legend="Has the tenant already vacated?"
+        legend={t("evi_q_tenant_vacated")}
         required
         options={["Yes", "No", "Partially"]}
         name="evictionTenantVacated"
         register={register}
         error={errors.evictionTenantVacated?.message}
+        lang={lang}
       />
       <Select
         id="evictionRent"
-        label="Approximate monthly rent amount"
+        label={t("evi_q_rent")}
         required
         options={RENT_RANGES}
         register={register}
         name="evictionRent"
-        placeholder="Select range…"
+        placeholder={t("evi_q_rent_placeholder")}
         error={errors.evictionRent?.message}
+        lang={lang}
       />
     </div>
   );
@@ -1709,6 +1773,7 @@ function CheckboxGrid({
   control,
   required,
   error,
+  lang,
 }: {
   legend: string;
   options: readonly string[];
@@ -1717,6 +1782,7 @@ function CheckboxGrid({
   control: any;
   required?: boolean;
   error?: string;
+  lang: Language;
 }) {
   return (
     <fieldset>
@@ -1746,7 +1812,7 @@ function CheckboxGrid({
                     }}
                     className="accent-[var(--color-gold)] h-4 w-4"
                   />
-                  <span className="text-sm">{opt}</span>
+                  <span className="text-sm">{optionLabel(opt, lang)}</span>
                 </label>
               );
             })}
@@ -1759,24 +1825,25 @@ function CheckboxGrid({
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function ImmigrationBranch({ register, control, watch, errors }: any) {
+function ImmigrationBranch({ register, control, watch, errors, t, lang }: any) {
   const hasDeadline = watch("immigrationHasDeadline");
   const forms: string[] = watch("immigrationForms") ?? [];
   const showOther = forms.includes("Other / Not Sure");
   return (
     <div className="space-y-6">
       <CheckboxGrid
-        legend="What type of immigration form do you need help preparing?"
+        legend={t("imm_q_forms")}
         required
         options={IMMIGRATION_FORM_OPTIONS}
         name="immigrationForms"
         control={control}
         error={errors.immigrationForms?.message as string | undefined}
+        lang={lang}
       />
       {showOther && (
         <Field
           id="immigrationFormsOther"
-          label="Please describe which other form(s)"
+          label={t("imm_q_forms_other")}
           error={errors.immigrationFormsOther?.message}
         >
           <textarea
@@ -1788,35 +1855,38 @@ function ImmigrationBranch({ register, control, watch, errors }: any) {
         </Field>
       )}
       <RadioGroup
-        legend="Is this application for yourself or a family member?"
+        legend={t("imm_q_for_whom")}
         required
         options={["Myself", "Family member", "Both"]}
         name="immigrationForWhom"
         register={register}
         error={errors.immigrationForWhom?.message}
+        lang={lang}
       />
       <Select
         id="immigrationStatus"
-        label="What is your current immigration status?"
+        label={t("imm_q_status")}
         required
         options={IMMIGRATION_STATUSES}
         register={register}
         name="immigrationStatus"
-        placeholder="Select status…"
+        placeholder={t("imm_q_status_placeholder")}
         error={errors.immigrationStatus?.message}
+        lang={lang}
       />
       <RadioGroup
-        legend="Do you have a filing deadline or appointment date?"
+        legend={t("imm_q_deadline")}
         required
         options={["Yes", "No"]}
         name="immigrationHasDeadline"
         register={register}
         error={errors.immigrationHasDeadline?.message}
+        lang={lang}
       />
       {hasDeadline === "Yes" && (
         <Field
           id="immigrationDeadlineDate"
-          label="What is the date?"
+          label={t("imm_q_deadline_date")}
           required
           error={errors.immigrationDeadlineDate?.message}
         >
@@ -1829,50 +1899,54 @@ function ImmigrationBranch({ register, control, watch, errors }: any) {
         </Field>
       )}
       <RadioGroup
-        legend="Have you previously filed any immigration forms?"
+        legend={t("imm_q_previously_filed")}
         required
         options={["Yes", "No", "Not sure"]}
         name="immigrationPreviouslyFiled"
         register={register}
         error={errors.immigrationPreviouslyFiled?.message}
+        lang={lang}
       />
     </div>
   );
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function TrustBranch({ register, watch, errors }: any) {
+function TrustBranch({ register, watch, errors, t, lang }: any) {
   const ownsProperty = watch("trustOwnsProperty");
   return (
     <div className="space-y-6">
       <RadioGroup
-        legend="Is this trust for an individual or a couple?"
+        legend={t("trust_q_type")}
         required
         options={["Individual", "Married couple"]}
         name="trustType"
         register={register}
         error={errors.trustType?.message}
+        lang={lang}
       />
       <RadioGroup
-        legend="Do you have minor children or grandchildren you want to include as beneficiaries?"
+        legend={t("trust_q_minors")}
         required
         options={["Yes", "No"]}
         name="trustHasMinors"
         register={register}
         error={errors.trustHasMinors?.message}
+        lang={lang}
       />
       <RadioGroup
-        legend="Do you own real property (home, land, rental property)?"
+        legend={t("trust_q_property")}
         required
         options={["Yes", "No"]}
         name="trustOwnsProperty"
         register={register}
         error={errors.trustOwnsProperty?.message}
+        lang={lang}
       />
       {ownsProperty === "Yes" && (
         <Field
           id="trustPropertyCount"
-          label="How many properties?"
+          label={t("trust_q_property_count")}
           required
           error={errors.trustPropertyCount?.message}
         >
@@ -1886,66 +1960,72 @@ function TrustBranch({ register, watch, errors }: any) {
         </Field>
       )}
       <RadioGroup
-        legend="Do you have significant financial accounts or assets to include?"
+        legend={t("trust_q_assets")}
         required
         options={["Yes", "No", "Not sure"]}
         name="trustHasAssets"
         register={register}
         error={errors.trustHasAssets?.message}
+        lang={lang}
       />
       <RadioGroup
-        legend="Do you already have a will or existing estate planning documents?"
+        legend={t("trust_q_existing")}
         required
         options={["Yes", "No", "Not sure"]}
         name="trustExistingDocs"
         register={register}
         error={errors.trustExistingDocs?.message}
+        lang={lang}
       />
       <RadioGroup
-        legend="Who would you like to name as your successor trustee?"
+        legend={t("trust_q_successor")}
         required
         options={TRUST_SUCCESSOR_OPTIONS}
         name="trustSuccessor"
         register={register}
         error={errors.trustSuccessor?.message}
+        lang={lang}
       />
     </div>
   );
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function PoaBranch({ register, control, watch, errors }: any) {
+function PoaBranch({ register, control, watch, errors, t, lang }: any) {
   const hasReason = watch("poaHasReason");
   return (
     <div className="space-y-6">
       <CheckboxGrid
-        legend="What type of Power of Attorney do you need?"
+        legend={t("poa_q_types")}
         required
         options={POA_TYPES}
         name="poaTypes"
         control={control}
         error={errors.poaTypes?.message as string | undefined}
+        lang={lang}
       />
       <RadioGroup
-        legend="Who will be the agent (the person given authority)?"
+        legend={t("poa_q_agent")}
         required
         options={AGENT_OPTIONS}
         name="poaAgent"
         register={register}
         error={errors.poaAgent?.message}
+        lang={lang}
       />
       <RadioGroup
-        legend="Is there a specific reason or deadline for needing this document?"
+        legend={t("poa_q_reason_yn")}
         required
         options={["Yes", "No"]}
         name="poaHasReason"
         register={register}
         error={errors.poaHasReason?.message}
+        lang={lang}
       />
       {hasReason === "Yes" && (
         <Field
           id="poaReason"
-          label="Please describe"
+          label={t("poa_q_reason")}
           required
           error={errors.poaReason?.message}
         >
@@ -1954,47 +2034,50 @@ function PoaBranch({ register, control, watch, errors }: any) {
             rows={3}
             {...register("poaReason")}
             className={inputBase}
-            placeholder='e.g. "upcoming surgery", "traveling abroad"'
+            placeholder={t("poa_q_reason_placeholder")}
           />
         </Field>
       )}
       <RadioGroup
-        legend="Do you need this document notarized?"
+        legend={t("poa_q_notarize")}
         required
         options={["Yes", "No", "Not sure"]}
         name="poaNotarize"
         register={register}
         error={errors.poaNotarize?.message}
+        lang={lang}
       />
     </div>
   );
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function DmvBranch({ register, control, watch, errors }: any) {
+function DmvBranch({ register, control, watch, errors, t, lang }: any) {
   const hasAppt = watch("dmvHasAppointment");
   return (
     <div className="space-y-6">
       <CheckboxGrid
-        legend="What type of DMV form do you need help completing?"
+        legend={t("dmv_q_forms")}
         required
         options={DMV_FORM_OPTIONS}
         name="dmvFormTypes"
         control={control}
         error={errors.dmvFormTypes?.message as string | undefined}
+        lang={lang}
       />
       <RadioGroup
-        legend="Do you have a DMV appointment scheduled?"
+        legend={t("dmv_q_appointment")}
         required
         options={["Yes", "No"]}
         name="dmvHasAppointment"
         register={register}
         error={errors.dmvHasAppointment?.message}
+        lang={lang}
       />
       {hasAppt === "Yes" && (
         <Field
           id="dmvAppointmentDate"
-          label="What is the appointment date?"
+          label={t("dmv_q_appointment_date")}
           required
           error={errors.dmvAppointmentDate?.message}
         >
@@ -2008,7 +2091,7 @@ function DmvBranch({ register, control, watch, errors }: any) {
       )}
       <Field
         id="dmvDetails"
-        label="Additional details about what you need"
+        label={t("dmv_q_details")}
         error={errors.dmvDetails?.message}
       >
         <textarea
@@ -2016,7 +2099,7 @@ function DmvBranch({ register, control, watch, errors }: any) {
           rows={4}
           {...register("dmvDetails")}
           className={inputBase}
-          placeholder="Optional"
+          placeholder={t("placeholder_optional")}
         />
       </Field>
     </div>
@@ -2024,40 +2107,43 @@ function DmvBranch({ register, control, watch, errors }: any) {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function TaxBranch({ register, control, watch, errors }: any) {
+function TaxBranch({ register, control, watch, errors, t, lang }: any) {
   const hasDeadline = watch("taxHasDeadline");
   return (
     <div className="space-y-6">
       <CheckboxGrid
-        legend="What type of tax document assistance do you need?"
+        legend={t("tax_q_types")}
         required
         options={TAX_TYPE_OPTIONS}
         name="taxTypes"
         control={control}
         error={errors.taxTypes?.message as string | undefined}
+        lang={lang}
       />
       <Select
         id="taxYear"
-        label="What tax year(s) are involved?"
+        label={t("tax_q_year")}
         required
         options={TAX_YEARS}
         register={register}
         name="taxYear"
-        placeholder="Select year…"
+        placeholder={t("tax_q_year_placeholder")}
         error={errors.taxYear?.message}
+        lang={lang}
       />
       <RadioGroup
-        legend="Do you have a filing deadline?"
+        legend={t("tax_q_deadline")}
         required
         options={["Yes", "No"]}
         name="taxHasDeadline"
         register={register}
         error={errors.taxHasDeadline?.message}
+        lang={lang}
       />
       {hasDeadline === "Yes" && (
         <Field
           id="taxDeadlineDate"
-          label="What is the deadline?"
+          label={t("tax_q_deadline_date")}
           required
           error={errors.taxDeadlineDate?.message}
         >
@@ -2071,7 +2157,7 @@ function TaxBranch({ register, control, watch, errors }: any) {
       )}
       <Field
         id="taxNotes"
-        label="Additional notes"
+        label={t("tax_q_notes")}
         error={errors.taxNotes?.message}
       >
         <textarea
@@ -2079,7 +2165,7 @@ function TaxBranch({ register, control, watch, errors }: any) {
           rows={4}
           {...register("taxNotes")}
           className={inputBase}
-          placeholder="Optional"
+          placeholder={t("placeholder_optional")}
         />
       </Field>
     </div>
@@ -2087,13 +2173,13 @@ function TaxBranch({ register, control, watch, errors }: any) {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function OtherBranch({ register, watch, errors }: any) {
+function OtherBranch({ register, watch, errors, t, lang }: any) {
   const hasDeadline = watch("otherHasDeadline");
   return (
     <div className="space-y-6">
       <Field
         id="otherDescription"
-        label="Please describe what documents you need help preparing"
+        label={t("other_q_description")}
         required
         error={errors.otherDescription?.message}
       >
@@ -2105,17 +2191,18 @@ function OtherBranch({ register, watch, errors }: any) {
         />
       </Field>
       <RadioGroup
-        legend="Do you have a deadline or court date?"
+        legend={t("other_q_deadline")}
         required
         options={["Yes", "No"]}
         name="otherHasDeadline"
         register={register}
         error={errors.otherHasDeadline?.message}
+        lang={lang}
       />
       {hasDeadline === "Yes" && (
         <Field
           id="otherDeadlineDate"
-          label="What is the date?"
+          label={t("other_q_deadline_date")}
           required
           error={errors.otherDeadlineDate?.message}
         >
@@ -2135,112 +2222,136 @@ function OtherBranch({ register, watch, errors }: any) {
 // Review summary
 // ---------------------------------------------------------------------------
 
-function ReviewSummary({ data }: { data: Partial<IntakeData> }) {
+function ReviewSummary({
+  data,
+  t,
+  lang,
+}: {
+  data: Partial<IntakeData>;
+  t: (key: TranslationKey) => string;
+  lang: Language;
+}) {
+  // Localize a stored option value (English) for display.
+  const opt = (v: string | undefined) =>
+    v ? optionLabel(v, lang) : undefined;
+  const optList = (arr: string[] | undefined) =>
+    arr && arr.length > 0 ? arr.map((v) => optionLabel(v, lang)).join(", ") : undefined;
+  const serviceName = (v: string | undefined) =>
+    v ? SERVICE_NAME_TRANSLATIONS[v]?.[lang] ?? v : undefined;
+  const servicesList = (arr: string[] | undefined) =>
+    arr && arr.length > 0
+      ? arr.map((v) => SERVICE_NAME_TRANSLATIONS[v]?.[lang] ?? v).join(", ")
+      : undefined;
+
   const rows: Array<[string, string | undefined]> = [
-    ["Name", [data.firstName, data.lastName].filter(Boolean).join(" ")],
-    ["Phone", data.phone],
-    ["Email", data.email],
-    ["Preferred contact", data.contactMethod],
+    [t("rs_name"), [data.firstName, data.lastName].filter(Boolean).join(" ")],
+    [t("rs_phone"), data.phone],
+    [t("rs_email"), data.email],
+    [t("rs_preferred_contact"), opt(data.contactMethod)],
     [
-      "Best time",
-      data.bestTime === "LateAfternoon" ? "Late Afternoon" : data.bestTime,
+      t("rs_best_time"),
+      data.bestTime === "LateAfternoon"
+        ? t("rs_late_afternoon_display")
+        : opt(data.bestTime),
     ],
-    ["Primary service", data.primaryService],
+    [t("rs_primary_service"), serviceName(data.primaryService)],
     [
-      "Additional services",
+      t("rs_additional_services"),
       data.needsMoreServices === "Yes"
-        ? data.additionalServices?.join(", ")
+        ? servicesList(data.additionalServices)
         : undefined,
     ],
 
     // Divorce
-    ["Divorce type", data.divorceType],
-    ["Minor children", data.divorceHasChildren],
-    ["Number of children", data.divorceChildrenCount],
-    ["Ages of children", data.divorceChildrenAges],
-    ["Real property", data.divorceHasProperty],
-    ["Significant assets", data.divorceHasAssets],
-    ["Marriage length", data.divorceMarriageLength],
-    ["Filing county", data.divorceFilingCounty],
-    ["Already filed", data.divorceFiledPaperwork],
+    [t("rs_divorce_type"), opt(data.divorceType)],
+    [t("rs_minor_children"), opt(data.divorceHasChildren)],
+    [t("rs_children_count"), data.divorceChildrenCount],
+    [t("rs_children_ages"), data.divorceChildrenAges],
+    [t("rs_real_property"), opt(data.divorceHasProperty)],
+    [t("rs_significant_assets"), opt(data.divorceHasAssets)],
+    [t("rs_marriage_length"), opt(data.divorceMarriageLength)],
+    [t("rs_filing_county"), opt(data.divorceFilingCounty)],
+    [t("rs_already_filed"), opt(data.divorceFiledPaperwork)],
 
     // Eviction
-    ["Party", data.evictionParty],
-    ["Property type", data.evictionPropertyType],
-    ["Eviction reason", data.evictionReason],
-    ["Notice served", data.evictionNoticeServed],
-    ["Notice type", data.evictionNoticeType],
-    ["Notice date", data.evictionNoticeDate],
-    ["Property county", data.evictionCounty],
-    ["Tenant vacated", data.evictionTenantVacated],
-    ["Monthly rent", data.evictionRent],
+    [t("rs_party"), opt(data.evictionParty)],
+    [t("rs_property_type"), opt(data.evictionPropertyType)],
+    [t("rs_eviction_reason"), opt(data.evictionReason)],
+    [t("rs_notice_served"), opt(data.evictionNoticeServed)],
+    [t("rs_notice_type"), opt(data.evictionNoticeType)],
+    [t("rs_notice_date"), data.evictionNoticeDate],
+    [t("rs_property_county"), opt(data.evictionCounty)],
+    [t("rs_tenant_vacated"), opt(data.evictionTenantVacated)],
+    [t("rs_monthly_rent"), opt(data.evictionRent)],
 
     // Immigration
-    ["Immigration forms", data.immigrationForms?.join(", ")],
-    ["Other forms detail", data.immigrationFormsOther],
-    ["Application for", data.immigrationForWhom],
-    ["Immigration status", data.immigrationStatus],
+    [t("rs_immigration_forms"), optList(data.immigrationForms)],
+    [t("rs_other_forms_detail"), data.immigrationFormsOther],
+    [t("rs_application_for"), opt(data.immigrationForWhom)],
+    [t("rs_immigration_status"), opt(data.immigrationStatus)],
     [
-      "Deadline",
+      t("rs_deadline"),
       data.immigrationHasDeadline === "Yes"
-        ? data.immigrationDeadlineDate || "Yes"
-        : data.immigrationHasDeadline,
+        ? data.immigrationDeadlineDate || optionLabel("Yes", lang)
+        : opt(data.immigrationHasDeadline),
     ],
-    ["Previously filed", data.immigrationPreviouslyFiled],
+    [t("rs_previously_filed"), opt(data.immigrationPreviouslyFiled)],
 
     // Trust
-    ["Trust for", data.trustType],
-    ["Minor beneficiaries", data.trustHasMinors],
-    ["Owns real property", data.trustOwnsProperty],
-    ["Number of properties", data.trustPropertyCount],
-    ["Significant assets", data.trustHasAssets],
-    ["Existing estate docs", data.trustExistingDocs],
-    ["Successor trustee", data.trustSuccessor],
+    [t("rs_trust_for"), opt(data.trustType)],
+    [t("rs_minor_beneficiaries"), opt(data.trustHasMinors)],
+    [t("rs_owns_real_property"), opt(data.trustOwnsProperty)],
+    [t("rs_property_count"), data.trustPropertyCount],
+    [t("rs_significant_assets"), opt(data.trustHasAssets)],
+    [t("rs_existing_estate_docs"), opt(data.trustExistingDocs)],
+    [t("rs_successor_trustee"), opt(data.trustSuccessor)],
 
     // POA
-    ["POA types", data.poaTypes?.join(", ")],
-    ["POA agent", data.poaAgent],
+    [t("rs_poa_types"), optList(data.poaTypes)],
+    [t("rs_poa_agent"), opt(data.poaAgent)],
     [
-      "POA reason",
-      data.poaHasReason === "Yes" ? data.poaReason || "Yes" : data.poaHasReason,
+      t("rs_poa_reason"),
+      data.poaHasReason === "Yes"
+        ? data.poaReason || optionLabel("Yes", lang)
+        : opt(data.poaHasReason),
     ],
-    ["Notarize", data.poaNotarize],
+    [t("rs_notarize"), opt(data.poaNotarize)],
 
     // DMV
-    ["DMV forms", data.dmvFormTypes?.join(", ")],
+    [t("rs_dmv_forms"), optList(data.dmvFormTypes)],
     [
-      "DMV appointment",
+      t("rs_dmv_appointment"),
       data.dmvHasAppointment === "Yes"
-        ? data.dmvAppointmentDate || "Yes"
-        : data.dmvHasAppointment,
+        ? data.dmvAppointmentDate || optionLabel("Yes", lang)
+        : opt(data.dmvHasAppointment),
     ],
-    ["DMV details", data.dmvDetails],
+    [t("rs_dmv_details"), data.dmvDetails],
 
     // Tax
-    ["Tax assistance", data.taxTypes?.join(", ")],
-    ["Tax year", data.taxYear],
+    [t("rs_tax_assistance"), optList(data.taxTypes)],
+    [t("rs_tax_year"), opt(data.taxYear)],
     [
-      "Tax deadline",
+      t("rs_tax_deadline"),
       data.taxHasDeadline === "Yes"
-        ? data.taxDeadlineDate || "Yes"
-        : data.taxHasDeadline,
+        ? data.taxDeadlineDate || optionLabel("Yes", lang)
+        : opt(data.taxHasDeadline),
     ],
-    ["Tax notes", data.taxNotes],
+    [t("rs_tax_notes"), data.taxNotes],
 
     // Other
-    ["Description", data.otherDescription],
+    [t("rs_description"), data.otherDescription],
     [
-      "Deadline",
+      t("rs_deadline"),
       data.otherHasDeadline === "Yes"
-        ? data.otherDeadlineDate || "Yes"
-        : data.otherHasDeadline,
+        ? data.otherDeadlineDate || optionLabel("Yes", lang)
+        : opt(data.otherHasDeadline),
     ],
 
     // General
-    ["Your county", data.clientCounty],
-    ["Heard about us via", data.referralSource],
-    ["Referred by", data.referralName],
-    ["Additional notes", data.additionalNotes],
+    [t("rs_your_county"), opt(data.clientCounty)],
+    [t("rs_heard_via"), opt(data.referralSource)],
+    [t("rs_referred_by"), data.referralName],
+    [t("rs_additional_notes"), data.additionalNotes],
   ];
 
   return (

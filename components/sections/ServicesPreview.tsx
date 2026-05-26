@@ -3,12 +3,12 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
-import { HOMEPAGE_SERVICES } from "@/lib/services";
+import { HOMEPAGE_SERVICES, localized } from "@/lib/services";
 import { fadeUp, staggerContainer, viewportOnce } from "@/lib/animations";
 import { useLanguage } from "@/lib/language-context";
 
 export function ServicesPreview() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   return (
     <section className="bg-[var(--color-navy)] text-white py-20 md:py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -51,10 +51,10 @@ export function ServicesPreview() {
                     strokeWidth={1.5}
                   />
                   <h3 className="font-serif text-xl md:text-2xl mb-3 leading-snug">
-                    {service.title}
+                    {localized(service, "title", lang)}
                   </h3>
                   <p className="text-sm text-[var(--color-body-light)] leading-relaxed mb-5">
-                    {service.short}
+                    {localized(service, "short", lang)}
                   </p>
                   <span className="inline-flex items-center gap-1.5 text-sm text-[var(--color-gold)] group-hover:gap-2.5 transition-all">
                     {t("services_learn_more")}

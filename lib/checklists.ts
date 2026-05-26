@@ -1,11 +1,17 @@
 // Personalized document checklists shown on the intake success page,
 // keyed by the primaryService value selected in Step 2 of the intake form.
 
+import type { Language } from "./translations";
+
 export type ServiceChecklist = {
   title: string;
   intro: string;
   items: string[];
   note: string;
+  titleEs: string;
+  introEs: string;
+  itemsEs: string[];
+  noteEs: string;
 };
 
 export const SERVICE_CHECKLISTS: Record<string, ServiceChecklist> = {
@@ -25,6 +31,22 @@ export const SERVICE_CHECKLISTS: Record<string, ServiceChecklist> = {
     ],
     note:
       "You do not need all of these to get started — bring what you have and we'll guide you through the rest.",
+    titleEs: "Documentos a Reunir para Sus Trámites de Divorcio",
+    introEs:
+      "Tener esto listo nos ayudará a preparar sus documentos más rápido:",
+    itemsEs: [
+      "Certificado de matrimonio",
+      "Nombres legales completos y fechas de nacimiento de ambas partes",
+      "Direcciones actuales de ambas partes",
+      "Lista de toda propiedad inmueble (direcciones, valores estimados)",
+      "Lista de cuentas financieras (banco, jubilación, inversiones)",
+      "Información de vehículos (marca, modelo, año, valor estimado)",
+      "Nombres legales completos y fechas de nacimiento de los hijos (si aplica)",
+      "Cualquier orden judicial o acuerdo existente entre las partes",
+      "Fecha aproximada de separación",
+    ],
+    noteEs:
+      "No necesita todo esto para comenzar — traiga lo que tenga y le guiaremos con el resto.",
   },
   "Eviction (Unlawful Detainer) Paperwork": {
     title: "Documents to Gather for Your Eviction Paperwork",
@@ -40,6 +62,20 @@ export const SERVICE_CHECKLISTS: Record<string, ServiceChecklist> = {
     ],
     note:
       "If you've already served a notice, bring a copy — the date and method of service are important for the paperwork.",
+    titleEs: "Documentos a Reunir para Sus Trámites de Desalojo",
+    introEs:
+      "Por favor tenga disponible lo siguiente cuando le contactemos:",
+    itemsEs: [
+      "Copia del contrato de arrendamiento actual",
+      "Nombre(s) legal(es) completo(s) del inquilino tal como aparecen en el contrato",
+      "Dirección completa de la propiedad en alquiler",
+      "Registro de pagos de alquiler (o impagos)",
+      "Copia de cualquier aviso ya entregado al inquilino",
+      "Fecha(s) en que se entregaron los avisos y cómo se entregaron",
+      "Cualquier comunicación escrita con el inquilino sobre el problema",
+    ],
+    noteEs:
+      "Si ya entregó un aviso, traiga una copia — la fecha y el método de entrega son importantes para los trámites.",
   },
   "Immigration Documents": {
     title: "Documents to Gather for Your Immigration Paperwork",
@@ -57,6 +93,21 @@ export const SERVICE_CHECKLISTS: Record<string, ServiceChecklist> = {
     ],
     note:
       "Immigration forms have specific photo and document requirements. We'll confirm exactly what's needed for your specific forms when we follow up.",
+    titleEs: "Documentos a Reunir para Sus Trámites de Inmigración",
+    introEs:
+      "Los documentos exactos necesarios dependen de los formularios que presente, pero generalmente necesitará:",
+    itemsEs: [
+      "Identificación con foto válida emitida por el gobierno",
+      "Pasaporte (suyo y de los familiares involucrados)",
+      "Certificados de nacimiento de todos los solicitantes",
+      "Certificado de matrimonio (si presenta para un cónyuge)",
+      "Cualquier documento de inmigración previo (visa, residencia, solicitudes anteriores)",
+      "Avisos de recibo de USCIS para cualquier solicitud pendiente",
+      "Comprobante de domicilio (factura de servicios, contrato, estado bancario)",
+      "Dos fotos tamaño pasaporte por solicitante",
+    ],
+    noteEs:
+      "Los formularios de inmigración tienen requisitos específicos de fotos y documentos. Confirmaremos exactamente qué se necesita para sus formularios específicos cuando le contactemos.",
   },
   "Living Trust Documents": {
     title: "Documents to Gather for Your Living Trust",
@@ -73,6 +124,20 @@ export const SERVICE_CHECKLISTS: Record<string, ServiceChecklist> = {
     ],
     note:
       "We prepare the documents at your direction. You decide what goes into your trust — we handle the paperwork.",
+    titleEs: "Documentos a Reunir para Su Fideicomiso en Vida",
+    introEs: "Para preparar sus documentos de fideicomiso, por favor reúna:",
+    itemsEs: [
+      "Nombres legales completos y fechas de nacimiento de todos los fideicomisarios y beneficiarios",
+      "Direcciones de todos los fideicomisarios y beneficiarios",
+      "Escrituras o títulos de cualquier propiedad inmueble a incluir",
+      "Lista de cuentas financieras que desea incluir (números de cuenta aún no requeridos)",
+      "Títulos de vehículos (si incluye vehículos)",
+      "Nombres e información de contacto de su(s) fideicomisario(s) sucesor(es)",
+      "Nombres y edades de beneficiarios menores de edad",
+      "Testamento o documentos patrimoniales existentes (si los hay)",
+    ],
+    noteEs:
+      "Preparamos los documentos según sus instrucciones. Usted decide qué incluye su fideicomiso — nosotros manejamos los trámites.",
   },
   "Power of Attorney": {
     title: "Documents to Gather for Your Power of Attorney",
@@ -86,6 +151,17 @@ export const SERVICE_CHECKLISTS: Record<string, ServiceChecklist> = {
     ],
     note:
       "Power of Attorney documents typically require notarization. We can help prepare the document — you'll arrange notarization separately.",
+    titleEs: "Documentos a Reunir para Su Poder Notarial",
+    introEs: "Por favor tenga listo lo siguiente:",
+    itemsEs: [
+      'Nombre legal completo y fecha de nacimiento de la persona que otorga la autoridad (el "poderdante")',
+      'Nombre legal completo e información de contacto de la persona que recibe la autoridad (el "apoderado")',
+      "Identificación emitida por el gobierno del poderdante",
+      "Descripción de los poderes o limitaciones específicas que desea incluir (si aplica)",
+      "Nombre de un apoderado alterno (recomendado en caso de que su primera opción no esté disponible)",
+    ],
+    noteEs:
+      "Los documentos de Poder Notarial generalmente requieren notarización. Podemos ayudar a preparar el documento — usted coordinará la notarización por separado.",
   },
   "DMV Form Assistance": {
     title: "Documents to Gather for DMV Form Assistance",
@@ -101,6 +177,19 @@ export const SERVICE_CHECKLISTS: Record<string, ServiceChecklist> = {
     ],
     note:
       "We help you complete the forms — you submit them to the DMV directly.",
+    titleEs: "Documentos a Reunir para Asistencia con Formularios del DMV",
+    introEs: "Dependiendo de su asunto en el DMV, puede necesitar:",
+    itemsEs: [
+      "Título actual del vehículo o pink slip",
+      "Identificación con foto válida emitida por el gobierno",
+      "Registro actual del vehículo",
+      "Comprobante de seguro",
+      "Comprobante de venta (para transferencias)",
+      "Liberación de responsabilidad (si vende un vehículo)",
+      "Confirmación de cita del DMV (si tiene una)",
+    ],
+    noteEs:
+      "Le ayudamos a completar los formularios — usted los presenta directamente al DMV.",
   },
   "Tax Document Organization (Clerical)": {
     title: "Documents to Gather for Tax Document Organization",
@@ -116,6 +205,19 @@ export const SERVICE_CHECKLISTS: Record<string, ServiceChecklist> = {
     ],
     note:
       "We provide clerical organization and document preparation assistance only. We do not provide tax advice. You submit all tax documents directly.",
+    titleEs: "Documentos a Reunir para Organización de Documentos de Impuestos",
+    introEs: "Por favor reúna lo siguiente:",
+    itemsEs: [
+      "Todos los formularios W-2 de los empleadores",
+      "Formularios 1099 (intereses, dividendos, trabajo por contrato, etc.)",
+      "Declaración de impuestos del año anterior (como referencia)",
+      "Números de Seguro Social para usted y sus dependientes",
+      "Recibos o registros de cualquier deducción que reclame",
+      "Cualquier aviso del IRS o impuestos estatales recibido",
+      "Estados bancarios si se necesitan para verificación de ingresos",
+    ],
+    noteEs:
+      "Solo brindamos organización clerical y asistencia en la preparación de documentos. No brindamos asesoría fiscal. Usted presenta todos los documentos de impuestos directamente.",
   },
   default: {
     title: "Documents to Gather",
@@ -128,5 +230,44 @@ export const SERVICE_CHECKLISTS: Record<string, ServiceChecklist> = {
     ],
     note:
       "We'll follow up within 1 business day with specific requirements for your documents.",
+    titleEs: "Documentos a Reunir",
+    introEs: "Mientras revisamos su solicitud, comience a reunir:",
+    itemsEs: [
+      "Identificación con foto válida emitida por el gobierno",
+      "Cualquier documento existente relacionado con su asunto",
+      "Fechas y detalles relevantes a su situación",
+      "Información de contacto de otras partes involucradas",
+    ],
+    noteEs:
+      "Le contactaremos dentro de 1 día hábil con los requisitos específicos para sus documentos.",
   },
 };
+
+// Localized checklist accessors — fall back to English if Spanish missing.
+export function checklistTitle(
+  c: ServiceChecklist,
+  lang: Language,
+): string {
+  return lang === "es" ? c.titleEs || c.title : c.title;
+}
+
+export function checklistIntro(
+  c: ServiceChecklist,
+  lang: Language,
+): string {
+  return lang === "es" ? c.introEs || c.intro : c.intro;
+}
+
+export function checklistItems(
+  c: ServiceChecklist,
+  lang: Language,
+): string[] {
+  return lang === "es" ? c.itemsEs || c.items : c.items;
+}
+
+export function checklistNote(
+  c: ServiceChecklist,
+  lang: Language,
+): string {
+  return lang === "es" ? c.noteEs || c.note : c.note;
+}

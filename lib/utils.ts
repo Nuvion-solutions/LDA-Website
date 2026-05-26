@@ -10,7 +10,6 @@ export const BUSINESS = {
   shortName: "CLDE",
   lda: "LDA #87",
   county: "Sonoma County",
-  address: "1407 Rusch Court, Santa Rosa, CA 95401",
   phone: "(707) 909-1240",
   phoneTel: "+17079091240",
   email: "ak.cnewtonesq@gmail.com",

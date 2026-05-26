@@ -23,23 +23,18 @@ export const metadata: Metadata = {
 const TEAM = [
   {
     name: "Carson C. Newton",
-    role: "Principal / Supervising LDA",
-    bio: "Founder and principal of California Legal Document Excellence, LLC. Oversees all document preparation work and quality standards.",
-  },
-  {
-    name: "Arzoo Khan",
-    role: "Legal Document Preparation Apprentice",
-    bio: "California Law Office Study Program Legal Apprentice. Hands-on experience preparing documents in family law, eviction, civil, and related court matters. Works closely with the Law Office of Carson C. Newton. Detail-oriented, professional document formatting, committed to helping clients navigate paperwork. Focuses on clear, accurate, and polished document preparation.",
-  },
-  {
-    name: "S. Khan",
-    role: "Document Preparation Specialist",
-    bio: "Prepares court forms and administrative paperwork with a focus on accuracy and clean formatting.",
+    role: "Principal / Founder",
+    bio: "Co-founder and principal of California Legal Document Excellence, LLC. Oversees document preparation operations and quality standards.",
   },
   {
     name: "A. Khan",
-    role: "Document Preparation Specialist",
-    bio: "Prepares court forms and administrative paperwork with a focus on accuracy and clean formatting.",
+    role: "Principal / Founder",
+    bio: "Co-founder and principal of California Legal Document Excellence, LLC.",
+  },
+  {
+    name: "S. Khan",
+    role: "Principal / Founder",
+    bio: "Co-founder and principal of California Legal Document Excellence, LLC.",
   },
 ];
 

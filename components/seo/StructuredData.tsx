@@ -6,17 +6,18 @@ import { SERVICES } from "@/lib/services";
 // Renders two graphs: a LegalService (with full LocalBusiness fields) and
 // a WebSite entry to help with sitelinks search box rendering.
 
+// Service-area business: we surface city/region/country only (no street
+// address) so Google can still place us in local results without exposing
+// a specific office location.
 const ADDRESS = {
   "@type": "PostalAddress",
-  streetAddress: "1407 Rusch Court",
   addressLocality: "Santa Rosa",
   addressRegion: "CA",
-  postalCode: "95401",
   addressCountry: "US",
 };
 
 // Geographic coordinates for Santa Rosa, CA (approximate centroid — used
-// only as a hint for Google's local indexing; the address is authoritative).
+// only as a hint for Google's local indexing).
 const GEO = {
   "@type": "GeoCoordinates",
   latitude: 38.4404,

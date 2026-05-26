@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { MapPin, Phone, Mail, Clock } from "lucide-react";
+import { Phone, Mail, Clock } from "lucide-react";
 import { BUSINESS } from "@/lib/utils";
 import { SERVICES, localized } from "@/lib/services";
 import { useLanguage } from "@/lib/language-context";
@@ -23,10 +23,6 @@ export function Footer() {
               {BUSINESS.lda}, {BUSINESS.county}
             </p>
             <ul className="space-y-3 text-sm">
-              <li className="flex items-start gap-3">
-                <MapPin className="h-4 w-4 mt-0.5 text-[var(--color-gold)] shrink-0" aria-hidden />
-                <span>{BUSINESS.address}</span>
-              </li>
               <li className="flex items-start gap-3">
                 <Phone className="h-4 w-4 mt-0.5 text-[var(--color-gold)] shrink-0" aria-hidden />
                 <a href={`tel:${BUSINESS.phoneTel}`} className="hover:text-[var(--color-gold)]">

@@ -96,6 +96,61 @@ type IntakeBody = {
   consentContact?: boolean;
 };
 
+// Webhook delivery: retry on 5xx + transport errors so transient GHL/network
+// hiccups don't drop a lead. Two retries with a short backoff is enough to
+// cover the common cases (rolling deploys, brief 502s) without delaying the
+// user-facing response by more than a few seconds.
+const WEBHOOK_RETRY_DELAYS_MS = [1000, 3000];
+const WEBHOOK_TIMEOUT_MS = 8000;
+
+async function deliverToGhl(
+  url: string,
+  payload: unknown,
+  submissionId: string,
+): Promise<{ ok: true; status: number } | { ok: false; reason: string }> {
+  const attempts = WEBHOOK_RETRY_DELAYS_MS.length + 1;
+  let lastReason = "unknown";
+
+  for (let i = 0; i < attempts; i++) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), WEBHOOK_TIMEOUT_MS);
+    try {
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Submission-Id": submissionId,
+        },
+        body: JSON.stringify(payload),
+        signal: controller.signal,
+      });
+      clearTimeout(timer);
+
+      if (res.ok) return { ok: true, status: res.status };
+
+      // 4xx is a permanent failure — don't waste retries.
+      if (res.status >= 400 && res.status < 500) {
+        return { ok: false, reason: `http_${res.status}` };
+      }
+
+      lastReason = `http_${res.status}`;
+    } catch (err) {
+      clearTimeout(timer);
+      lastReason =
+        err instanceof Error && err.name === "AbortError"
+          ? "timeout"
+          : "network";
+    }
+
+    const delay = WEBHOOK_RETRY_DELAYS_MS[i];
+    if (delay !== undefined) {
+      await new Promise((r) => setTimeout(r, delay));
+    }
+  }
+
+  return { ok: false, reason: lastReason };
+}
+
 export async function POST(req: Request) {
   let data: IntakeBody;
   try {
@@ -107,11 +162,13 @@ export async function POST(req: Request) {
     );
   }
 
+  const submissionId = crypto.randomUUID();
   const webhookUrl = process.env.GHL_WEBHOOK_URL;
 
   // Graceful fallback when webhook URL is not configured.
   if (!webhookUrl) {
     console.log("[intake] No GHL_WEBHOOK_URL set — logging submission locally:", {
+      submissionId,
       submittedAt: new Date().toISOString(),
       firstName: data.firstName,
       lastName: data.lastName,
@@ -120,7 +177,7 @@ export async function POST(req: Request) {
       primaryService: data.primaryService,
       clientCounty: data.clientCounty,
     });
-    return Response.json({ success: true, mode: "local" });
+    return Response.json({ success: true, mode: "local", submissionId });
   }
 
   // Urgency calculation — feed deadline-bearing fields to the shared helper.
@@ -129,6 +186,8 @@ export async function POST(req: Request) {
   const urgencyTag = urgencyTagFor(daysUntilDeadline);
 
   const ghlPayload = {
+    submissionId,
+    submittedAt: new Date().toISOString(),
     firstName: data.firstName,
     lastName: data.lastName,
     phone: data.phone,
@@ -229,16 +288,28 @@ export async function POST(req: Request) {
     },
   };
 
-  try {
-    const response = await fetch(webhookUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(ghlPayload),
-    });
+  const result = await deliverToGhl(webhookUrl, ghlPayload, submissionId);
 
-    return Response.json({ success: true, status: response.status });
-  } catch (error) {
-    console.error("[intake] GHL webhook error:", error);
-    return Response.json({ success: true, mode: "fallback" });
+  if (result.ok) {
+    return Response.json({ success: true, submissionId, status: result.status });
   }
+
+  // Log enough context to recover the lead manually if GHL delivery fails.
+  // Vercel logs roll every 24h, so also wire a durable sink (Sentry/Slack)
+  // if you can't tolerate any drop.
+  console.error("[intake] GHL webhook failed after retries:", {
+    submissionId,
+    reason: result.reason,
+    firstName: data.firstName,
+    lastName: data.lastName,
+    email: data.email,
+    phone: data.phone,
+    primaryService: data.primaryService,
+    submittedAt: new Date().toISOString(),
+  });
+
+  return Response.json(
+    { success: false, submissionId, error: "delivery_failed", reason: result.reason },
+    { status: 502 },
+  );
 }

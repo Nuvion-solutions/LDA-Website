@@ -41,7 +41,7 @@ export function Footer() {
               </li>
               <li className="flex items-start gap-3">
                 <Clock className="h-4 w-4 mt-0.5 text-[var(--color-gold)] shrink-0" aria-hidden />
-                <span>{BUSINESS.hours}</span>
+                <span>{t("business_hours")}</span>
               </li>
             </ul>
           </div>

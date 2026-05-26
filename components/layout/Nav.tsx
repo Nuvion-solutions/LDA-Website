@@ -60,8 +60,8 @@ export function Nav() {
               onClick={toggleLang}
               aria-label={
                 lang === "en"
-                  ? "Cambiar a español"
-                  : "Switch to English"
+                  ? "Switch to Spanish"
+                  : "Cambiar a inglés"
               }
               className="inline-flex items-center gap-1.5 text-xs font-medium text-[var(--color-gold-light)] border border-[var(--color-gold)]/40 px-3 py-2 rounded-sm hover:border-[var(--color-gold)] hover:text-[var(--color-gold)] transition-colors min-h-[40px]"
             >
@@ -83,8 +83,8 @@ export function Nav() {
               onClick={toggleLang}
               aria-label={
                 lang === "en"
-                  ? "Cambiar a español"
-                  : "Switch to English"
+                  ? "Switch to Spanish"
+                  : "Cambiar a inglés"
               }
               className="inline-flex items-center gap-1.5 text-xs font-medium text-[var(--color-gold-light)] border border-[var(--color-gold)]/40 px-2.5 py-2 rounded-sm active:bg-[var(--color-gold)]/10 transition-colors min-h-[40px]"
             >

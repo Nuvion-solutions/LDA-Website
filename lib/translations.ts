@@ -378,6 +378,13 @@ const en = {
   // Generic placeholders
   placeholder_optional: "Optional",
   placeholder_select: "Select…",
+
+  // Business info
+  business_hours: "Monday–Saturday, 9:00 AM – 5:00 PM",
+
+  // Validation errors (Spanish-visible, shown via t())
+  err_consent_lda: "You must acknowledge this to continue",
+  err_consent_contact: "You must consent to be contacted",
 } as const;
 
 type Dict = Record<keyof typeof en, string>;
@@ -767,6 +774,13 @@ const es: Dict = {
   // Generic placeholders
   placeholder_optional: "Opcional",
   placeholder_select: "Seleccione…",
+
+  // Business info
+  business_hours: "Lunes a sábado, 9:00 AM – 5:00 PM",
+
+  // Validation errors
+  err_consent_lda: "Debe reconocer esto para continuar",
+  err_consent_contact: "Debe dar su consentimiento para ser contactado",
 };
 
 export const translations = { en, es } as const;

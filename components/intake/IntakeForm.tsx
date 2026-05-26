@@ -605,7 +605,7 @@ export function IntakeForm() {
     trigger,
     watch,
     getValues,
-    formState: { errors },
+    formState: { errors, isSubmitted, touchedFields },
   } = useForm<IntakeData>({
     resolver: zodResolver(intakeSchema),
     mode: "onTouched",
@@ -1140,8 +1140,8 @@ export function IntakeForm() {
                     {t("intake_consent_lda")} <Req />
                   </span>
                 </label>
-                {errors.consentLDA && (
-                  <p className={errorBase}>{errors.consentLDA.message}</p>
+                {errors.consentLDA && (isSubmitted || touchedFields.consentLDA) && (
+                  <p className={errorBase}>{t("err_consent_lda")}</p>
                 )}
 
                 <label className="flex items-start gap-3 p-4 border border-[var(--color-border-light)] rounded-sm cursor-pointer hover:border-[var(--color-gold)] transition-colors has-checked:border-[var(--color-gold)] has-checked:bg-[var(--color-gold)]/5">
@@ -1154,8 +1154,8 @@ export function IntakeForm() {
                     {t("intake_consent_contact")} <Req />
                   </span>
                 </label>
-                {errors.consentContact && (
-                  <p className={errorBase}>{errors.consentContact.message}</p>
+                {errors.consentContact && (isSubmitted || touchedFields.consentContact) && (
+                  <p className={errorBase}>{t("err_consent_contact")}</p>
                 )}
               </div>
 

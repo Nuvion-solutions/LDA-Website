@@ -386,6 +386,24 @@ const en = {
   // Validation errors (Spanish-visible, shown via t())
   err_consent_lda: "You must acknowledge this to continue",
   err_consent_contact: "You must consent to be contacted",
+  err_required: "Required",
+  err_first_name: "First name is required",
+  err_last_name: "Last name is required",
+  err_phone_invalid: "Please enter a valid phone number",
+  err_phone_long: "Phone number is too long",
+  err_email_invalid: "Please enter a valid email address",
+  err_contact_method: "Please choose how to reach you",
+  err_best_time: "Please choose the best time",
+  err_choose_service: "Please choose a service",
+  err_yes_no: "Please answer Yes or No",
+  err_additional_services: "Select at least one additional service",
+  err_one_form: "Select at least one form",
+  err_one_type: "Select at least one type",
+  err_one_option: "Select at least one option",
+  err_other_description: "Please describe what you need",
+  err_choose_county: "Please choose a county",
+  err_referral_source: "Please choose how you heard about us",
+  err_referral_name: "Please tell us who referred you",
 } as const;
 
 type Dict = Record<keyof typeof en, string>;
@@ -783,6 +801,24 @@ const es: Dict = {
   // Validation errors
   err_consent_lda: "Debe reconocer esto para continuar",
   err_consent_contact: "Debe dar su consentimiento para ser contactado",
+  err_required: "Obligatorio",
+  err_first_name: "El nombre es obligatorio",
+  err_last_name: "El apellido es obligatorio",
+  err_phone_invalid: "Ingrese un número de teléfono válido",
+  err_phone_long: "El número de teléfono es demasiado largo",
+  err_email_invalid: "Ingrese un correo electrónico válido",
+  err_contact_method: "Indique cómo prefiere que lo contactemos",
+  err_best_time: "Indique el mejor horario",
+  err_choose_service: "Seleccione un servicio",
+  err_yes_no: "Responda Sí o No",
+  err_additional_services: "Seleccione al menos un servicio adicional",
+  err_one_form: "Seleccione al menos un formulario",
+  err_one_type: "Seleccione al menos un tipo",
+  err_one_option: "Seleccione al menos una opción",
+  err_other_description: "Describa lo que necesita",
+  err_choose_county: "Seleccione un condado",
+  err_referral_source: "Indique cómo se enteró de nosotros",
+  err_referral_name: "Indíquenos quién lo refirió",
 };
 
 export const translations = { en, es } as const;

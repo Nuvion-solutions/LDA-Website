@@ -31,6 +31,7 @@ import { useLanguage } from "@/lib/language-context";
 import {
   SERVICE_NAME_TRANSLATIONS,
   optionLabel,
+  translations,
   type Language,
   type TranslationKey,
 } from "@/lib/translations";
@@ -173,6 +174,23 @@ const TRUST_SUCCESSOR_OPTIONS = [
 ] as const;
 
 // ---------------------------------------------------------------------------
+// Error message helper
+// ---------------------------------------------------------------------------
+
+// Schema messages are translation-key strings (e.g. "err_first_name"); this
+// resolves them through t() at render time. Unknown strings pass through.
+function tErr(
+  msg: string | undefined,
+  t: (k: TranslationKey) => string,
+): string | undefined {
+  if (!msg) return undefined;
+  if (msg in (translations.en as Record<string, string>)) {
+    return t(msg as TranslationKey);
+  }
+  return msg;
+}
+
+// ---------------------------------------------------------------------------
 // Schema
 // ---------------------------------------------------------------------------
 
@@ -187,27 +205,27 @@ const optDate = z.string().optional().or(z.literal(""));
 const intakeSchema = z
   .object({
     // Step 1
-    firstName: z.string().min(1, "First name is required").max(100),
-    lastName: z.string().min(1, "Last name is required").max(100),
+    firstName: z.string().min(1, "err_first_name").max(100),
+    lastName: z.string().min(1, "err_last_name").max(100),
     phone: z
       .string()
-      .min(7, "Please enter a valid phone number")
-      .max(30, "Phone number is too long"),
-    email: z.string().email("Please enter a valid email address"),
+      .min(7, "err_phone_invalid")
+      .max(30, "err_phone_long"),
+    email: z.string().email("err_email_invalid"),
     contactMethod: requiredEnum(
       ["Phone", "Email", "Text"],
-      "Please choose how to reach you",
+      "err_contact_method",
     ),
     bestTime: requiredEnum(
       ["Morning", "Afternoon", "LateAfternoon"],
-      "Please choose the best time",
+      "err_best_time",
     ),
 
     // Step 2
-    primaryService: requiredEnum(PRIMARY_SERVICES, "Please choose a service"),
+    primaryService: requiredEnum(PRIMARY_SERVICES, "err_choose_service"),
     needsMoreServices: requiredEnum(
       ["Yes", "No"],
-      "Please answer Yes or No",
+      "err_yes_no",
     ),
     additionalServices: z.array(z.string()).optional(),
 
@@ -281,24 +299,24 @@ const intakeSchema = z
     otherDeadlineDate: optDate,
 
     // Step 4
-    clientCounty: requiredEnum(COUNTIES, "Please choose a county"),
+    clientCounty: requiredEnum(COUNTIES, "err_choose_county"),
     referralSource: requiredEnum(
       REFERRAL_SOURCES,
-      "Please choose how you heard about us",
+      "err_referral_source",
     ),
     referralName: optStr,
     additionalNotes: z.string().max(4000).optional().or(z.literal("")),
 
     // Step 5
     consentLDA: z.literal(true, {
-      message: "You must acknowledge this to continue",
+      message: "err_consent_lda",
     }),
     consentContact: z.literal(true, {
-      message: "You must consent to be contacted",
+      message: "err_consent_contact",
     }),
   })
   .superRefine((data, ctx) => {
-    const need = (path: string, value: unknown, msg = "Required") => {
+    const need = (path: string, value: unknown, msg = "err_required") => {
       const empty =
         value === undefined ||
         value === null ||
@@ -319,7 +337,7 @@ const intakeSchema = z
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           path: ["additionalServices"],
-          message: "Select at least one additional service",
+          message: "err_additional_services",
         });
       }
     }
@@ -358,7 +376,7 @@ const intakeSchema = z
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             path: ["immigrationForms"],
-            message: "Select at least one form",
+            message: "err_one_form",
           });
         }
         need("immigrationForWhom", data.immigrationForWhom);
@@ -387,7 +405,7 @@ const intakeSchema = z
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             path: ["poaTypes"],
-            message: "Select at least one type",
+            message: "err_one_type",
           });
         }
         need("poaAgent", data.poaAgent);
@@ -403,7 +421,7 @@ const intakeSchema = z
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             path: ["dmvFormTypes"],
-            message: "Select at least one form",
+            message: "err_one_form",
           });
         }
         need("dmvHasAppointment", data.dmvHasAppointment);
@@ -417,7 +435,7 @@ const intakeSchema = z
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
             path: ["taxTypes"],
-            message: "Select at least one option",
+            message: "err_one_option",
           });
         }
         need("taxYear", data.taxYear);
@@ -431,7 +449,7 @@ const intakeSchema = z
         need(
           "otherDescription",
           data.otherDescription,
-          "Please describe what you need",
+          "err_other_description",
         );
         need("otherHasDeadline", data.otherHasDeadline);
         if (data.otherHasDeadline === "Yes") {
@@ -443,7 +461,7 @@ const intakeSchema = z
 
     // Referral name conditional
     if (data.referralSource === "Referral") {
-      need("referralName", data.referralName, "Please tell us who referred you");
+      need("referralName", data.referralName, "err_referral_name");
     }
   });
 
@@ -810,7 +828,7 @@ export function IntakeForm() {
                   id="firstName"
                   label={t("intake_f_first")}
                   required
-                  error={errors.firstName?.message}
+                  error={tErr(errors.firstName?.message, t)}
                 >
                   <input
                     id="firstName"
@@ -823,7 +841,7 @@ export function IntakeForm() {
                   id="lastName"
                   label={t("intake_f_last")}
                   required
-                  error={errors.lastName?.message}
+                  error={tErr(errors.lastName?.message, t)}
                 >
                   <input
                     id="lastName"
@@ -836,7 +854,7 @@ export function IntakeForm() {
                   id="phone"
                   label={t("intake_f_phone")}
                   required
-                  error={errors.phone?.message}
+                  error={tErr(errors.phone?.message, t)}
                 >
                   <input
                     id="phone"
@@ -850,7 +868,7 @@ export function IntakeForm() {
                   id="email"
                   label={t("intake_f_email")}
                   required
-                  error={errors.email?.message}
+                  error={tErr(errors.email?.message, t)}
                 >
                   <input
                     id="email"
@@ -886,7 +904,7 @@ export function IntakeForm() {
                   ))}
                 </div>
                 {errors.contactMethod && (
-                  <p className={errorBase}>{errors.contactMethod.message}</p>
+                  <p className={errorBase}>{tErr(errors.contactMethod.message, t)}</p>
                 )}
               </fieldset>
 
@@ -908,7 +926,7 @@ export function IntakeForm() {
                   <option value="LateAfternoon">{t("intake_opt_late")}</option>
                 </select>
                 {errors.bestTime && (
-                  <p className={errorBase}>{errors.bestTime.message}</p>
+                  <p className={errorBase}>{tErr(errors.bestTime.message, t)}</p>
                 )}
               </div>
             </StepWrap>
@@ -939,7 +957,7 @@ export function IntakeForm() {
                   ))}
                 </div>
                 {errors.primaryService && (
-                  <p className={errorBase}>{errors.primaryService.message}</p>
+                  <p className={errorBase}>{tErr(errors.primaryService.message, t)}</p>
                 )}
               </fieldset>
 
@@ -966,7 +984,7 @@ export function IntakeForm() {
                   ))}
                 </div>
                 {errors.needsMoreServices && (
-                  <p className={errorBase}>{errors.needsMoreServices.message}</p>
+                  <p className={errorBase}>{tErr(errors.needsMoreServices.message, t)}</p>
                 )}
               </fieldset>
 
@@ -1008,7 +1026,7 @@ export function IntakeForm() {
                   />
                   {errors.additionalServices && (
                     <p className={errorBase}>
-                      {errors.additionalServices.message as string}
+                      {tErr(errors.additionalServices.message as string, t)}
                     </p>
                   )}
                 </fieldset>
@@ -1062,7 +1080,7 @@ export function IntakeForm() {
                   ))}
                 </select>
                 {errors.clientCounty && (
-                  <p className={errorBase}>{errors.clientCounty.message}</p>
+                  <p className={errorBase}>{tErr(errors.clientCounty.message, t)}</p>
                 )}
               </div>
 
@@ -1086,7 +1104,7 @@ export function IntakeForm() {
                   ))}
                 </select>
                 {errors.referralSource && (
-                  <p className={errorBase}>{errors.referralSource.message}</p>
+                  <p className={errorBase}>{tErr(errors.referralSource.message, t)}</p>
                 )}
               </div>
 
@@ -1101,7 +1119,7 @@ export function IntakeForm() {
                     className={inputBase}
                   />
                   {errors.referralName && (
-                    <p className={errorBase}>{errors.referralName.message}</p>
+                    <p className={errorBase}>{tErr(errors.referralName.message, t)}</p>
                   )}
                 </div>
               )}
@@ -1564,7 +1582,7 @@ function DivorceBranch({ register, watch, errors, t, lang }: any) {
         options={["Uncontested", "Contested", "Not sure yet"]}
         name="divorceType"
         register={register}
-        error={errors.divorceType?.message}
+        error={tErr(errors.divorceType?.message, t)}
         lang={lang}
       />
       <RadioGroup
@@ -1573,7 +1591,7 @@ function DivorceBranch({ register, watch, errors, t, lang }: any) {
         options={["Yes", "No"]}
         name="divorceHasChildren"
         register={register}
-        error={errors.divorceHasChildren?.message}
+        error={tErr(errors.divorceHasChildren?.message, t)}
         lang={lang}
       />
       {hasChildren === "Yes" && (
@@ -1582,7 +1600,7 @@ function DivorceBranch({ register, watch, errors, t, lang }: any) {
             id="divorceChildrenCount"
             label={t("div_q_children_count")}
             required
-            error={errors.divorceChildrenCount?.message}
+            error={tErr(errors.divorceChildrenCount?.message, t)}
           >
             <input
               id="divorceChildrenCount"
@@ -1596,7 +1614,7 @@ function DivorceBranch({ register, watch, errors, t, lang }: any) {
             id="divorceChildrenAges"
             label={t("div_q_children_ages")}
             required
-            error={errors.divorceChildrenAges?.message}
+            error={tErr(errors.divorceChildrenAges?.message, t)}
           >
             <input
               id="divorceChildrenAges"
@@ -1613,7 +1631,7 @@ function DivorceBranch({ register, watch, errors, t, lang }: any) {
         options={["Yes", "No", "Not sure"]}
         name="divorceHasProperty"
         register={register}
-        error={errors.divorceHasProperty?.message}
+        error={tErr(errors.divorceHasProperty?.message, t)}
         lang={lang}
       />
       <RadioGroup
@@ -1622,7 +1640,7 @@ function DivorceBranch({ register, watch, errors, t, lang }: any) {
         options={["Yes", "No", "Not sure"]}
         name="divorceHasAssets"
         register={register}
-        error={errors.divorceHasAssets?.message}
+        error={tErr(errors.divorceHasAssets?.message, t)}
         lang={lang}
       />
       <Select
@@ -1633,7 +1651,7 @@ function DivorceBranch({ register, watch, errors, t, lang }: any) {
         register={register}
         name="divorceMarriageLength"
         placeholder={t("div_q_marriage_placeholder")}
-        error={errors.divorceMarriageLength?.message}
+        error={tErr(errors.divorceMarriageLength?.message, t)}
         lang={lang}
       />
       <Select
@@ -1644,7 +1662,7 @@ function DivorceBranch({ register, watch, errors, t, lang }: any) {
         register={register}
         name="divorceFilingCounty"
         placeholder={t("div_q_filing_county_placeholder")}
-        error={errors.divorceFilingCounty?.message}
+        error={tErr(errors.divorceFilingCounty?.message, t)}
         lang={lang}
       />
       <RadioGroup
@@ -1653,7 +1671,7 @@ function DivorceBranch({ register, watch, errors, t, lang }: any) {
         options={["Yes", "No"]}
         name="divorceFiledPaperwork"
         register={register}
-        error={errors.divorceFiledPaperwork?.message}
+        error={tErr(errors.divorceFiledPaperwork?.message, t)}
         lang={lang}
       />
     </div>
@@ -1671,7 +1689,7 @@ function EvictionBranch({ register, watch, errors, t, lang }: any) {
         options={["Landlord", "Tenant"]}
         name="evictionParty"
         register={register}
-        error={errors.evictionParty?.message}
+        error={tErr(errors.evictionParty?.message, t)}
         lang={lang}
       />
       <RadioGroup
@@ -1680,7 +1698,7 @@ function EvictionBranch({ register, watch, errors, t, lang }: any) {
         options={["Residential", "Commercial"]}
         name="evictionPropertyType"
         register={register}
-        error={errors.evictionPropertyType?.message}
+        error={tErr(errors.evictionPropertyType?.message, t)}
         lang={lang}
       />
       <Select
@@ -1691,7 +1709,7 @@ function EvictionBranch({ register, watch, errors, t, lang }: any) {
         register={register}
         name="evictionReason"
         placeholder={t("evi_q_reason_placeholder")}
-        error={errors.evictionReason?.message}
+        error={tErr(errors.evictionReason?.message, t)}
         lang={lang}
       />
       <RadioGroup
@@ -1700,7 +1718,7 @@ function EvictionBranch({ register, watch, errors, t, lang }: any) {
         options={["Yes", "No"]}
         name="evictionNoticeServed"
         register={register}
-        error={errors.evictionNoticeServed?.message}
+        error={tErr(errors.evictionNoticeServed?.message, t)}
         lang={lang}
       />
       {noticeServed === "Yes" && (
@@ -1713,14 +1731,14 @@ function EvictionBranch({ register, watch, errors, t, lang }: any) {
             register={register}
             name="evictionNoticeType"
             placeholder={t("evi_q_notice_type_placeholder")}
-            error={errors.evictionNoticeType?.message}
+            error={tErr(errors.evictionNoticeType?.message, t)}
             lang={lang}
           />
           <Field
             id="evictionNoticeDate"
             label={t("evi_q_notice_date")}
             required
-            error={errors.evictionNoticeDate?.message}
+            error={tErr(errors.evictionNoticeDate?.message, t)}
           >
             <input
               id="evictionNoticeDate"
@@ -1739,7 +1757,7 @@ function EvictionBranch({ register, watch, errors, t, lang }: any) {
         register={register}
         name="evictionCounty"
         placeholder={t("evi_q_county_placeholder")}
-        error={errors.evictionCounty?.message}
+        error={tErr(errors.evictionCounty?.message, t)}
         lang={lang}
       />
       <RadioGroup
@@ -1748,7 +1766,7 @@ function EvictionBranch({ register, watch, errors, t, lang }: any) {
         options={["Yes", "No", "Partially"]}
         name="evictionTenantVacated"
         register={register}
-        error={errors.evictionTenantVacated?.message}
+        error={tErr(errors.evictionTenantVacated?.message, t)}
         lang={lang}
       />
       <Select
@@ -1759,7 +1777,7 @@ function EvictionBranch({ register, watch, errors, t, lang }: any) {
         register={register}
         name="evictionRent"
         placeholder={t("evi_q_rent_placeholder")}
-        error={errors.evictionRent?.message}
+        error={tErr(errors.evictionRent?.message, t)}
         lang={lang}
       />
     </div>
@@ -1837,14 +1855,14 @@ function ImmigrationBranch({ register, control, watch, errors, t, lang }: any) {
         options={IMMIGRATION_FORM_OPTIONS}
         name="immigrationForms"
         control={control}
-        error={errors.immigrationForms?.message as string | undefined}
+        error={tErr(errors.immigrationForms?.message, t)}
         lang={lang}
       />
       {showOther && (
         <Field
           id="immigrationFormsOther"
           label={t("imm_q_forms_other")}
-          error={errors.immigrationFormsOther?.message}
+          error={tErr(errors.immigrationFormsOther?.message, t)}
         >
           <textarea
             id="immigrationFormsOther"
@@ -1860,7 +1878,7 @@ function ImmigrationBranch({ register, control, watch, errors, t, lang }: any) {
         options={["Myself", "Family member", "Both"]}
         name="immigrationForWhom"
         register={register}
-        error={errors.immigrationForWhom?.message}
+        error={tErr(errors.immigrationForWhom?.message, t)}
         lang={lang}
       />
       <Select
@@ -1871,7 +1889,7 @@ function ImmigrationBranch({ register, control, watch, errors, t, lang }: any) {
         register={register}
         name="immigrationStatus"
         placeholder={t("imm_q_status_placeholder")}
-        error={errors.immigrationStatus?.message}
+        error={tErr(errors.immigrationStatus?.message, t)}
         lang={lang}
       />
       <RadioGroup
@@ -1880,7 +1898,7 @@ function ImmigrationBranch({ register, control, watch, errors, t, lang }: any) {
         options={["Yes", "No"]}
         name="immigrationHasDeadline"
         register={register}
-        error={errors.immigrationHasDeadline?.message}
+        error={tErr(errors.immigrationHasDeadline?.message, t)}
         lang={lang}
       />
       {hasDeadline === "Yes" && (
@@ -1888,7 +1906,7 @@ function ImmigrationBranch({ register, control, watch, errors, t, lang }: any) {
           id="immigrationDeadlineDate"
           label={t("imm_q_deadline_date")}
           required
-          error={errors.immigrationDeadlineDate?.message}
+          error={tErr(errors.immigrationDeadlineDate?.message, t)}
         >
           <input
             id="immigrationDeadlineDate"
@@ -1904,7 +1922,7 @@ function ImmigrationBranch({ register, control, watch, errors, t, lang }: any) {
         options={["Yes", "No", "Not sure"]}
         name="immigrationPreviouslyFiled"
         register={register}
-        error={errors.immigrationPreviouslyFiled?.message}
+        error={tErr(errors.immigrationPreviouslyFiled?.message, t)}
         lang={lang}
       />
     </div>
@@ -1922,7 +1940,7 @@ function TrustBranch({ register, watch, errors, t, lang }: any) {
         options={["Individual", "Married couple"]}
         name="trustType"
         register={register}
-        error={errors.trustType?.message}
+        error={tErr(errors.trustType?.message, t)}
         lang={lang}
       />
       <RadioGroup
@@ -1931,7 +1949,7 @@ function TrustBranch({ register, watch, errors, t, lang }: any) {
         options={["Yes", "No"]}
         name="trustHasMinors"
         register={register}
-        error={errors.trustHasMinors?.message}
+        error={tErr(errors.trustHasMinors?.message, t)}
         lang={lang}
       />
       <RadioGroup
@@ -1940,7 +1958,7 @@ function TrustBranch({ register, watch, errors, t, lang }: any) {
         options={["Yes", "No"]}
         name="trustOwnsProperty"
         register={register}
-        error={errors.trustOwnsProperty?.message}
+        error={tErr(errors.trustOwnsProperty?.message, t)}
         lang={lang}
       />
       {ownsProperty === "Yes" && (
@@ -1948,7 +1966,7 @@ function TrustBranch({ register, watch, errors, t, lang }: any) {
           id="trustPropertyCount"
           label={t("trust_q_property_count")}
           required
-          error={errors.trustPropertyCount?.message}
+          error={tErr(errors.trustPropertyCount?.message, t)}
         >
           <input
             id="trustPropertyCount"
@@ -1965,7 +1983,7 @@ function TrustBranch({ register, watch, errors, t, lang }: any) {
         options={["Yes", "No", "Not sure"]}
         name="trustHasAssets"
         register={register}
-        error={errors.trustHasAssets?.message}
+        error={tErr(errors.trustHasAssets?.message, t)}
         lang={lang}
       />
       <RadioGroup
@@ -1974,7 +1992,7 @@ function TrustBranch({ register, watch, errors, t, lang }: any) {
         options={["Yes", "No", "Not sure"]}
         name="trustExistingDocs"
         register={register}
-        error={errors.trustExistingDocs?.message}
+        error={tErr(errors.trustExistingDocs?.message, t)}
         lang={lang}
       />
       <RadioGroup
@@ -1983,7 +2001,7 @@ function TrustBranch({ register, watch, errors, t, lang }: any) {
         options={TRUST_SUCCESSOR_OPTIONS}
         name="trustSuccessor"
         register={register}
-        error={errors.trustSuccessor?.message}
+        error={tErr(errors.trustSuccessor?.message, t)}
         lang={lang}
       />
     </div>
@@ -2001,7 +2019,7 @@ function PoaBranch({ register, control, watch, errors, t, lang }: any) {
         options={POA_TYPES}
         name="poaTypes"
         control={control}
-        error={errors.poaTypes?.message as string | undefined}
+        error={tErr(errors.poaTypes?.message, t)}
         lang={lang}
       />
       <RadioGroup
@@ -2010,7 +2028,7 @@ function PoaBranch({ register, control, watch, errors, t, lang }: any) {
         options={AGENT_OPTIONS}
         name="poaAgent"
         register={register}
-        error={errors.poaAgent?.message}
+        error={tErr(errors.poaAgent?.message, t)}
         lang={lang}
       />
       <RadioGroup
@@ -2019,7 +2037,7 @@ function PoaBranch({ register, control, watch, errors, t, lang }: any) {
         options={["Yes", "No"]}
         name="poaHasReason"
         register={register}
-        error={errors.poaHasReason?.message}
+        error={tErr(errors.poaHasReason?.message, t)}
         lang={lang}
       />
       {hasReason === "Yes" && (
@@ -2027,7 +2045,7 @@ function PoaBranch({ register, control, watch, errors, t, lang }: any) {
           id="poaReason"
           label={t("poa_q_reason")}
           required
-          error={errors.poaReason?.message}
+          error={tErr(errors.poaReason?.message, t)}
         >
           <textarea
             id="poaReason"
@@ -2044,7 +2062,7 @@ function PoaBranch({ register, control, watch, errors, t, lang }: any) {
         options={["Yes", "No", "Not sure"]}
         name="poaNotarize"
         register={register}
-        error={errors.poaNotarize?.message}
+        error={tErr(errors.poaNotarize?.message, t)}
         lang={lang}
       />
     </div>
@@ -2062,7 +2080,7 @@ function DmvBranch({ register, control, watch, errors, t, lang }: any) {
         options={DMV_FORM_OPTIONS}
         name="dmvFormTypes"
         control={control}
-        error={errors.dmvFormTypes?.message as string | undefined}
+        error={tErr(errors.dmvFormTypes?.message, t)}
         lang={lang}
       />
       <RadioGroup
@@ -2071,7 +2089,7 @@ function DmvBranch({ register, control, watch, errors, t, lang }: any) {
         options={["Yes", "No"]}
         name="dmvHasAppointment"
         register={register}
-        error={errors.dmvHasAppointment?.message}
+        error={tErr(errors.dmvHasAppointment?.message, t)}
         lang={lang}
       />
       {hasAppt === "Yes" && (
@@ -2079,7 +2097,7 @@ function DmvBranch({ register, control, watch, errors, t, lang }: any) {
           id="dmvAppointmentDate"
           label={t("dmv_q_appointment_date")}
           required
-          error={errors.dmvAppointmentDate?.message}
+          error={tErr(errors.dmvAppointmentDate?.message, t)}
         >
           <input
             id="dmvAppointmentDate"
@@ -2092,7 +2110,7 @@ function DmvBranch({ register, control, watch, errors, t, lang }: any) {
       <Field
         id="dmvDetails"
         label={t("dmv_q_details")}
-        error={errors.dmvDetails?.message}
+        error={tErr(errors.dmvDetails?.message, t)}
       >
         <textarea
           id="dmvDetails"
@@ -2117,7 +2135,7 @@ function TaxBranch({ register, control, watch, errors, t, lang }: any) {
         options={TAX_TYPE_OPTIONS}
         name="taxTypes"
         control={control}
-        error={errors.taxTypes?.message as string | undefined}
+        error={tErr(errors.taxTypes?.message, t)}
         lang={lang}
       />
       <Select
@@ -2128,7 +2146,7 @@ function TaxBranch({ register, control, watch, errors, t, lang }: any) {
         register={register}
         name="taxYear"
         placeholder={t("tax_q_year_placeholder")}
-        error={errors.taxYear?.message}
+        error={tErr(errors.taxYear?.message, t)}
         lang={lang}
       />
       <RadioGroup
@@ -2137,7 +2155,7 @@ function TaxBranch({ register, control, watch, errors, t, lang }: any) {
         options={["Yes", "No"]}
         name="taxHasDeadline"
         register={register}
-        error={errors.taxHasDeadline?.message}
+        error={tErr(errors.taxHasDeadline?.message, t)}
         lang={lang}
       />
       {hasDeadline === "Yes" && (
@@ -2145,7 +2163,7 @@ function TaxBranch({ register, control, watch, errors, t, lang }: any) {
           id="taxDeadlineDate"
           label={t("tax_q_deadline_date")}
           required
-          error={errors.taxDeadlineDate?.message}
+          error={tErr(errors.taxDeadlineDate?.message, t)}
         >
           <input
             id="taxDeadlineDate"
@@ -2158,7 +2176,7 @@ function TaxBranch({ register, control, watch, errors, t, lang }: any) {
       <Field
         id="taxNotes"
         label={t("tax_q_notes")}
-        error={errors.taxNotes?.message}
+        error={tErr(errors.taxNotes?.message, t)}
       >
         <textarea
           id="taxNotes"
@@ -2181,7 +2199,7 @@ function OtherBranch({ register, watch, errors, t, lang }: any) {
         id="otherDescription"
         label={t("other_q_description")}
         required
-        error={errors.otherDescription?.message}
+        error={tErr(errors.otherDescription?.message, t)}
       >
         <textarea
           id="otherDescription"
@@ -2196,7 +2214,7 @@ function OtherBranch({ register, watch, errors, t, lang }: any) {
         options={["Yes", "No"]}
         name="otherHasDeadline"
         register={register}
-        error={errors.otherHasDeadline?.message}
+        error={tErr(errors.otherHasDeadline?.message, t)}
         lang={lang}
       />
       {hasDeadline === "Yes" && (
@@ -2204,7 +2222,7 @@ function OtherBranch({ register, watch, errors, t, lang }: any) {
           id="otherDeadlineDate"
           label={t("other_q_deadline_date")}
           required
-          error={errors.otherDeadlineDate?.message}
+          error={tErr(errors.otherDeadlineDate?.message, t)}
         >
           <input
             id="otherDeadlineDate"

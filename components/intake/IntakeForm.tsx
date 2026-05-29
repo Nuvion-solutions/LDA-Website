@@ -603,6 +603,11 @@ export function IntakeForm() {
     service: string;
   } | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  // Spam mitigation: a honeypot field that real users never see (and bots that
+  // auto-fill every input will trip), plus the time the form was rendered so
+  // the server can reject near-instant, bot-like submissions.
+  const [honeypot, setHoneypot] = useState("");
+  const [loadedAt] = useState(() => Date.now());
   const { lang, t } = useLanguage();
 
   const stepLabels = [
@@ -704,7 +709,11 @@ export function IntakeForm() {
       const res = await fetch("/api/intake", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          ...data,
+          website: honeypot,
+          elapsedMs: Date.now() - loadedAt,
+        }),
       });
       if (!res.ok) throw new Error("Submission failed");
       setSubmitted({
@@ -794,6 +803,32 @@ export function IntakeForm() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate>
+      {/* Honeypot — visually hidden and skipped by keyboard/screen readers.
+          Real users never fill it; naive bots that populate every field do,
+          which lets the server discard the submission. Not part of the
+          validated schema. */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          left: "-9999px",
+          width: "1px",
+          height: "1px",
+          overflow: "hidden",
+        }}
+      >
+        <label htmlFor="website-url">Website</label>
+        <input
+          id="website-url"
+          type="text"
+          name="website"
+          tabIndex={-1}
+          autoComplete="off"
+          value={honeypot}
+          onChange={(e) => setHoneypot(e.target.value)}
+        />
+      </div>
+
       {/* Progress bar */}
       <div className="mb-8">
         <div className="flex items-center justify-between mb-3">

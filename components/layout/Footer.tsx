@@ -68,6 +68,16 @@ export function Footer() {
                   {t("footer_link_faq")}
                 </Link>
               </li>
+              <li>
+                <Link href="/privacy" className="hover:text-[var(--color-gold)]">
+                  {t("footer_link_privacy")}
+                </Link>
+              </li>
+              <li>
+                <Link href="/terms" className="hover:text-[var(--color-gold)]">
+                  {t("footer_link_terms")}
+                </Link>
+              </li>
             </ul>
           </div>
 

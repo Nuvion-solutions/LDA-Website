@@ -94,6 +94,10 @@ type IntakeBody = {
   // Step 5
   consentLDA?: boolean;
   consentContact?: boolean;
+
+  // Spam mitigation (not user-facing; see POST handler)
+  website?: string;
+  elapsedMs?: number;
 };
 
 // Webhook delivery: retry on 5xx + transport errors so transient GHL/network
@@ -160,6 +164,26 @@ export async function POST(req: Request) {
       { success: false, error: "Invalid JSON body" },
       { status: 400 },
     );
+  }
+
+  // Spam mitigation. The hidden `website` honeypot is never filled by a real
+  // user; a non-empty value means a bot auto-filled every field. `elapsedMs`
+  // is how long the form was on screen — a multi-step form takes far longer
+  // than a few seconds to complete, so a near-instant submit is bot-like.
+  // In both cases we return a success-shaped response (so bots get no signal
+  // to adapt) but never forward the junk lead to GoHighLevel.
+  const honeypotTripped =
+    typeof data.website === "string" && data.website.trim() !== "";
+  const tooFast =
+    typeof data.elapsedMs === "number" &&
+    data.elapsedMs >= 0 &&
+    data.elapsedMs < 3000;
+  if (honeypotTripped || tooFast) {
+    console.warn("[intake] Dropped likely-bot submission:", {
+      reason: honeypotTripped ? "honeypot" : "too_fast",
+      elapsedMs: data.elapsedMs,
+    });
+    return Response.json({ success: true, mode: "ignored" });
   }
 
   const submissionId = crypto.randomUUID();

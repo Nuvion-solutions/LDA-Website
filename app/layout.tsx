@@ -5,6 +5,7 @@ import "./globals.css";
 import { Nav } from "@/components/layout/Nav";
 import { Footer } from "@/components/layout/Footer";
 import { StructuredData } from "@/components/seo/StructuredData";
+import { Analytics } from "@/components/analytics/Analytics";
 import { SITE_URL } from "@/lib/site";
 import { LanguageProvider, LANG_COOKIE } from "@/lib/language-context";
 import type { Language } from "@/lib/translations";
@@ -108,6 +109,7 @@ export default async function RootLayout({
           <Footer />
         </LanguageProvider>
       </body>
+      <Analytics />
     </html>
   );
 }

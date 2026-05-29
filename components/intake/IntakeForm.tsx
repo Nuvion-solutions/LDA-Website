@@ -27,6 +27,7 @@ import {
   checklistItems,
   checklistNote,
 } from "@/lib/checklists";
+import { sendGAEvent } from "@next/third-parties/google";
 import { useLanguage } from "@/lib/language-context";
 import {
   SERVICE_NAME_TRANSLATIONS,
@@ -716,6 +717,13 @@ export function IntakeForm() {
         }),
       });
       if (!res.ok) throw new Error("Submission failed");
+      // GA4 conversion event. No-op if analytics isn't configured (the event
+      // simply queues in the dataLayer with no consumer).
+      if (process.env.NEXT_PUBLIC_GA_ID) {
+        sendGAEvent("event", "generate_lead", {
+          service: data.primaryService,
+        });
+      }
       setSubmitted({
         firstName: data.firstName,
         service: data.primaryService,

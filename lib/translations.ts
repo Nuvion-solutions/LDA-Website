@@ -90,6 +90,14 @@ const en = {
   footer_disclosure_label: "Important Disclosure:",
   footer_rights: "All rights reserved.",
 
+  // 404 page
+  notfound_eyebrow: "Error 404",
+  notfound_title: "Page Not Found",
+  notfound_body:
+    "Sorry, the page you’re looking for doesn’t exist or may have moved.",
+  notfound_home: "Back to Home",
+  notfound_cta: "Start Your Intake",
+
   // Intake page hero
   intake_eyebrow: "Start Your Intake",
   intake_heading: "Tell us what you need.",
@@ -492,6 +500,14 @@ const es: Dict = {
   footer_payment_heading: "Métodos de Pago Aceptados",
   footer_disclosure_label: "Divulgación Importante:",
   footer_rights: "Todos los derechos reservados.",
+
+  // 404 page
+  notfound_eyebrow: "Error 404",
+  notfound_title: "Página No Encontrada",
+  notfound_body:
+    "Lo sentimos, la página que busca no existe o pudo haberse movido.",
+  notfound_home: "Volver al Inicio",
+  notfound_cta: "Comenzar Solicitud",
 
   // Intake page hero
   intake_eyebrow: "Comenzar Solicitud",

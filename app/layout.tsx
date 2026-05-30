@@ -6,6 +6,8 @@ import { Nav } from "@/components/layout/Nav";
 import { Footer } from "@/components/layout/Footer";
 import { StructuredData } from "@/components/seo/StructuredData";
 import { Analytics } from "@/components/analytics/Analytics";
+import { Analytics as VercelAnalytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { SITE_URL } from "@/lib/site";
 import { LanguageProvider, LANG_COOKIE } from "@/lib/language-context";
 import type { Language } from "@/lib/translations";
@@ -108,6 +110,8 @@ export default async function RootLayout({
           <main className="flex-1">{children}</main>
           <Footer />
         </LanguageProvider>
+        <VercelAnalytics />
+        <SpeedInsights />
       </body>
       <Analytics />
     </html>

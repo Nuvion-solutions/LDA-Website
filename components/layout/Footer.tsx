@@ -40,6 +40,9 @@ export function Footer() {
                 <span>{t("business_hours")}</span>
               </li>
             </ul>
+            <p className="mt-5 text-sm text-[var(--color-muted-light)] leading-relaxed">
+              {t("footer_service_area")}
+            </p>
           </div>
 
           {/* Column 2 — Quick links */}

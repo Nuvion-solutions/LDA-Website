@@ -23,17 +23,17 @@ export const metadata: Metadata = {
 const TEAM = [
   {
     name: "Carson C. Newton",
-    role: "Principal / Founder",
+    role: "Principal/Founder",
     bio: "Co-founder and principal of California Legal Document Excellence, LLC. Oversees document preparation operations and quality standards.",
   },
   {
-    name: "A. Khan",
-    role: "Principal / Founder",
+    name: "S. Khan",
+    role: "Principal/Founder",
     bio: "Co-founder and principal of California Legal Document Excellence, LLC.",
   },
   {
-    name: "S. Khan",
-    role: "Principal / Founder",
+    name: "A. Khan",
+    role: "Principal/Founder",
     bio: "Co-founder and principal of California Legal Document Excellence, LLC.",
   },
 ];

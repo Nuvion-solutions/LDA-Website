@@ -24,20 +24,24 @@ const playfair = Playfair_Display({
   display: "swap",
 });
 
-const TITLE = "California Legal Document Excellence, LLC | LDA #87 Sonoma County";
+const TITLE = "Sonoma County Legal Document Assistant | Divorce, Eviction & Trusts";
 const DESCRIPTION =
-  "Professional document preparation services in Santa Rosa, CA. Divorce, eviction, immigration, living trust, power of attorney, and more. LDA #87 Sonoma County. Call (707) 909-1240.";
+  "Registered Legal Document Assistant (LDA #87) in Sonoma County, serving the greater North Bay. Divorce, eviction, immigration, living trusts, power of attorney & more. Call (707) 909-1240.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
     default: TITLE,
-    template: "%s | California Legal Document Excellence, LLC",
+    template: "%s | California Legal Document Excellence",
   },
   description: DESCRIPTION,
   keywords: [
     "legal document assistant",
     "LDA Sonoma County",
+    "Sonoma County legal document assistant",
+    "North Bay legal document help",
+    "Napa County LDA",
+    "Marin County LDA",
     "divorce paperwork Santa Rosa",
     "eviction forms California",
     "document preparation Santa Rosa CA",
@@ -54,7 +58,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: TITLE,
     description:
-      "Professional document preparation services in Santa Rosa, CA. LDA #87 Sonoma County. Free consultation.",
+      "Registered LDA #87 in Sonoma County, serving the greater North Bay. Divorce, eviction, immigration, living trusts & more. Free consultation.",
     type: "website",
     locale: "en_US",
     url: SITE_URL,
@@ -64,7 +68,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: TITLE,
     description:
-      "Professional document preparation services in Santa Rosa, CA. LDA #87 Sonoma County.",
+      "Registered LDA #87 in Sonoma County, serving the greater North Bay. Divorce, eviction, trusts, immigration & more.",
   },
   robots: {
     index: true,

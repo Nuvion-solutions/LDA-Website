@@ -88,7 +88,7 @@ const en = {
   footer_link_terms: "Terms of Service",
   footer_payment_heading: "Payment Methods Accepted",
   footer_service_area:
-    "Serving Sonoma County and surrounding areas — remote services available.",
+    "Serving Sonoma County and the greater North Bay — including Napa, Marin, and the surrounding Bay Area. Remote services available.",
   footer_disclosure_label: "Important Disclosure:",
   footer_rights: "All rights reserved.",
 
@@ -501,7 +501,7 @@ const es: Dict = {
   footer_link_terms: "Términos de Servicio",
   footer_payment_heading: "Métodos de Pago Aceptados",
   footer_service_area:
-    "Atendemos el Condado de Sonoma y áreas circundantes — servicios remotos disponibles.",
+    "Atendemos el Condado de Sonoma y la región de North Bay — incluyendo Napa, Marin y el Área de la Bahía. Servicios remotos disponibles.",
   footer_disclosure_label: "Divulgación Importante:",
   footer_rights: "Todos los derechos reservados.",
 

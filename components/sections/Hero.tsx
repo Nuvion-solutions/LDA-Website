@@ -4,6 +4,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { Phone, CheckCircle2 } from "lucide-react";
 import { BUSINESS } from "@/lib/utils";
+import { CallLink } from "@/components/analytics/CallLink";
 import { fadeUp, staggerContainer } from "@/lib/animations";
 import { useLanguage } from "@/lib/language-context";
 
@@ -68,13 +69,13 @@ export function Hero() {
             >
               {t("hero_cta_primary")}
             </Link>
-            <a
-              href={`tel:${BUSINESS.phoneTel}`}
+            <CallLink
+              source="hero"
               className="inline-flex items-center justify-center gap-2 border border-white/70 hover:border-[var(--color-gold)] hover:text-[var(--color-gold)] text-white px-7 py-3.5 rounded-sm tracking-wide transition-colors"
             >
               <Phone className="h-4 w-4" aria-hidden />
               {t("hero_cta_secondary")} {BUSINESS.phone}
-            </a>
+            </CallLink>
           </motion.div>
 
           <motion.ul

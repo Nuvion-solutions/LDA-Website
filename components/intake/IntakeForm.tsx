@@ -16,6 +16,7 @@ import {
   Loader2,
 } from "lucide-react";
 import { BUSINESS } from "@/lib/utils";
+import { CallLink } from "@/components/analytics/CallLink";
 import {
   getDeadlineDate,
   daysUntil,
@@ -760,12 +761,12 @@ export function IntakeForm() {
           </p>
           <p className="text-[var(--color-body-dark)] opacity-80">
             {t("success_contact_lead")}{" "}
-            <a
-              href={`tel:${BUSINESS.phoneTel}`}
+            <CallLink
+              source="intake_success"
               className="text-[var(--color-navy)] font-medium underline decoration-[var(--color-gold)] underline-offset-4"
             >
               {BUSINESS.phone}
-            </a>{" "}
+            </CallLink>{" "}
             {t("success_contact_mid")}{" "}
             <a
               href={`mailto:${BUSINESS.email}`}
@@ -1223,12 +1224,12 @@ export function IntakeForm() {
               {submitError && (
                 <div className="mt-6 border-l-2 border-red-600 bg-red-50 px-4 py-3 text-sm text-red-900">
                   {t("intake_submit_error_lead")}{" "}
-                  <a
-                    href={`tel:${BUSINESS.phoneTel}`}
+                  <CallLink
+                    source="intake_error"
                     className="font-medium underline underline-offset-2"
                   >
                     {BUSINESS.phone}
-                  </a>{" "}
+                  </CallLink>{" "}
                   {t("intake_submit_error_mid")}{" "}
                   <a
                     href={`mailto:${BUSINESS.email}`}
@@ -1321,12 +1322,12 @@ function UrgencyBanner({
         />
         <div className="text-sm text-red-900 leading-relaxed">
           <strong>{t("urgency_red_strong")}</strong> {t("urgency_red_body_1")}{" "}
-          <a
-            href={`tel:${BUSINESS.phoneTel}`}
+          <CallLink
+            source="intake_urgency"
             className="font-semibold underline underline-offset-2"
           >
             {BUSINESS.phone}
-          </a>{" "}
+          </CallLink>{" "}
           {t("urgency_red_body_2")}
         </div>
       </div>

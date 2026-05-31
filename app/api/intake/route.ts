@@ -155,7 +155,104 @@ async function deliverToGhl(
   return { ok: false, reason: lastReason };
 }
 
+// Best-effort, per-instance rate limit. Serverless instances are ephemeral and
+// not shared, so this throttles bursts against a warm instance rather than
+// enforcing a strict global limit — for hard guarantees wire a shared store
+// (e.g. Upstash Redis). The window is generous so a real person re-submitting
+// is never blocked; it only stops scripted floods hammering one instance.
+const RATE_LIMIT_MAX = 5;
+const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
+const rateBuckets = new Map<string, number[]>();
+
+function rateLimited(ip: string): boolean {
+  const now = Date.now();
+  const recent = (rateBuckets.get(ip) ?? []).filter(
+    (t) => now - t < RATE_LIMIT_WINDOW_MS,
+  );
+  recent.push(now);
+  rateBuckets.set(ip, recent);
+  // Opportunistic cleanup so the map can't grow without bound on a long-lived
+  // instance.
+  if (rateBuckets.size > 5000) {
+    for (const [key, times] of rateBuckets) {
+      if (times.every((t) => now - t >= RATE_LIMIT_WINDOW_MS)) {
+        rateBuckets.delete(key);
+      }
+    }
+  }
+  return recent.length > RATE_LIMIT_MAX;
+}
+
+// Durable fallback so a lead is never lost if GoHighLevel delivery fails after
+// retries. Prefers an email via Resend (set RESEND_API_KEY + INTAKE_FALLBACK_
+// EMAIL_TO/FROM); otherwise posts a JSON summary to INTAKE_FALLBACK_WEBHOOK_URL
+// (e.g. a Slack/Zapier hook). No-ops silently if neither is configured.
+async function notifyFallback(summary: {
+  submissionId: string;
+  reason: string;
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
+  email?: string;
+  primaryService?: string;
+}): Promise<void> {
+  const resendKey = process.env.RESEND_API_KEY;
+  const emailTo = process.env.INTAKE_FALLBACK_EMAIL_TO;
+  const emailFrom = process.env.INTAKE_FALLBACK_EMAIL_FROM;
+  const fallbackWebhook = process.env.INTAKE_FALLBACK_WEBHOOK_URL;
+
+  const lines = [
+    `New website lead could not be delivered to GoHighLevel (reason: ${summary.reason}).`,
+    `Please follow up manually:`,
+    ``,
+    `Name: ${summary.firstName ?? ""} ${summary.lastName ?? ""}`.trim(),
+    `Phone: ${summary.phone ?? "—"}`,
+    `Email: ${summary.email ?? "—"}`,
+    `Service: ${summary.primaryService ?? "—"}`,
+    `Submission ID: ${summary.submissionId}`,
+  ].join("\n");
+
+  try {
+    if (resendKey && emailTo && emailFrom) {
+      await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${resendKey}`,
+        },
+        body: JSON.stringify({
+          from: emailFrom,
+          to: emailTo,
+          subject: `⚠️ Missed website lead — ${summary.firstName ?? "Unknown"} (${summary.primaryService ?? "general"})`,
+          text: lines,
+        }),
+      });
+      return;
+    }
+    if (fallbackWebhook) {
+      await fetch(fallbackWebhook, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: lines, ...summary }),
+      });
+    }
+  } catch (err) {
+    // The console.error in the caller is the last-resort record either way.
+    console.error("[intake] Fallback notification failed:", err);
+  }
+}
+
 export async function POST(req: Request) {
+  // Throttle scripted floods before doing any work.
+  const ip =
+    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+  if (ip !== "unknown" && rateLimited(ip)) {
+    return Response.json(
+      { success: false, error: "rate_limited" },
+      { status: 429 },
+    );
+  }
+
   let data: IntakeBody;
   try {
     data = await req.json();
@@ -330,6 +427,17 @@ export async function POST(req: Request) {
     phone: data.phone,
     primaryService: data.primaryService,
     submittedAt: new Date().toISOString(),
+  });
+
+  // Durably surface the lead so it can be recovered manually (email/webhook).
+  await notifyFallback({
+    submissionId,
+    reason: result.reason,
+    firstName: data.firstName,
+    lastName: data.lastName,
+    phone: data.phone,
+    email: data.email,
+    primaryService: data.primaryService,
   });
 
   return Response.json(

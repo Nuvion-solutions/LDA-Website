@@ -42,7 +42,7 @@ export function ServicesPreview() {
             return (
               <motion.div key={service.id} variants={fadeUp}>
                 <Link
-                  href={`/services#${service.slug}`}
+                  href={`/services/${service.slug}`}
                   className="group block h-full bg-[var(--color-navy-mid)] hover:bg-[var(--color-navy-light)] border border-[var(--color-border-dark)] hover:border-[var(--color-gold)] rounded-sm p-7 transition-all duration-300"
                 >
                   <Icon

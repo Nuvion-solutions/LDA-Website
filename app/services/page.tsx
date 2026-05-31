@@ -9,14 +9,14 @@ import { LANG_COOKIE } from "@/lib/language-context";
 import { translations, type Language } from "@/lib/translations";
 
 export const metadata: Metadata = {
-  title: "Services",
+  title: "Document Preparation Services",
   description:
-    "Document preparation services for divorce, eviction, immigration, living trust, power of attorney, DMV forms, and tax document organization. LDA #87 Sonoma County.",
+    "Divorce, eviction, immigration, living trust, power of attorney, DMV & tax document preparation. Registered LDA #87 serving Sonoma County & the North Bay.",
   alternates: { canonical: "/services" },
   openGraph: {
-    title: "Services | California Legal Document Excellence, LLC",
+    title: "Document Preparation Services | California Legal Document Excellence",
     description:
-      "Document preparation services for divorce, eviction, immigration, living trust, power of attorney, DMV forms, and tax document organization.",
+      "Divorce, eviction, immigration, living trust, power of attorney, DMV & tax document preparation. Registered LDA #87, Sonoma County.",
     url: "/services",
     type: "website",
   },
@@ -70,7 +70,12 @@ export default async function ServicesPage() {
                   </div>
                   <div>
                     <h2 className="font-serif text-2xl md:text-4xl text-[var(--color-navy)] leading-tight">
-                      {title}
+                      <Link
+                        href={`/services/${service.slug}`}
+                        className="hover:text-[var(--color-gold)] transition-colors"
+                      >
+                        {title}
+                      </Link>
                     </h2>
                   </div>
                 </div>

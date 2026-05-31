@@ -11,10 +11,10 @@ import {
 export const metadata: Metadata = {
   title: "Terms of Service",
   description:
-    "The terms that govern your use of the California Legal Document Excellence, LLC website and the document preparation services we provide as a Registered Legal Document Assistant.",
+    "The terms governing your use of our website and the document preparation services we provide as a Registered Legal Document Assistant (LDA #87).",
   alternates: { canonical: "/terms" },
   openGraph: {
-    title: "Terms of Service | California Legal Document Excellence, LLC",
+    title: "Terms of Service | California Legal Document Excellence",
     description:
       "The terms that govern your use of our website and document preparation services.",
     url: "/terms",

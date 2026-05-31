@@ -5,10 +5,10 @@ import { IntakeHero } from "@/components/intake/IntakeHero";
 export const metadata: Metadata = {
   title: "Start Your Intake",
   description:
-    "Tell us what documents you need prepared. We'll follow up within 1 business day with pricing, required information, and next steps. LDA #87 Sonoma County.",
+    "Tell us what documents you need prepared. We respond within 1 business day with pricing & next steps. Registered LDA #87, Sonoma County.",
   alternates: { canonical: "/intake" },
   openGraph: {
-    title: "Start Your Intake | California Legal Document Excellence, LLC",
+    title: "Start Your Intake | California Legal Document Excellence",
     description:
       "Tell us what documents you need prepared. We follow up within 1 business day. Free consultation.",
     url: "/intake",

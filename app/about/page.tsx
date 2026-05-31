@@ -7,14 +7,14 @@ import { LANG_COOKIE } from "@/lib/language-context";
 import { translations, type Language } from "@/lib/translations";
 
 export const metadata: Metadata = {
-  title: "About",
+  title: "About Us",
   description:
-    "Meet the team behind California Legal Document Excellence, LLC. Registered Legal Document Assistants serving Sonoma County and beyond. LDA #87.",
+    "Meet the registered Legal Document Assistants behind California Legal Document Excellence — serving Sonoma County & the greater North Bay. LDA #87.",
   alternates: { canonical: "/about" },
   openGraph: {
-    title: "About | California Legal Document Excellence, LLC",
+    title: "About Us | California Legal Document Excellence",
     description:
-      "Meet the team behind California Legal Document Excellence, LLC. Registered LDAs serving Sonoma County and beyond.",
+      "Meet the registered Legal Document Assistants serving Sonoma County & the greater North Bay. LDA #87.",
     url: "/about",
     type: "website",
   },

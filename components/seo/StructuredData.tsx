@@ -60,6 +60,20 @@ export function StructuredData() {
     description:
       "Registered Legal Document Assistant (LDA #87, Sonoma County) providing professional document preparation services for divorce, eviction, immigration, living trust, power of attorney, DMV forms, and tax document organization. Not a law firm; we do not provide legal advice or representation.",
     url: SITE_URL,
+    // The auto-generated brand images double as the org logo/image so Google's
+    // Knowledge Panel and local results have something to render.
+    logo: `${SITE_URL}/icon`,
+    image: `${SITE_URL}/opengraph-image`,
+    // The people behind the practice — credibility signal for a new business.
+    founder: [
+      { "@type": "Person", name: "Carson C. Newton" },
+      { "@type": "Person", name: "S. Khan" },
+      { "@type": "Person", name: "A. Khan" },
+    ],
+    // sameAs links every profile that confirms this is the same business.
+    // Add the Google Business Profile URL + any social pages here once live —
+    // this is one of the strongest trust/entity signals for local SEO.
+    sameAs: [],
     telephone: BUSINESS.phone,
     email: BUSINESS.email,
     address: ADDRESS,

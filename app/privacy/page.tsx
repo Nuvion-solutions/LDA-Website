@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     "How California Legal Document Excellence, LLC collects, uses, and protects the information you share through our website and intake form.",
   alternates: { canonical: "/privacy" },
   openGraph: {
-    title: "Privacy Policy | California Legal Document Excellence, LLC",
+    title: "Privacy Policy | California Legal Document Excellence",
     description:
       "How we collect, use, and protect the information you share with us.",
     url: "/privacy",

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Phone, Mail, Clock } from "lucide-react";
 import { BUSINESS } from "@/lib/utils";
+import { CallLink } from "@/components/analytics/CallLink";
 import { SERVICES, localized } from "@/lib/services";
 import { useLanguage } from "@/lib/language-context";
 
@@ -25,9 +26,9 @@ export function Footer() {
             <ul className="space-y-3 text-sm">
               <li className="flex items-start gap-3">
                 <Phone className="h-4 w-4 mt-0.5 text-[var(--color-gold)] shrink-0" aria-hidden />
-                <a href={`tel:${BUSINESS.phoneTel}`} className="hover:text-[var(--color-gold)]">
+                <CallLink source="footer" className="hover:text-[var(--color-gold)]">
                   {BUSINESS.phone}
-                </a>
+                </CallLink>
               </li>
               <li className="flex items-start gap-3">
                 <Mail className="h-4 w-4 mt-0.5 text-[var(--color-gold)] shrink-0" aria-hidden />

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { Menu, X, Phone, Languages } from "lucide-react";
 import { BUSINESS } from "@/lib/utils";
+import { CallLink } from "@/components/analytics/CallLink";
 import { useLanguage } from "@/lib/language-context";
 
 export function Nav() {
@@ -49,13 +50,13 @@ export function Nav() {
                 {link.label}
               </Link>
             ))}
-            <a
-              href={`tel:${BUSINESS.phoneTel}`}
+            <CallLink
+              source="nav_desktop"
               className="flex items-center gap-2 text-[var(--color-body-light)] hover:text-[var(--color-gold)] transition-colors text-sm"
             >
               <Phone className="h-4 w-4" aria-hidden />
               {BUSINESS.phone}
-            </a>
+            </CallLink>
             <button
               type="button"
               onClick={toggleLang}
@@ -122,14 +123,14 @@ export function Nav() {
                 {link.label}
               </Link>
             ))}
-            <a
-              href={`tel:${BUSINESS.phoneTel}`}
+            <CallLink
+              source="nav_mobile"
               onClick={() => setOpen(false)}
               className="flex items-center gap-3 text-[var(--color-body-light)] hover:text-[var(--color-gold)] py-4 text-lg border-b border-[var(--color-border-dark)]"
             >
               <Phone className="h-5 w-5" aria-hidden />
               {BUSINESS.phone}
-            </a>
+            </CallLink>
             <button
               type="button"
               onClick={() => {

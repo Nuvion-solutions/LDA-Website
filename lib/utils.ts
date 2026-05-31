@@ -12,7 +12,7 @@ export const BUSINESS = {
   county: "Sonoma County",
   phone: "(707) 909-1240",
   phoneTel: "+17079091240",
-  email: "ak.cnewtonesq@gmail.com",
+  email: "contact@calegaldocumenthelp.com",
   hours: "Monday–Saturday, 9:00 AM – 5:00 PM",
 } as const;
 

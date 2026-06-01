@@ -59,12 +59,4 @@ export const FAQS: FaqEntry[] = [
     answerEs:
       "Le ayudamos a organizar la información y preparar los documentos de forma limpia, profesional y completa para que no tenga que lidiar solo con formularios confusos.",
   },
-  {
-    question: "Do you offer services in Spanish?",
-    answer:
-      "Yes. We offer document preparation services in both English and Spanish.",
-    questionEs: "¿Ofrecen servicios en español?",
-    answerEs:
-      "Sí. Ofrecemos servicios de preparación de documentos tanto en inglés como en español.",
-  },
 ];

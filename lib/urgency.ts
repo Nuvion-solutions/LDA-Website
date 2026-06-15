@@ -57,6 +57,8 @@ export function daysUntil(dateStr: string | null): number | null {
 
 export function urgencyTagFor(days: number | null): UrgencyTag {
   if (days === null) return "standard-lead";
+  // A date in the past isn't an upcoming deadline — don't flag it as urgent.
+  if (days < 0) return "standard-lead";
   if (days <= 7) return "urgent-7-days";
   if (days <= 14) return "urgent-14-days";
   if (days <= 30) return "deadline-30-days";

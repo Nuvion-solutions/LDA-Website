@@ -212,8 +212,9 @@ const intakeSchema = z
     phone: z
       .string()
       .min(7, "err_phone_invalid")
-      .max(30, "err_phone_long"),
-    email: z.string().email("err_email_invalid"),
+      .max(30, "err_phone_long")
+      .regex(/^[0-9+()\-.\s]+$/, "err_phone_invalid"),
+    email: z.email("err_email_invalid"),
     contactMethod: requiredEnum(
       ["Phone", "Email", "Text"],
       "err_contact_method",
@@ -580,6 +581,55 @@ function step3FieldsFor(
   }
 }
 
+// Every Step-3 field across all branches. React Hook Form keeps values for
+// conditionally-unmounted inputs, so we use this to strip fields that don't
+// belong to the chosen service before submitting — otherwise switching service
+// mid-form would forward a mix of branches to the CRM.
+const ALL_STEP3_FIELDS: FieldName[] = [
+  "divorceType", "divorceHasChildren", "divorceChildrenCount",
+  "divorceChildrenAges", "divorceHasProperty", "divorceHasAssets",
+  "divorceMarriageLength", "divorceFilingCounty", "divorceFiledPaperwork",
+  "evictionParty", "evictionPropertyType", "evictionReason",
+  "evictionNoticeServed", "evictionNoticeType", "evictionNoticeDate",
+  "evictionCounty", "evictionTenantVacated", "evictionRent",
+  "immigrationForms", "immigrationFormsOther", "immigrationForWhom",
+  "immigrationStatus", "immigrationHasDeadline", "immigrationDeadlineDate",
+  "immigrationPreviouslyFiled",
+  "trustType", "trustHasMinors", "trustOwnsProperty", "trustPropertyCount",
+  "trustHasAssets", "trustExistingDocs", "trustSuccessor",
+  "poaTypes", "poaAgent", "poaHasReason", "poaReason", "poaNotarize",
+  "dmvFormTypes", "dmvHasAppointment", "dmvAppointmentDate", "dmvDetails",
+  "taxTypes", "taxYear", "taxHasDeadline", "taxDeadlineDate", "taxNotes",
+  "otherDescription", "otherHasDeadline", "otherDeadlineDate",
+];
+
+// Build the payload with only the fields relevant to the chosen service and
+// the active conditional toggles, so stale answers from an abandoned branch
+// (or a toggle the user flipped back to "No") never reach the CRM.
+function prunePayload(data: IntakeData): Record<string, unknown> {
+  const active = new Set<FieldName>(step3FieldsFor(data.primaryService));
+  const out: Record<string, unknown> = { ...data };
+  for (const f of ALL_STEP3_FIELDS) {
+    if (!active.has(f)) delete out[f];
+  }
+  // Clear conditional sub-fields whose parent toggle is not "Yes".
+  if (out.divorceHasChildren !== "Yes") {
+    delete out.divorceChildrenCount;
+    delete out.divorceChildrenAges;
+  }
+  if (out.evictionNoticeServed !== "Yes") {
+    delete out.evictionNoticeType;
+    delete out.evictionNoticeDate;
+  }
+  if (out.immigrationHasDeadline !== "Yes") delete out.immigrationDeadlineDate;
+  if (out.trustOwnsProperty !== "Yes") delete out.trustPropertyCount;
+  if (out.poaHasReason !== "Yes") delete out.poaReason;
+  if (out.dmvHasAppointment !== "Yes") delete out.dmvAppointmentDate;
+  if (out.taxHasDeadline !== "Yes") delete out.taxDeadlineDate;
+  if (out.otherHasDeadline !== "Yes") delete out.otherDeadlineDate;
+  return out;
+}
+
 // ---------------------------------------------------------------------------
 // Styles
 // ---------------------------------------------------------------------------
@@ -630,6 +680,8 @@ export function IntakeForm() {
     trigger,
     watch,
     getValues,
+    setFocus,
+    getFieldState,
     formState: { errors, isSubmitted, touchedFields },
   } = useForm<IntakeData>({
     resolver: zodResolver(intakeSchema),
@@ -696,6 +748,11 @@ export function IntakeForm() {
     if (valid) {
       setStep((s) => Math.min(s + 1, STEPS.length - 1));
       window.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      // Move focus to the first invalid field so the failed "Continue" is
+      // obvious (especially for keyboard/screen-reader users).
+      const firstInvalid = fields.find((f) => getFieldState(f).invalid);
+      if (firstInvalid) setFocus(firstInvalid);
     }
   };
 
@@ -705,6 +762,7 @@ export function IntakeForm() {
   };
 
   const onSubmit = async (data: IntakeData) => {
+    if (submitting) return; // guard against a fast double-click
     setSubmitting(true);
     setSubmitError(null);
     try {
@@ -712,7 +770,7 @@ export function IntakeForm() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ...data,
+          ...prunePayload(data),
           website: honeypot,
           elapsedMs: Date.now() - loadedAt,
         }),

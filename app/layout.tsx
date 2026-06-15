@@ -91,7 +91,6 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  maximumScale: 5,
   themeColor: "#0D1B2A",
 };
 
@@ -108,10 +107,18 @@ export default async function RootLayout({
       className={`${inter.variable} ${playfair.variable} h-full`}
     >
       <body className="min-h-full flex flex-col bg-white text-[var(--color-body-dark)]">
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-sm focus:bg-[var(--color-navy)] focus:px-4 focus:py-2 focus:text-white"
+        >
+          {initialLang === "es" ? "Saltar al contenido" : "Skip to content"}
+        </a>
         <StructuredData />
         <LanguageProvider initialLang={initialLang}>
           <Nav />
-          <main className="flex-1">{children}</main>
+          <main id="main" className="flex-1">
+            {children}
+          </main>
           <Footer />
         </LanguageProvider>
         <VercelAnalytics />

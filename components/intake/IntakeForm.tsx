@@ -382,6 +382,10 @@ const intakeSchema = z
             message: "err_one_form",
           });
         }
+        // If they picked "Other / Not Sure", make them describe it.
+        if (data.immigrationForms?.includes("Other / Not Sure")) {
+          need("immigrationFormsOther", data.immigrationFormsOther);
+        }
         need("immigrationForWhom", data.immigrationForWhom);
         need("immigrationStatus", data.immigrationStatus);
         need("immigrationHasDeadline", data.immigrationHasDeadline);
@@ -2013,6 +2017,7 @@ function ImmigrationBranch({ register, control, watch, errors, t, lang }: any) {
           <input
             id="immigrationDeadlineDate"
             type="date"
+            min={new Date().toISOString().slice(0, 10)}
             {...register("immigrationDeadlineDate")}
             className={inputBase}
           />
@@ -2204,6 +2209,7 @@ function DmvBranch({ register, control, watch, errors, t, lang }: any) {
           <input
             id="dmvAppointmentDate"
             type="date"
+            min={new Date().toISOString().slice(0, 10)}
             {...register("dmvAppointmentDate")}
             className={inputBase}
           />
@@ -2270,6 +2276,7 @@ function TaxBranch({ register, control, watch, errors, t, lang }: any) {
           <input
             id="taxDeadlineDate"
             type="date"
+            min={new Date().toISOString().slice(0, 10)}
             {...register("taxDeadlineDate")}
             className={inputBase}
           />
@@ -2329,6 +2336,7 @@ function OtherBranch({ register, watch, errors, t, lang }: any) {
           <input
             id="otherDeadlineDate"
             type="date"
+            min={new Date().toISOString().slice(0, 10)}
             {...register("otherDeadlineDate")}
             className={inputBase}
           />

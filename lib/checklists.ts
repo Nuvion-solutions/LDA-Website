@@ -164,7 +164,7 @@ export const SERVICE_CHECKLISTS: Record<string, ServiceChecklist> = {
       "Los documentos de Poder Notarial generalmente requieren notarización. Podemos ayudar a preparar el documento — usted coordinará la notarización por separado.",
   },
   "DMV Form Assistance": {
-    title: "Documents to Gather for DMV Form Assistance",
+    title: "Documents to Gather for DMV & Administrative Forms",
     intro: "Depending on your DMV matter, you may need:",
     items: [
       "Current vehicle title or pink slip",
@@ -177,7 +177,7 @@ export const SERVICE_CHECKLISTS: Record<string, ServiceChecklist> = {
     ],
     note:
       "We help you complete the forms — you submit them to the DMV directly.",
-    titleEs: "Documentos a Reunir para Asistencia con Formularios del DMV",
+    titleEs: "Documentos a Reunir para Formularios del DMV y Administrativos",
     introEs: "Dependiendo de su asunto en el DMV, puede necesitar:",
     itemsEs: [
       "Título actual del vehículo o pink slip",

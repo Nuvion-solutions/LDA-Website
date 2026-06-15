@@ -1075,8 +1075,8 @@ export const SERVICE_NAME_TRANSLATIONS: Record<string, { en: string; es: string 
     es: "Poder Notarial",
   },
   "DMV Form Assistance": {
-    en: "DMV Form Assistance",
-    es: "Asistencia con Formularios del DMV",
+    en: "DMV & Administrative Forms",
+    es: "Formularios del DMV y Administrativos",
   },
   "Tax Document Organization (Clerical)": {
     en: "Tax Document Organization (Clerical)",

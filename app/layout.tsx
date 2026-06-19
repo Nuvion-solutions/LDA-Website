@@ -6,6 +6,7 @@ import { Nav } from "@/components/layout/Nav";
 import { Footer } from "@/components/layout/Footer";
 import { StructuredData } from "@/components/seo/StructuredData";
 import { Analytics } from "@/components/analytics/Analytics";
+import { MetaPixel } from "@/components/analytics/MetaPixel";
 import { Analytics as VercelAnalytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { SITE_URL } from "@/lib/site";
@@ -123,6 +124,7 @@ export default async function RootLayout({
         </LanguageProvider>
         <VercelAnalytics />
         <SpeedInsights />
+        <MetaPixel />
       </body>
       <Analytics />
     </html>

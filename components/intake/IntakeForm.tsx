@@ -787,6 +787,13 @@ export function IntakeForm() {
           service: data.primaryService,
         });
       }
+      // Meta Pixel conversion event for ad optimization/reporting. Guarded on
+      // the pixel ID so it stays off in dev/preview, mirroring MetaPixel.tsx.
+      if (process.env.NEXT_PUBLIC_FB_PIXEL_ID) {
+        window.fbq?.("track", "Lead", {
+          content_name: data.primaryService,
+        });
+      }
       setSubmitted({
         firstName: data.firstName,
         service: data.primaryService,

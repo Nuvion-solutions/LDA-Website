@@ -198,7 +198,7 @@ const en = {
   short_disclaimer:
     "California Legal Document Excellence, LLC is not a law firm and does not provide legal advice or legal representation.",
   full_disclaimer:
-    "California Legal Document Excellence, LLC is a Registered Legal Document Assistant (LDA #87, Sonoma County). We are not a law firm and do not provide legal advice, legal representation, or legal counsel. All document preparation services are provided at the client's direction. We are not attorneys.",
+    "California Legal Document Excellence, LLC is a Registered Legal Document Assistant (LDA #87, Sonoma County). We are not a law firm and do not provide legal advice, legal representation, or legal counsel. All document preparation services are provided at the client's direction. We are not attorneys. If your matter requires legal representation, we can refer you to a licensed attorney.",
 
   // Services page
   services_page_eyebrow: "What We Prepare",
@@ -612,7 +612,7 @@ const es: Dict = {
   short_disclaimer:
     "California Legal Document Excellence, LLC no es un bufete de abogados y no brinda asesoramiento legal ni representación legal.",
   full_disclaimer:
-    "California Legal Document Excellence, LLC es un Asistente Legal Registrado (LDA #87, Condado de Sonoma). No somos un bufete de abogados y no brindamos asesoramiento legal, representación legal ni consejo legal. Todos los servicios de preparación de documentos se proporcionan según las instrucciones del cliente.",
+    "California Legal Document Excellence, LLC es un Asistente Legal Registrado (LDA #87, Condado de Sonoma). No somos un bufete de abogados y no brindamos asesoramiento legal, representación legal ni consejo legal. Todos los servicios de preparación de documentos se proporcionan según las instrucciones del cliente. Si su asunto requiere representación legal, podemos referirlo a un abogado con licencia.",
 
   // Services page
   services_page_eyebrow: "Lo Que Preparamos",

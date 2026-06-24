@@ -21,7 +21,7 @@ export default function IntakePage() {
   return (
     <>
       <IntakeHero />
-      <section className="bg-[var(--color-offwhite)] py-12 md:py-16">
+      <section className="bg-[var(--color-offwhite)] py-8 md:py-10">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
           <IntakeForm />
         </div>

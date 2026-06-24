@@ -805,6 +805,26 @@ export function IntakeForm() {
     }
   };
 
+  // Called when a submit attempt fails validation. Without this, a blocked
+  // submit is silent — the button looks dead, especially if the offending
+  // field (e.g. an unchecked consent box) is just below the fold. Jump the
+  // user to the step holding the first error and scroll it into view so the
+  // reason is always visible.
+  const onInvalid = (formErrors: typeof errors) => {
+    const errored = Object.keys(formErrors) as FieldName[];
+    if (errored.length === 0) return;
+    const stepForField = (field: FieldName): number => {
+      if (STEP_1_FIELDS.includes(field)) return 0;
+      if (STEP_2_FIELDS.includes(field)) return 1;
+      if (step3FieldsFor(primaryService).includes(field)) return 2;
+      if (STEP_4_FIELDS.includes(field)) return 3;
+      return 4; // consent / confirm step
+    };
+    const targetStep = Math.min(...errored.map(stepForField));
+    setStep(targetStep);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   if (submitted) {
     const checklist =
       SERVICE_CHECKLISTS[submitted.service] ?? SERVICE_CHECKLISTS["default"];
@@ -880,7 +900,7 @@ export function IntakeForm() {
   const progressPct = ((step + 1) / STEPS.length) * 100;
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} noValidate>
+    <form onSubmit={handleSubmit(onSubmit, onInvalid)} noValidate>
       {/* Honeypot — visually hidden and skipped by keyboard/screen readers.
           Real users never fill it; naive bots that populate every field do,
           which lets the server discard the submission. Not part of the

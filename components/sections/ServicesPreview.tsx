@@ -65,6 +65,22 @@ export function ServicesPreview() {
             );
           })}
         </motion.div>
+
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewportOnce}
+          variants={fadeUp}
+          className="mt-10 md:mt-12 text-center"
+        >
+          <Link
+            href="/intake"
+            className="inline-flex items-center justify-center gap-2 bg-[var(--color-gold)] hover:bg-[var(--color-gold-light)] text-[var(--color-navy)] font-medium px-7 py-3.5 rounded-sm tracking-wide transition-colors"
+          >
+            {t("hero_cta_primary")}
+            <ArrowRight className="h-4 w-4" aria-hidden />
+          </Link>
+        </motion.div>
       </div>
     </section>
   );

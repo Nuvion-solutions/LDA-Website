@@ -1,6 +1,6 @@
 import { BUSINESS } from "@/lib/utils";
 import { SITE_URL } from "@/lib/site";
-import { SERVICES } from "@/lib/services";
+import { SERVICES, ADDITIONAL_SERVICE_CATEGORIES } from "@/lib/services";
 
 // JSON-LD structured data for Google's Knowledge Graph + local pack.
 // Renders two graphs: a LegalService (with full LocalBusiness fields) and
@@ -83,7 +83,13 @@ export function StructuredData() {
     priceRange: "$$",
     paymentAccepted: ["Credit Card", "Debit Card", "Zelle", "Venmo"],
     currenciesAccepted: "USD",
-    knowsAbout: SERVICES.map((s) => s.title),
+    // Entity signal of everything we prepare — the featured services plus the
+    // broader breadth listed on the services page, so Google understands the
+    // full range (name changes, probate, small claims, deeds, etc.).
+    knowsAbout: [
+      ...SERVICES.map((s) => s.title),
+      ...ADDITIONAL_SERVICE_CATEGORIES.flatMap((c) => c.items),
+    ],
     hasOfferCatalog: {
       "@type": "OfferCatalog",
       name: "Document Preparation Services",

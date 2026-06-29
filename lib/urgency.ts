@@ -1,5 +1,5 @@
 // Urgency calculation shared between the intake form (for the urgency
-// banner) and the API route (for GHL tagging).
+// banner) and the API route (for flagging lead urgency in the email).
 
 import { differenceInDays } from "date-fns";
 

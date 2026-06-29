@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Link from "next/link";
 import { useForm, Controller } from "react-hook-form";
 import type { Path } from "react-hook-form";
@@ -664,6 +664,14 @@ export function IntakeForm() {
   // the server can reject near-instant, bot-like submissions.
   const [honeypot, setHoneypot] = useState("");
   const [loadedAt] = useState(() => Date.now());
+  // Stable id so an early "contact captured" ping and the final full
+  // submission can be matched up on the receiving end.
+  const [leadId] = useState(() =>
+    typeof crypto !== "undefined" && crypto.randomUUID
+      ? crypto.randomUUID()
+      : String(Date.now()),
+  );
+  const partialSent = useRef(false);
   const { lang, t } = useLanguage();
 
   const stepLabels = [
@@ -750,6 +758,10 @@ export function IntakeForm() {
 
     const valid = await trigger(fields);
     if (valid) {
+      // Once contact details pass on step 1, capture them immediately — a
+      // visitor who abandons later is still a reachable lead (important for
+      // paid traffic). Fire-and-forget; never block navigation on it.
+      if (step === 0) void sendPartialLead();
       setStep((s) => Math.min(s + 1, STEPS.length - 1));
       window.scrollTo({ top: 0, behavior: "smooth" });
     } else {
@@ -765,6 +777,34 @@ export function IntakeForm() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  // Best-effort early capture of contact info after step 1. Sent once; if it
+  // fails we reset the flag so the next step-advance can retry.
+  const sendPartialLead = async () => {
+    if (partialSent.current) return;
+    partialSent.current = true;
+    const v = getValues();
+    try {
+      await fetch("/api/intake", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          partial: true,
+          leadId,
+          firstName: v.firstName,
+          lastName: v.lastName,
+          phone: v.phone,
+          email: v.email,
+          contactMethod: v.contactMethod,
+          bestTime: v.bestTime,
+          website: honeypot,
+          elapsedMs: Date.now() - loadedAt,
+        }),
+      });
+    } catch {
+      partialSent.current = false;
+    }
+  };
+
   const onSubmit = async (data: IntakeData) => {
     if (submitting) return; // guard against a fast double-click
     setSubmitting(true);
@@ -775,6 +815,7 @@ export function IntakeForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...prunePayload(data),
+          leadId,
           website: honeypot,
           elapsedMs: Date.now() - loadedAt,
         }),

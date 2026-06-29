@@ -97,6 +97,12 @@ type IntakeBody = {
   consentLDA?: boolean;
   consentContact?: boolean;
 
+  // Early-capture: a "partial" ping fired after the contact step so a visitor
+  // who abandons the rest of the form is still a reachable lead. leadId ties
+  // the partial ping to the eventual full submission.
+  partial?: boolean;
+  leadId?: string;
+
   // Spam mitigation (not user-facing; see POST handler)
   website?: string;
   elapsedMs?: number;
@@ -230,7 +236,13 @@ function escapeHtml(s: string): string {
 
 function renderEmail(
   sections: Section[],
-  meta: { urgencyLabel: string; submissionId: string; submittedAt: string },
+  meta: {
+    urgencyLabel: string;
+    submissionId: string;
+    submittedAt: string;
+    note?: string;
+    leadId?: string;
+  },
 ): { html: string; text: string } {
   const htmlSections = sections
     .map((s) => {
@@ -248,24 +260,37 @@ function renderEmail(
     })
     .join("");
 
+  const noteHtml = meta.note
+    ? `<p style="margin:0 0 16px;padding:10px 14px;background:#fef9c3;border-left:3px solid #ca8a04;font-size:14px;color:#713f12;">${escapeHtml(
+        meta.note,
+      )}</p>`
+    : "";
+
+  const idLine = meta.leadId
+    ? `Lead ID: ${escapeHtml(meta.leadId)}<br/>`
+    : "";
+
   const html = `<div style="font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;max-width:640px;margin:0 auto;padding:24px;color:#111827;">
     <p style="margin:0 0 4px;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:#9ca3af;">New website lead</p>
-    <h2 style="margin:0 0 4px;font-size:20px;">${escapeHtml(meta.urgencyLabel)}</h2>
+    <h2 style="margin:0 0 12px;font-size:20px;">${escapeHtml(meta.urgencyLabel)}</h2>
+    ${noteHtml}
     ${htmlSections}
     <hr style="margin:24px 0;border:none;border-top:1px solid #e5e7eb;" />
-    <p style="font-size:12px;color:#9ca3af;">Submission ID: ${escapeHtml(
+    <p style="font-size:12px;color:#9ca3af;">${idLine}Submission ID: ${escapeHtml(
       meta.submissionId,
     )}<br/>Received: ${escapeHtml(meta.submittedAt)}</p>
   </div>`;
 
   const text = [
     `NEW WEBSITE LEAD — ${meta.urgencyLabel}`,
+    ...(meta.note ? ["", meta.note] : []),
     "",
     ...sections.flatMap((s) => [
       s.title.toUpperCase(),
       ...s.fields.map((f) => `  ${f.label}: ${f.value}`),
       "",
     ]),
+    ...(meta.leadId ? [`Lead ID: ${meta.leadId}`] : []),
     `Submission ID: ${meta.submissionId}`,
     `Received: ${meta.submittedAt}`,
   ].join("\n");
@@ -381,9 +406,14 @@ export async function POST(req: Request) {
   // than a few seconds, so a near-instant submit is bot-like. In both cases we
   // return a success-shaped response (so bots get no signal to adapt) but
   // never send the junk lead.
+  const partial = data.partial === true;
   const honeypotTripped =
     typeof data.website === "string" && data.website.trim() !== "";
+  // The too-fast check guards the full submission; the early-capture ping
+  // legitimately fires within seconds (just the contact step), so skip it
+  // there. Honeypot + rate limiting still apply to both.
   const tooFast =
+    !partial &&
     typeof data.elapsedMs === "number" &&
     data.elapsedMs >= 0 &&
     data.elapsedMs < 3000;
@@ -393,6 +423,12 @@ export async function POST(req: Request) {
       elapsedMs: data.elapsedMs,
     });
     return Response.json({ success: true, mode: "ignored" });
+  }
+
+  // Kill-switch for early capture: set INTAKE_CAPTURE_PARTIAL="false" to stop
+  // the contact-step pings (e.g. if they become noisy) without a code change.
+  if (partial && process.env.INTAKE_CAPTURE_PARTIAL === "false") {
+    return Response.json({ success: true, mode: "partial_disabled" });
   }
 
   const submissionId = crypto.randomUUID();
@@ -435,15 +471,22 @@ export async function POST(req: Request) {
 
   const sections = buildSections(data);
   const { html, text } = renderEmail(sections, {
-    urgencyLabel,
+    urgencyLabel: partial ? "🟡 Intake started — contact captured" : urgencyLabel,
+    note: partial
+      ? "This visitor completed the contact step but may not have finished the full intake. Their details are below — reaching out is recommended. If they finish, you'll get a second email with full details under the same Lead ID."
+      : undefined,
+    leadId: data.leadId,
     submissionId,
     submittedAt,
   });
 
   const isUrgent = urgencyTag !== "standard-lead";
-  const subject = `${isUrgent ? `${urgencyLabel} — ` : ""}New lead: ${
-    data.firstName ?? "Unknown"
-  } ${data.lastName ?? ""} (${data.primaryService ?? "general"})`.trim();
+  const name = `${data.firstName ?? "Unknown"} ${data.lastName ?? ""}`.trim();
+  const subject = partial
+    ? `🟡 Intake started — ${name}`
+    : `${isUrgent ? `${urgencyLabel} — ` : ""}New lead: ${name} (${
+        data.primaryService ?? "general"
+      })`.trim();
 
   const result = await sendLeadEmail(
     {

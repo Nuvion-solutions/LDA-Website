@@ -5,6 +5,8 @@
 
 import { getDeadlineDate, daysUntil, urgencyTagFor } from "@/lib/urgency";
 import type { UrgencyTag } from "@/lib/urgency";
+import { BUSINESS } from "@/lib/utils";
+import { translations } from "@/lib/translations";
 
 export const dynamic = "force-dynamic";
 
@@ -102,6 +104,9 @@ type IntakeBody = {
   // the partial ping to the eventual full submission.
   partial?: boolean;
   leadId?: string;
+
+  // Visitor's site language, used to localize the confirmation email.
+  lang?: "en" | "es";
 
   // Spam mitigation (not user-facing; see POST handler)
   website?: string;
@@ -296,6 +301,65 @@ function renderEmail(
   ].join("\n");
 
   return { html, text };
+}
+
+// Confirmation email sent to the person who submitted the intake. Localized to
+// their site language; reply-to is set to the business inbox by the caller so a
+// reply reaches the LDA, not the unmonitored send address.
+function buildConfirmationEmail(
+  data: IntakeBody,
+  lang: "en" | "es",
+): { subject: string; html: string; text: string } {
+  const firstName = (data.firstName ?? "").trim();
+  const service = (data.primaryService ?? "").trim();
+  const phone = BUSINESS.phone;
+  const disclaimer = translations[lang].short_disclaimer;
+
+  const copy =
+    lang === "es"
+      ? {
+          subject: "Recibimos su solicitud — California Legal Document Excellence",
+          greeting: firstName ? `Hola ${firstName},` : "Hola,",
+          body: `Gracias por comunicarse con California Legal Document Excellence. Recibimos su solicitud${
+            service ? ` sobre ${service}` : ""
+          } y la revisaremos para responderle dentro de 1 día hábil con los próximos pasos y el precio.`,
+          contact: `Si necesita comunicarse antes, llámenos al ${phone} o simplemente responda a este correo.`,
+          signoff:
+            "California Legal Document Excellence\nAsistente Legal Registrado · LDA #87 · Condado de Sonoma",
+        }
+      : {
+          subject: "We received your intake — California Legal Document Excellence",
+          greeting: firstName ? `Hi ${firstName},` : "Hi there,",
+          body: `Thank you for reaching out to California Legal Document Excellence. We've received your intake${
+            service ? ` for ${service}` : ""
+          } and will review it and follow up within 1 business day with next steps and pricing.`,
+          contact: `If you need to reach us sooner, call ${phone} or just reply to this email.`,
+          signoff:
+            "California Legal Document Excellence\nRegistered Legal Document Assistant · LDA #87 · Sonoma County",
+        };
+
+  const html = `<div style="font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;max-width:560px;margin:0 auto;padding:24px;color:#111827;line-height:1.55;">
+    <p style="margin:0 0 16px;">${escapeHtml(copy.greeting)}</p>
+    <p style="margin:0 0 16px;">${escapeHtml(copy.body)}</p>
+    <p style="margin:0 0 16px;">${escapeHtml(copy.contact)}</p>
+    <p style="margin:0 0 16px;white-space:pre-line;color:#1f3a5f;">${escapeHtml(copy.signoff)}</p>
+    <hr style="margin:24px 0;border:none;border-top:1px solid #e5e7eb;" />
+    <p style="font-size:12px;color:#9ca3af;">${escapeHtml(disclaimer)}</p>
+  </div>`;
+
+  const text = [
+    copy.greeting,
+    "",
+    copy.body,
+    "",
+    copy.contact,
+    "",
+    copy.signoff,
+    "",
+    disclaimer,
+  ].join("\n");
+
+  return { subject: copy.subject, html, text };
 }
 
 // Send via Resend with a short retry on transient (5xx / network) failures so
@@ -504,6 +568,31 @@ export async function POST(req: Request) {
   );
 
   if (result.ok) {
+    // Send the submitter a localized confirmation (full submissions only, and
+    // only once the business notification succeeded so a retry can't duplicate
+    // it). Best-effort: a failed confirmation never fails the submission.
+    if (!partial && data.email) {
+      const lang = data.lang === "es" ? "es" : "en";
+      const conf = buildConfirmationEmail(data, lang);
+      const confResult = await sendLeadEmail(
+        {
+          from: emailFrom,
+          to: [data.email],
+          subject: conf.subject,
+          html: conf.html,
+          text: conf.text,
+          // Replies from the client go to the monitored business inbox.
+          reply_to: emailTo[0],
+        },
+        apiKey,
+      );
+      if (!confResult.ok) {
+        console.error("[intake] Confirmation email failed:", {
+          submissionId,
+          reason: confResult.reason,
+        });
+      }
+    }
     return Response.json({ success: true, submissionId });
   }
 

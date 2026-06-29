@@ -675,6 +675,7 @@ export function IntakeForm() {
         body: JSON.stringify({
           ...prunePayload(data),
           leadId,
+          lang,
           website: honeypot,
           elapsedMs: Date.now() - loadedAt,
         }),

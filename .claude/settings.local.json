@@ -112,7 +112,8 @@
       "PowerShell($env:NODE_OPTIONS = \"--use-system-ca\"; npx vercel ls --prod 2>&1 | Select-Object -First 15)",
       "PowerShell($env:NODE_OPTIONS = \"--use-system-ca\"; npx vercel logs https://client-newton-lmup5r7fa-djprudhomme04s-projects.vercel.app 2>&1 | Select-Object -First 40)",
       "PowerShell($env:NODE_OPTIONS = \"--use-system-ca\"; npx vercel logs https://client-newton-lmup5r7fa-djprudhomme04s-projects.vercel.app 2>&1 | Select-String \"intake\")",
-      "PowerShell($env:NODE_OPTIONS=\"--use-system-ca\"; npx vercel ls --prod 2>&1 | Select-String \"Ready|Building|Error|Age\" | Select-Object -First 4)"
+      "PowerShell($env:NODE_OPTIONS=\"--use-system-ca\"; npx vercel ls --prod 2>&1 | Select-String \"Ready|Building|Error|Age\" | Select-Object -First 4)",
+      "PowerShell($env:NODE_OPTIONS=\"--use-system-ca\"; npx vercel env rm GHL_FORM_WEBHOOK_URL production --yes)"
     ]
   }
 }

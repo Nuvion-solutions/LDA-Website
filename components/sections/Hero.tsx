@@ -15,6 +15,7 @@ export function Hero() {
     t("hero_trust_2"),
     t("hero_trust_3"),
     t("hero_trust_4"),
+    t("hero_trust_5"),
   ];
 
   return (

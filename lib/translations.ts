@@ -31,6 +31,7 @@ const en = {
   hero_trust_2: "Sonoma County",
   hero_trust_3: "Free Consultation",
   hero_trust_4: "Remote Services Available",
+  hero_trust_5: "Attorney Referrals Available",
 
   // Services preview
   services_eyebrow: "Our Services",
@@ -65,6 +66,9 @@ const en = {
   why_3_title: "Clear Communication",
   why_3_body:
     "We keep you informed at every step so you always know where your documents stand.",
+  why_4_title: "Attorney Referrals",
+  why_4_body:
+    "We're not a law firm — but if your matter needs legal advice or representation, we work with a licensed attorney and can refer you. You're never left without options.",
 
   // FAQ
   faq_eyebrow: "Common Questions",
@@ -452,6 +456,7 @@ const es: Dict = {
   hero_trust_2: "Condado de Sonoma",
   hero_trust_3: "Consulta Gratuita",
   hero_trust_4: "Servicios Remotos Disponibles",
+  hero_trust_5: "Referencias a Abogados Disponibles",
 
   // Services preview
   services_eyebrow: "Nuestros Servicios",
@@ -487,6 +492,9 @@ const es: Dict = {
   why_3_title: "Comunicación Clara",
   why_3_body:
     "Le mantenemos informado en cada paso para que siempre sepa el estado de sus documentos.",
+  why_4_title: "Referencias a Abogados",
+  why_4_body:
+    "No somos un bufete de abogados, pero si su asunto requiere asesoría o representación legal, trabajamos con un abogado con licencia y podemos referirlo. Nunca se queda sin opciones.",
 
   // FAQ
   faq_eyebrow: "Preguntas Comunes",

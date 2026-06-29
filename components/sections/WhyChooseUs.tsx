@@ -1,7 +1,12 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Sparkles, BadgeDollarSign, MessageSquareText } from "lucide-react";
+import {
+  Sparkles,
+  BadgeDollarSign,
+  MessageSquareText,
+  Scale,
+} from "lucide-react";
 import { fadeUp, staggerContainer, viewportOnce } from "@/lib/animations";
 import { useLanguage } from "@/lib/language-context";
 
@@ -18,6 +23,11 @@ export function WhyChooseUs() {
       icon: MessageSquareText,
       title: t("why_3_title"),
       body: t("why_3_body"),
+    },
+    {
+      icon: Scale,
+      title: t("why_4_title"),
+      body: t("why_4_body"),
     },
   ];
 
@@ -44,7 +54,7 @@ export function WhyChooseUs() {
           whileInView="visible"
           viewport={viewportOnce}
           variants={staggerContainer}
-          className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-10"
         >
           {pillars.map((p) => {
             const Icon = p.icon;

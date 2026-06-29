@@ -185,6 +185,150 @@ export const SERVICES: Service[] = [
 
 export const HOMEPAGE_SERVICES = SERVICES.slice(0, 6);
 
+// The broader breadth of document types we prepare, grouped by area. Shown on
+// the services page below the featured services — captures long-tail search
+// interest and signals full-service range without bloating the intake form,
+// which keeps its focused set of primary services plus an "Other" catch-all.
+export type ServiceCategory = {
+  title: string;
+  titleEs: string;
+  items: string[];
+  itemsEs: string[];
+};
+
+export const ADDITIONAL_SERVICE_CATEGORIES: ServiceCategory[] = [
+  {
+    title: "Family Law",
+    titleEs: "Derecho Familiar",
+    items: [
+      "Divorce & legal separation",
+      "Annulments",
+      "Child custody & visitation",
+      "Child & spousal support (and modifications)",
+      "Paternity",
+      "Marital settlement agreements",
+      "Pre-nuptial & post-nuptial agreements",
+      "Qualified Domestic Relations Orders (QDRO)",
+      "Adoption",
+      "Guardianships",
+      "Emancipation of minors",
+      "Name changes",
+    ],
+    itemsEs: [
+      "Divorcio y separación legal",
+      "Anulaciones",
+      "Custodia y visitas de menores",
+      "Manutención de menores y cónyuge (y modificaciones)",
+      "Paternidad",
+      "Acuerdos de liquidación matrimonial",
+      "Acuerdos prenupciales y postnupciales",
+      "Órdenes QDRO (relaciones domésticas calificadas)",
+      "Adopción",
+      "Tutelas",
+      "Emancipación de menores",
+      "Cambios de nombre",
+    ],
+  },
+  {
+    title: "Estate Planning",
+    titleEs: "Planificación Patrimonial",
+    items: [
+      "Living trusts",
+      "Wills",
+      "Certification of trust",
+      "Health care directives",
+      "Powers of attorney",
+      "Probate",
+    ],
+    itemsEs: [
+      "Fideicomisos en vida",
+      "Testamentos",
+      "Certificación de fideicomiso",
+      "Directivas de atención médica",
+      "Poderes notariales",
+      "Sucesiones (probate)",
+    ],
+  },
+  {
+    title: "Housing & Real Estate",
+    titleEs: "Vivienda y Bienes Raíces",
+    items: [
+      "Evictions / unlawful detainer",
+      "Deeds & quitclaim deeds",
+      "Assignment of personal property",
+    ],
+    itemsEs: [
+      "Desalojos / unlawful detainer",
+      "Escrituras y escrituras de finiquito (quitclaim)",
+      "Asignación de bienes personales",
+    ],
+  },
+  {
+    title: "Civil & Collections",
+    titleEs: "Civil y Cobranzas",
+    items: [
+      "Small claims",
+      "Civil actions",
+      "Collections",
+      "Wage garnishments",
+      "Settlement agreements & stipulations",
+      "Orders to show cause",
+    ],
+    itemsEs: [
+      "Reclamos menores (small claims)",
+      "Acciones civiles",
+      "Cobranzas",
+      "Embargos de salario",
+      "Acuerdos de conciliación y estipulaciones",
+      "Órdenes para mostrar causa",
+    ],
+  },
+  {
+    title: "Business",
+    titleEs: "Negocios",
+    items: ["Corporations, partnerships & LLCs"],
+    itemsEs: ["Corporaciones, sociedades y LLCs"],
+  },
+  {
+    title: "Immigration",
+    titleEs: "Inmigración",
+    items: ["Immigration & citizenship documents"],
+    itemsEs: ["Documentos de inmigración y ciudadanía"],
+  },
+  {
+    title: "Other Document Services",
+    titleEs: "Otros Servicios de Documentos",
+    items: [
+      "Bankruptcy",
+      "Mediation",
+      "Notary",
+      "Document typing & preparation",
+      "Resumes",
+    ],
+    itemsEs: [
+      "Bancarrota",
+      "Mediación",
+      "Notaría",
+      "Mecanografía y preparación de documentos",
+      "Currículums",
+    ],
+  },
+];
+
+// Resolve a localized category (title + items), falling back to English.
+export function localizedCategory(
+  cat: ServiceCategory,
+  lang: Language,
+): { title: string; items: string[] } {
+  if (lang === "es") {
+    return {
+      title: cat.titleEs || cat.title,
+      items: cat.itemsEs.length > 0 ? cat.itemsEs : cat.items,
+    };
+  }
+  return { title: cat.title, items: cat.items };
+}
+
 // Resolve a localized field on a Service. Falls back to the English value
 // if the Spanish field is missing.
 export function localized<K extends "title" | "short" | "what" | "documents" | "who">(

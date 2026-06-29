@@ -212,6 +212,13 @@ const en = {
   services_page_note_body:
     "We prepare documents at your direction. We do not provide legal advice.",
   services_page_get_help: "Get Help With",
+  services_more_eyebrow: "Full Range",
+  services_more_h2: "We Also Prepare Documents For",
+  services_more_sub:
+    "Legal Document Assistants are trained across many areas. Beyond the services above, we prepare a wide range of California legal documents at your direction.",
+  services_more_foot:
+    "Don't see what you need? Chances are we can help — just ask.",
+  services_more_foot_link: "Start your intake",
 
   // About page
   about_eyebrow: "About Us",
@@ -626,6 +633,13 @@ const es: Dict = {
   services_page_note_body:
     "Preparamos documentos según sus instrucciones. No brindamos asesoramiento legal.",
   services_page_get_help: "Obtener Ayuda con",
+  services_more_eyebrow: "Gama Completa",
+  services_more_h2: "También Preparamos Documentos Para",
+  services_more_sub:
+    "Los Asistentes Legales de Documentos están capacitados en muchas áreas. Además de los servicios anteriores, preparamos una amplia variedad de documentos legales de California según sus instrucciones.",
+  services_more_foot:
+    "¿No ve lo que necesita? Es probable que podamos ayudar: pregúntenos.",
+  services_more_foot_link: "Comience su solicitud",
 
   // About page
   about_eyebrow: "Acerca de Nosotros",

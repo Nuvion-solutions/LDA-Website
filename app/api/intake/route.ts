@@ -1,8 +1,10 @@
 // POST /api/intake
-// Receives form submissions from the intake form and forwards to GoHighLevel
-// via a server-side webhook URL. Falls back to local logging if no URL is set.
+// Receives form submissions from the intake form and emails the lead to the
+// business via Resend. Falls back to local logging if Resend isn't configured
+// (e.g. dev/preview), so the form always succeeds for the user.
 
 import { getDeadlineDate, daysUntil, urgencyTagFor } from "@/lib/urgency";
+import type { UrgencyTag } from "@/lib/urgency";
 
 export const dynamic = "force-dynamic";
 
@@ -100,56 +102,228 @@ type IntakeBody = {
   elapsedMs?: number;
 };
 
-// Webhook delivery: retry on 5xx + transport errors so transient GHL/network
-// hiccups don't drop a lead. Two retries with a short backoff is enough to
-// cover the common cases (rolling deploys, brief 502s) without delaying the
-// user-facing response by more than a few seconds.
-const WEBHOOK_RETRY_DELAYS_MS = [1000, 3000];
-const WEBHOOK_TIMEOUT_MS = 8000;
+// Human-readable label + emoji for each urgency level, used in the email
+// subject and header so the business can triage at a glance.
+const URGENCY_LABEL: Record<UrgencyTag, string> = {
+  "urgent-7-days": "🔴 URGENT — deadline within 7 days",
+  "urgent-14-days": "🟠 Deadline within 14 days",
+  "deadline-30-days": "🟡 Deadline within 30 days",
+  "standard-lead": "Standard",
+};
 
-async function deliverToGhl(
-  url: string,
-  payload: unknown,
-  submissionId: string,
-): Promise<{ ok: true; status: number } | { ok: false; reason: string }> {
-  const attempts = WEBHOOK_RETRY_DELAYS_MS.length + 1;
+type Field = { label: string; value: string | undefined };
+type Section = { title: string; fields: Field[] };
+
+function join(value: string[] | undefined): string | undefined {
+  return value && value.length > 0 ? value.join(", ") : undefined;
+}
+
+// Builds the labeled sections for the lead email. Service-specific fields are
+// only populated for the chosen service, so empty values are filtered out
+// before rendering — the email only shows what the client actually answered.
+function buildSections(data: IntakeBody): Section[] {
+  const sections: Section[] = [
+    {
+      title: "Contact",
+      fields: [
+        { label: "Name", value: `${data.firstName ?? ""} ${data.lastName ?? ""}`.trim() },
+        { label: "Phone", value: data.phone },
+        { label: "Email", value: data.email },
+        { label: "Preferred contact", value: data.contactMethod },
+        { label: "Best time to reach", value: data.bestTime },
+      ],
+    },
+    {
+      title: "Service requested",
+      fields: [
+        { label: "Primary service", value: data.primaryService },
+        { label: "Wants additional services", value: data.needsMoreServices },
+        { label: "Additional services", value: join(data.additionalServices) },
+      ],
+    },
+    {
+      title: "Details",
+      fields: [
+        // Divorce
+        { label: "Divorce type", value: data.divorceType },
+        { label: "Has children", value: data.divorceHasChildren },
+        { label: "Number of children", value: data.divorceChildrenCount },
+        { label: "Children ages", value: data.divorceChildrenAges },
+        { label: "Has property", value: data.divorceHasProperty },
+        { label: "Has assets", value: data.divorceHasAssets },
+        { label: "Marriage length", value: data.divorceMarriageLength },
+        { label: "Filing county", value: data.divorceFilingCounty },
+        { label: "Already filed paperwork", value: data.divorceFiledPaperwork },
+        // Eviction
+        { label: "Landlord or tenant", value: data.evictionParty },
+        { label: "Property type", value: data.evictionPropertyType },
+        { label: "Reason", value: data.evictionReason },
+        { label: "Notice served", value: data.evictionNoticeServed },
+        { label: "Notice type", value: data.evictionNoticeType },
+        { label: "Notice date", value: data.evictionNoticeDate },
+        { label: "County", value: data.evictionCounty },
+        { label: "Tenant vacated", value: data.evictionTenantVacated },
+        { label: "Monthly rent", value: data.evictionRent },
+        // Immigration
+        { label: "Forms", value: join(data.immigrationForms) },
+        { label: "Forms (other)", value: data.immigrationFormsOther },
+        { label: "For whom", value: data.immigrationForWhom },
+        { label: "Current status", value: data.immigrationStatus },
+        { label: "Has deadline", value: data.immigrationHasDeadline },
+        { label: "Deadline date", value: data.immigrationDeadlineDate },
+        { label: "Previously filed", value: data.immigrationPreviouslyFiled },
+        // Living Trust
+        { label: "Trust type", value: data.trustType },
+        { label: "Has minor children", value: data.trustHasMinors },
+        { label: "Owns property", value: data.trustOwnsProperty },
+        { label: "Number of properties", value: data.trustPropertyCount },
+        { label: "Has assets", value: data.trustHasAssets },
+        { label: "Existing estate docs", value: data.trustExistingDocs },
+        { label: "Successor trustee", value: data.trustSuccessor },
+        // POA
+        { label: "POA types", value: join(data.poaTypes) },
+        { label: "Agent", value: data.poaAgent },
+        { label: "Has specific reason", value: data.poaHasReason },
+        { label: "Reason", value: data.poaReason },
+        { label: "Needs notarization", value: data.poaNotarize },
+        // DMV
+        { label: "DMV form types", value: join(data.dmvFormTypes) },
+        { label: "Has appointment", value: data.dmvHasAppointment },
+        { label: "Appointment date", value: data.dmvAppointmentDate },
+        { label: "Details", value: data.dmvDetails },
+        // Tax
+        { label: "Tax help types", value: join(data.taxTypes) },
+        { label: "Tax year", value: data.taxYear },
+        { label: "Has deadline", value: data.taxHasDeadline },
+        { label: "Deadline date", value: data.taxDeadlineDate },
+        { label: "Notes", value: data.taxNotes },
+        // Other
+        { label: "Description", value: data.otherDescription },
+        { label: "Has deadline", value: data.otherHasDeadline },
+        { label: "Deadline date", value: data.otherDeadlineDate },
+      ],
+    },
+    {
+      title: "General",
+      fields: [
+        { label: "Client county", value: data.clientCounty },
+        { label: "How they heard about us", value: data.referralSource },
+        { label: "Referral name", value: data.referralName },
+        { label: "Additional notes", value: data.additionalNotes },
+      ],
+    },
+  ];
+
+  // Drop empty fields, then drop any section left with nothing to show.
+  return sections
+    .map((s) => ({ ...s, fields: s.fields.filter((f) => f.value && f.value.trim() !== "") }))
+    .filter((s) => s.fields.length > 0);
+}
+
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function renderEmail(
+  sections: Section[],
+  meta: { urgencyLabel: string; submissionId: string; submittedAt: string },
+): { html: string; text: string } {
+  const htmlSections = sections
+    .map((s) => {
+      const rows = s.fields
+        .map(
+          (f) =>
+            `<tr><td style="padding:4px 12px 4px 0;color:#6b7280;vertical-align:top;white-space:nowrap;">${escapeHtml(
+              f.label,
+            )}</td><td style="padding:4px 0;color:#111827;">${escapeHtml(f.value as string)}</td></tr>`,
+        )
+        .join("");
+      return `<h3 style="margin:24px 0 8px;font-size:13px;text-transform:uppercase;letter-spacing:0.08em;color:#1f3a5f;">${escapeHtml(
+        s.title,
+      )}</h3><table style="border-collapse:collapse;font-size:14px;width:100%;">${rows}</table>`;
+    })
+    .join("");
+
+  const html = `<div style="font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;max-width:640px;margin:0 auto;padding:24px;color:#111827;">
+    <p style="margin:0 0 4px;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:#9ca3af;">New website lead</p>
+    <h2 style="margin:0 0 4px;font-size:20px;">${escapeHtml(meta.urgencyLabel)}</h2>
+    ${htmlSections}
+    <hr style="margin:24px 0;border:none;border-top:1px solid #e5e7eb;" />
+    <p style="font-size:12px;color:#9ca3af;">Submission ID: ${escapeHtml(
+      meta.submissionId,
+    )}<br/>Received: ${escapeHtml(meta.submittedAt)}</p>
+  </div>`;
+
+  const text = [
+    `NEW WEBSITE LEAD — ${meta.urgencyLabel}`,
+    "",
+    ...sections.flatMap((s) => [
+      s.title.toUpperCase(),
+      ...s.fields.map((f) => `  ${f.label}: ${f.value}`),
+      "",
+    ]),
+    `Submission ID: ${meta.submissionId}`,
+    `Received: ${meta.submittedAt}`,
+  ].join("\n");
+
+  return { html, text };
+}
+
+// Send via Resend with a short retry on transient (5xx / network) failures so
+// a brief hiccup doesn't drop a lead. 4xx is permanent — don't waste retries.
+const SEND_RETRY_DELAYS_MS = [1000, 3000];
+const SEND_TIMEOUT_MS = 8000;
+
+type ResendPayload = {
+  from: string;
+  to: string[];
+  bcc?: string[];
+  subject: string;
+  html: string;
+  text: string;
+  reply_to?: string;
+};
+
+async function sendLeadEmail(
+  payload: ResendPayload,
+  apiKey: string,
+): Promise<{ ok: true } | { ok: false; reason: string }> {
+  const attempts = SEND_RETRY_DELAYS_MS.length + 1;
   let lastReason = "unknown";
 
   for (let i = 0; i < attempts; i++) {
     const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), WEBHOOK_TIMEOUT_MS);
+    const timer = setTimeout(() => controller.abort(), SEND_TIMEOUT_MS);
     try {
-      const res = await fetch(url, {
+      const res = await fetch("https://api.resend.com/emails", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-Submission-Id": submissionId,
+          Authorization: `Bearer ${apiKey}`,
         },
         body: JSON.stringify(payload),
         signal: controller.signal,
       });
       clearTimeout(timer);
 
-      if (res.ok) return { ok: true, status: res.status };
+      if (res.ok) return { ok: true };
 
-      // 4xx is a permanent failure — don't waste retries.
       if (res.status >= 400 && res.status < 500) {
         return { ok: false, reason: `http_${res.status}` };
       }
-
       lastReason = `http_${res.status}`;
     } catch (err) {
       clearTimeout(timer);
       lastReason =
-        err instanceof Error && err.name === "AbortError"
-          ? "timeout"
-          : "network";
+        err instanceof Error && err.name === "AbortError" ? "timeout" : "network";
     }
 
-    const delay = WEBHOOK_RETRY_DELAYS_MS[i];
-    if (delay !== undefined) {
-      await new Promise((r) => setTimeout(r, delay));
-    }
+    const delay = SEND_RETRY_DELAYS_MS[i];
+    if (delay !== undefined) await new Promise((r) => setTimeout(r, delay));
   }
 
   return { ok: false, reason: lastReason };
@@ -157,9 +331,8 @@ async function deliverToGhl(
 
 // Best-effort, per-instance rate limit. Serverless instances are ephemeral and
 // not shared, so this throttles bursts against a warm instance rather than
-// enforcing a strict global limit — for hard guarantees wire a shared store
-// (e.g. Upstash Redis). The window is generous so a real person re-submitting
-// is never blocked; it only stops scripted floods hammering one instance.
+// enforcing a strict global limit. The window is generous so a real person
+// re-submitting is never blocked; it only stops scripted floods.
 const RATE_LIMIT_MAX = 5;
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 const rateBuckets = new Map<string, number[]>();
@@ -171,8 +344,6 @@ function rateLimited(ip: string): boolean {
   );
   recent.push(now);
   rateBuckets.set(ip, recent);
-  // Opportunistic cleanup so the map can't grow without bound on a long-lived
-  // instance.
   if (rateBuckets.size > 5000) {
     for (const [key, times] of rateBuckets) {
       if (times.every((t) => now - t >= RATE_LIMIT_WINDOW_MS)) {
@@ -181,65 +352,6 @@ function rateLimited(ip: string): boolean {
     }
   }
   return recent.length > RATE_LIMIT_MAX;
-}
-
-// Durable fallback so a lead is never lost if GoHighLevel delivery fails after
-// retries. Prefers an email via Resend (set RESEND_API_KEY + INTAKE_FALLBACK_
-// EMAIL_TO/FROM); otherwise posts a JSON summary to INTAKE_FALLBACK_WEBHOOK_URL
-// (e.g. a Slack/Zapier hook). No-ops silently if neither is configured.
-async function notifyFallback(summary: {
-  submissionId: string;
-  reason: string;
-  firstName?: string;
-  lastName?: string;
-  phone?: string;
-  email?: string;
-  primaryService?: string;
-}): Promise<void> {
-  const resendKey = process.env.RESEND_API_KEY;
-  const emailTo = process.env.INTAKE_FALLBACK_EMAIL_TO;
-  const emailFrom = process.env.INTAKE_FALLBACK_EMAIL_FROM;
-  const fallbackWebhook = process.env.INTAKE_FALLBACK_WEBHOOK_URL;
-
-  const lines = [
-    `New website lead could not be delivered to GoHighLevel (reason: ${summary.reason}).`,
-    `Please follow up manually:`,
-    ``,
-    `Name: ${summary.firstName ?? ""} ${summary.lastName ?? ""}`.trim(),
-    `Phone: ${summary.phone ?? "—"}`,
-    `Email: ${summary.email ?? "—"}`,
-    `Service: ${summary.primaryService ?? "—"}`,
-    `Submission ID: ${summary.submissionId}`,
-  ].join("\n");
-
-  try {
-    if (resendKey && emailTo && emailFrom) {
-      await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${resendKey}`,
-        },
-        body: JSON.stringify({
-          from: emailFrom,
-          to: emailTo,
-          subject: `⚠️ Missed website lead — ${summary.firstName ?? "Unknown"} (${summary.primaryService ?? "general"})`,
-          text: lines,
-        }),
-      });
-      return;
-    }
-    if (fallbackWebhook) {
-      await fetch(fallbackWebhook, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: lines, ...summary }),
-      });
-    }
-  } catch (err) {
-    // The console.error in the caller is the last-resort record either way.
-    console.error("[intake] Fallback notification failed:", err);
-  }
 }
 
 export async function POST(req: Request) {
@@ -266,9 +378,9 @@ export async function POST(req: Request) {
   // Spam mitigation. The hidden `website` honeypot is never filled by a real
   // user; a non-empty value means a bot auto-filled every field. `elapsedMs`
   // is how long the form was on screen — a multi-step form takes far longer
-  // than a few seconds to complete, so a near-instant submit is bot-like.
-  // In both cases we return a success-shaped response (so bots get no signal
-  // to adapt) but never forward the junk lead to GoHighLevel.
+  // than a few seconds, so a near-instant submit is bot-like. In both cases we
+  // return a success-shaped response (so bots get no signal to adapt) but
+  // never send the junk lead.
   const honeypotTripped =
     typeof data.website === "string" && data.website.trim() !== "";
   const tooFast =
@@ -284,161 +396,86 @@ export async function POST(req: Request) {
   }
 
   const submissionId = crypto.randomUUID();
-  const webhookUrl = process.env.GHL_FORM_WEBHOOK_URL;
+  const submittedAt = new Date().toISOString();
 
-  // Graceful fallback when webhook URL is not configured.
-  if (!webhookUrl) {
-    console.log("[intake] No GHL_FORM_WEBHOOK_URL set — logging submission locally:", {
+  // Urgency — used to flag the subject line so time-sensitive leads stand out.
+  const deadlineDate = getDeadlineDate(data);
+  const urgencyTag = urgencyTagFor(daysUntil(deadlineDate));
+  const urgencyLabel = URGENCY_LABEL[urgencyTag];
+
+  const apiKey = process.env.RESEND_API_KEY;
+  const emailTo = (process.env.INTAKE_EMAIL_TO ?? "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  // Optional monitoring copy, invisible to the primary recipient. Set this to
+  // silently receive every lead (e.g. while verifying delivery); remove the
+  // env var to stop, no code change needed.
+  const emailBcc = (process.env.INTAKE_EMAIL_BCC ?? "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  const emailFrom = process.env.INTAKE_EMAIL_FROM;
+
+  // Graceful fallback when Resend isn't configured (dev/preview): log and
+  // succeed so the form still works locally.
+  if (!apiKey || emailTo.length === 0 || !emailFrom) {
+    console.log("[intake] Resend not configured — logging submission locally:", {
       submissionId,
-      submittedAt: new Date().toISOString(),
+      submittedAt,
       firstName: data.firstName,
       lastName: data.lastName,
       email: data.email,
       phone: data.phone,
       primaryService: data.primaryService,
-      clientCounty: data.clientCounty,
+      urgency: urgencyTag,
     });
     return Response.json({ success: true, mode: "local", submissionId });
   }
 
-  // Urgency calculation — feed deadline-bearing fields to the shared helper.
-  const deadlineDate = getDeadlineDate(data);
-  const daysUntilDeadline = daysUntil(deadlineDate);
-  const urgencyTag = urgencyTagFor(daysUntilDeadline);
-
-  const ghlPayload = {
+  const sections = buildSections(data);
+  const { html, text } = renderEmail(sections, {
+    urgencyLabel,
     submissionId,
-    submittedAt: new Date().toISOString(),
-    firstName: data.firstName,
-    lastName: data.lastName,
-    phone: data.phone,
-    email: data.email,
-    contactMethod: data.contactMethod,
-    bestTime: data.bestTime,
-    primaryService: data.primaryService,
-    additionalServices: data.additionalServices?.join(", "),
-    consentLDA: data.consentLDA,
-    consentContact: data.consentContact,
-    source: "Website Intake Form",
-    tags: [
-      "website-lead",
-      "intake-form",
-      urgencyTag,
-      data.primaryService ?? "general",
-    ],
-    customFields: {
-      // Urgency
-      lda_urgency_level: urgencyTag,
-      lda_days_until_deadline: daysUntilDeadline?.toString(),
-      lda_deadline_date: deadlineDate,
-
-      // Primary
-      lda_primary_service: data.primaryService,
-      lda_needs_more_services: data.needsMoreServices,
-      lda_additional_services: data.additionalServices?.join(", "),
-
-      // Divorce
-      lda_divorce_type: data.divorceType,
-      lda_has_children: data.divorceHasChildren,
-      lda_children_count: data.divorceChildrenCount,
-      lda_children_ages: data.divorceChildrenAges,
-      lda_has_property: data.divorceHasProperty,
-      lda_has_assets: data.divorceHasAssets,
-      lda_marriage_length: data.divorceMarriageLength,
-      lda_filing_county: data.divorceFilingCounty,
-      lda_filed_paperwork: data.divorceFiledPaperwork,
-
-      // Eviction
-      lda_eviction_party: data.evictionParty,
-      lda_property_type: data.evictionPropertyType,
-      lda_eviction_reason: data.evictionReason,
-      lda_notice_served: data.evictionNoticeServed,
-      lda_notice_type: data.evictionNoticeType,
-      lda_notice_date: data.evictionNoticeDate,
-      lda_eviction_county: data.evictionCounty,
-      lda_tenant_vacated: data.evictionTenantVacated,
-      lda_monthly_rent: data.evictionRent,
-
-      // Immigration
-      lda_immigration_forms: data.immigrationForms?.join(", "),
-      lda_immigration_forms_other: data.immigrationFormsOther,
-      lda_immigration_for_whom: data.immigrationForWhom,
-      lda_immigration_status: data.immigrationStatus,
-      lda_immigration_deadline: data.immigrationHasDeadline,
-      lda_immigration_deadline_date: data.immigrationDeadlineDate,
-      lda_immigration_previously_filed: data.immigrationPreviouslyFiled,
-
-      // Living Trust
-      lda_trust_type: data.trustType,
-      lda_has_minor_children: data.trustHasMinors,
-      lda_owns_property: data.trustOwnsProperty,
-      lda_property_count: data.trustPropertyCount,
-      lda_trust_has_assets: data.trustHasAssets,
-      lda_trust_existing_docs: data.trustExistingDocs,
-      lda_trust_successor: data.trustSuccessor,
-
-      // POA
-      lda_poa_types: data.poaTypes?.join(", "),
-      lda_poa_agent: data.poaAgent,
-      lda_poa_has_reason: data.poaHasReason,
-      lda_poa_reason: data.poaReason,
-      lda_poa_notarize: data.poaNotarize,
-
-      // DMV
-      lda_dmv_form_types: data.dmvFormTypes?.join(", "),
-      lda_dmv_has_appointment: data.dmvHasAppointment,
-      lda_dmv_appointment_date: data.dmvAppointmentDate,
-      lda_dmv_details: data.dmvDetails,
-
-      // Tax
-      lda_tax_types: data.taxTypes?.join(", "),
-      lda_tax_year: data.taxYear,
-      lda_tax_has_deadline: data.taxHasDeadline,
-      lda_tax_deadline_date: data.taxDeadlineDate,
-      lda_tax_notes: data.taxNotes,
-
-      // Other
-      lda_other_description: data.otherDescription,
-      lda_other_has_deadline: data.otherHasDeadline,
-      lda_other_deadline_date: data.otherDeadlineDate,
-
-      // General
-      lda_client_county: data.clientCounty,
-      lda_source: data.referralSource,
-      lda_referral_name: data.referralName,
-      lda_notes: data.additionalNotes,
-    },
-  };
-
-  const result = await deliverToGhl(webhookUrl, ghlPayload, submissionId);
-
-  if (result.ok) {
-    return Response.json({ success: true, submissionId, status: result.status });
-  }
-
-  // Log enough context to recover the lead manually if GHL delivery fails.
-  // Vercel logs roll every 24h, so also wire a durable sink (Sentry/Slack)
-  // if you can't tolerate any drop.
-  console.error("[intake] GHL webhook failed after retries:", {
-    submissionId,
-    reason: result.reason,
-    firstName: data.firstName,
-    lastName: data.lastName,
-    email: data.email,
-    phone: data.phone,
-    primaryService: data.primaryService,
-    submittedAt: new Date().toISOString(),
+    submittedAt,
   });
 
-  // Durably surface the lead so it can be recovered manually (email/webhook).
-  await notifyFallback({
+  const isUrgent = urgencyTag !== "standard-lead";
+  const subject = `${isUrgent ? `${urgencyLabel} — ` : ""}New lead: ${
+    data.firstName ?? "Unknown"
+  } ${data.lastName ?? ""} (${data.primaryService ?? "general"})`.trim();
+
+  const result = await sendLeadEmail(
+    {
+      from: emailFrom,
+      to: emailTo,
+      ...(emailBcc.length > 0 ? { bcc: emailBcc } : {}),
+      subject,
+      html,
+      text,
+      // Replies go straight to the client — set reply-to so the business can
+      // respond to the lead directly from the notification email.
+      ...(data.email ? { reply_to: data.email } : {}),
+    },
+    apiKey,
+  );
+
+  if (result.ok) {
+    return Response.json({ success: true, submissionId });
+  }
+
+  // Log enough context to recover the lead manually if delivery fails. Vercel
+  // logs roll, so wire a durable sink (Sentry/Slack) if you can't tolerate any
+  // drop.
+  console.error("[intake] Resend delivery failed after retries:", {
     submissionId,
     reason: result.reason,
     firstName: data.firstName,
     lastName: data.lastName,
-    phone: data.phone,
     email: data.email,
+    phone: data.phone,
     primaryService: data.primaryService,
+    submittedAt,
   });
 
   return Response.json(

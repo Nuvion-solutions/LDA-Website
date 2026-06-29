@@ -135,16 +135,6 @@ function join(value: string[] | undefined): string | undefined {
 function buildSections(data: IntakeBody): Section[] {
   const sections: Section[] = [
     {
-      title: "Contact",
-      fields: [
-        { label: "Name", value: `${data.firstName ?? ""} ${data.lastName ?? ""}`.trim() },
-        { label: "Phone", value: data.phone },
-        { label: "Email", value: data.email },
-        { label: "Preferred contact", value: data.contactMethod },
-        { label: "Best time to reach", value: data.bestTime },
-      ],
-    },
-    {
       title: "Service requested",
       fields: [
         { label: "Primary service", value: data.primaryService },
@@ -239,56 +229,121 @@ function escapeHtml(s: string): string {
     .replace(/"/g, "&quot;");
 }
 
+type Contact = {
+  name: string;
+  phone?: string;
+  email?: string;
+  preferredContact?: string;
+  bestTime?: string;
+};
+
 function renderEmail(
   sections: Section[],
   meta: {
     urgencyLabel: string;
     submissionId: string;
     submittedAt: string;
+    contact: Contact;
     note?: string;
     leadId?: string;
   },
 ): { html: string; text: string } {
+  const c = meta.contact;
+  const phoneHref = (c.phone ?? "").replace(/[^0-9+]/g, "");
+
+  // Each section is a titled card; each answer is its own bordered row with the
+  // question label on the left and the client's answer on the right, so the
+  // reader can scan straight down and immediately see what every answer means.
   const htmlSections = sections
     .map((s) => {
       const rows = s.fields
         .map(
-          (f) =>
-            `<tr><td style="padding:4px 12px 4px 0;color:#6b7280;vertical-align:top;white-space:nowrap;">${escapeHtml(
-              f.label,
-            )}</td><td style="padding:4px 0;color:#111827;">${escapeHtml(f.value as string)}</td></tr>`,
+          (f, i) =>
+            `<tr>
+              <td style="padding:10px 14px;width:42%;color:#5b6573;font-size:12px;text-transform:uppercase;letter-spacing:0.04em;vertical-align:top;background:#fafafa;border-top:${
+              i === 0 ? "0" : "1px solid #eceef1"
+            };">${escapeHtml(f.label)}</td>
+              <td style="padding:10px 14px;color:#111827;font-size:14px;font-weight:500;vertical-align:top;border-top:${
+                i === 0 ? "0" : "1px solid #eceef1"
+              };border-left:1px solid #eceef1;">${escapeHtml(f.value as string)}</td>
+            </tr>`,
         )
         .join("");
-      return `<h3 style="margin:24px 0 8px;font-size:13px;text-transform:uppercase;letter-spacing:0.08em;color:#1f3a5f;">${escapeHtml(
-        s.title,
-      )}</h3><table style="border-collapse:collapse;font-size:14px;width:100%;">${rows}</table>`;
+      return `<div style="margin:0 0 16px;border:1px solid #e5e7eb;border-radius:6px;overflow:hidden;">
+        <div style="padding:8px 14px;background:#0D1B2A;color:#c9a84c;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;">${escapeHtml(
+          s.title,
+        )}</div>
+        <table style="border-collapse:collapse;width:100%;">${rows}</table>
+      </div>`;
     })
     .join("");
 
   const noteHtml = meta.note
-    ? `<p style="margin:0 0 16px;padding:10px 14px;background:#fef9c3;border-left:3px solid #ca8a04;font-size:14px;color:#713f12;">${escapeHtml(
+    ? `<p style="margin:0 0 16px;padding:10px 14px;background:#fef9c3;border-left:3px solid #ca8a04;font-size:14px;color:#713f12;border-radius:0 4px 4px 0;">${escapeHtml(
         meta.note,
       )}</p>`
     : "";
 
-  const idLine = meta.leadId
-    ? `Lead ID: ${escapeHtml(meta.leadId)}<br/>`
-    : "";
+  const contactLinks = [
+    c.phone
+      ? `<a href="tel:${escapeHtml(phoneHref)}" style="color:#1f3a5f;text-decoration:none;font-weight:600;">📞 ${escapeHtml(
+          c.phone,
+        )}</a>`
+      : "",
+    c.email
+      ? `<a href="mailto:${escapeHtml(c.email)}" style="color:#1f3a5f;text-decoration:none;font-weight:600;">✉️ ${escapeHtml(
+          c.email,
+        )}</a>`
+      : "",
+  ]
+    .filter(Boolean)
+    .join('<span style="color:#cbd5e1;">&nbsp;&nbsp;|&nbsp;&nbsp;</span>');
 
-  const html = `<div style="font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;max-width:640px;margin:0 auto;padding:24px;color:#111827;">
-    <p style="margin:0 0 4px;font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:#9ca3af;">New website lead</p>
-    <h2 style="margin:0 0 12px;font-size:20px;">${escapeHtml(meta.urgencyLabel)}</h2>
-    ${noteHtml}
-    ${htmlSections}
-    <hr style="margin:24px 0;border:none;border-top:1px solid #e5e7eb;" />
-    <p style="font-size:12px;color:#9ca3af;">${idLine}Submission ID: ${escapeHtml(
-      meta.submissionId,
-    )}<br/>Received: ${escapeHtml(meta.submittedAt)}</p>
+  const subline = [
+    c.preferredContact ? `Prefers ${escapeHtml(c.preferredContact)}` : "",
+    c.bestTime ? `Best time: ${escapeHtml(c.bestTime)}` : "",
+  ]
+    .filter(Boolean)
+    .join(" · ");
+
+  const idLine = meta.leadId ? `Lead ID: ${escapeHtml(meta.leadId)}<br/>` : "";
+
+  const html = `<div style="font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;max-width:640px;margin:0 auto;background:#f3f4f6;color:#111827;">
+    <div style="padding:18px 24px;background:#0D1B2A;">
+      <p style="margin:0 0 2px;font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:#9aa6b8;">New website lead</p>
+      <p style="margin:0;font-size:17px;font-weight:600;color:#ffffff;">${escapeHtml(
+        meta.urgencyLabel,
+      )}</p>
+    </div>
+    <div style="padding:24px;background:#ffffff;">
+      ${noteHtml}
+      <p style="margin:0 0 6px;font-size:22px;font-weight:700;color:#0D1B2A;">${escapeHtml(
+        c.name || "—",
+      )}</p>
+      <p style="margin:0 0 ${subline ? "4px" : "20px"};font-size:15px;">${contactLinks}</p>
+      ${
+        subline
+          ? `<p style="margin:0 0 20px;font-size:13px;color:#6b7280;">${subline}</p>`
+          : ""
+      }
+      ${htmlSections}
+      <hr style="margin:8px 0 16px;border:none;border-top:1px solid #e5e7eb;" />
+      <p style="font-size:12px;color:#9ca3af;margin:0;">${idLine}Submission ID: ${escapeHtml(
+        meta.submissionId,
+      )}<br/>Received: ${escapeHtml(meta.submittedAt)}</p>
+    </div>
   </div>`;
 
   const text = [
     `NEW WEBSITE LEAD — ${meta.urgencyLabel}`,
     ...(meta.note ? ["", meta.note] : []),
+    "",
+    `CONTACT`,
+    `  Name: ${c.name || "—"}`,
+    ...(c.phone ? [`  Phone: ${c.phone}`] : []),
+    ...(c.email ? [`  Email: ${c.email}`] : []),
+    ...(c.preferredContact ? [`  Prefers: ${c.preferredContact}`] : []),
+    ...(c.bestTime ? [`  Best time: ${c.bestTime}`] : []),
     "",
     ...sections.flatMap((s) => [
       s.title.toUpperCase(),
@@ -542,6 +597,13 @@ export async function POST(req: Request) {
     leadId: data.leadId,
     submissionId,
     submittedAt,
+    contact: {
+      name: `${data.firstName ?? ""} ${data.lastName ?? ""}`.trim(),
+      phone: data.phone,
+      email: data.email,
+      preferredContact: data.contactMethod,
+      bestTime: data.bestTime,
+    },
   });
 
   const isUrgent = urgencyTag !== "standard-lead";

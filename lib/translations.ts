@@ -150,6 +150,8 @@ const en = {
   intake_h_details: "Service Details",
   intake_sub_details:
     "A few specifics so we can quote and prepare accurately.",
+  intake_details_optional:
+    "These questions are optional — share what you can and skip the rest. The more you tell us, the faster we can help. You can continue at any time.",
 
   // Step 4 — General
   intake_h_general: "General Information",
@@ -570,6 +572,8 @@ const es: Dict = {
   intake_h_details: "Detalles del Servicio",
   intake_sub_details:
     "Algunos detalles específicos para poder cotizar y preparar con precisión.",
+  intake_details_optional:
+    "Estas preguntas son opcionales: comparta lo que pueda y omita el resto. Cuanto más nos cuente, más rápido podremos ayudar. Puede continuar en cualquier momento.",
 
   // Step 4 — General
   intake_h_general: "Información General",

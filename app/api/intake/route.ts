@@ -498,6 +498,71 @@ function rateLimited(ip: string): boolean {
   return recent.length > RATE_LIMIT_MAX;
 }
 
+// --- Content-based spam filtering ------------------------------------------
+// Bots that slip past the honeypot/timing checks (or post directly to the API)
+// still tend to use placeholder data. These are high-signal checks that catch
+// the common junk with effectively no false positives for real clients.
+
+function isBadEmail(email?: string): boolean {
+  if (!email) return true;
+  const e = email.trim().toLowerCase();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) return true; // not a real address
+  const domain = e.split("@")[1] ?? "";
+  // RFC-reserved + common placeholder domains real users never actually use.
+  if (
+    [
+      "example.com",
+      "example.net",
+      "example.org",
+      "test.com",
+      "test.net",
+      "test.org",
+      "sample.com",
+    ].includes(domain)
+  )
+    return true;
+  if (/\.(test|invalid|localhost|example)$/.test(domain)) return true;
+  return false;
+}
+
+// Reserved fictional numbers: 555-0100 through 555-0199 (the "movie" numbers).
+function isFakePhone(phone?: string): boolean {
+  return !!phone && /555[\s.\-]?01\d\d/.test(phone);
+}
+
+function hasLinks(...texts: (string | undefined)[]): boolean {
+  const blob = texts.filter(Boolean).join(" ");
+  return /https?:\/\/|www\.|\[url|<a\s|href=/i.test(blob);
+}
+
+// Returns a short reason string if the submission looks like spam, else null.
+function spamReason(data: IntakeBody, partial: boolean): string | null {
+  if (isBadEmail(data.email)) return "bad_email";
+  if (isFakePhone(data.phone)) return "fake_phone";
+  if (
+    hasLinks(
+      data.additionalNotes,
+      data.otherDescription,
+      data.dmvDetails,
+      data.taxNotes,
+      data.poaReason,
+      data.immigrationFormsOther,
+      data.firstName,
+      data.lastName,
+    )
+  )
+    return "link_spam";
+  // Full submissions must carry the things the real multi-step form always
+  // sends; direct-to-API bots usually skip them.
+  if (!partial) {
+    if (data.consentLDA !== true || data.consentContact !== true)
+      return "missing_consent";
+    if (!data.primaryService || data.primaryService.trim() === "")
+      return "no_service";
+  }
+  return null;
+}
+
 export async function POST(req: Request) {
   // Throttle scripted floods before doing any work.
   const ip =
@@ -535,10 +600,11 @@ export async function POST(req: Request) {
     !partial &&
     typeof data.elapsedMs === "number" &&
     data.elapsedMs >= 0 &&
-    data.elapsedMs < 3000;
-  if (honeypotTripped || tooFast) {
+    data.elapsedMs < 5000;
+  const spam = spamReason(data, partial);
+  if (honeypotTripped || tooFast || spam) {
     console.warn("[intake] Dropped likely-bot submission:", {
-      reason: honeypotTripped ? "honeypot" : "too_fast",
+      reason: honeypotTripped ? "honeypot" : tooFast ? "too_fast" : spam,
       elapsedMs: data.elapsedMs,
     });
     return Response.json({ success: true, mode: "ignored" });

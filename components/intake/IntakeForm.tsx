@@ -690,10 +690,16 @@ export function IntakeForm() {
       }
       // Meta Pixel conversion event for ad optimization/reporting. Guarded on
       // the pixel ID so it stays off in dev/preview, mirroring MetaPixel.tsx.
+      // eventID must be the leadId: the server sends the same value as
+      // event_id on its Conversions API Lead event, and Meta deduplicates the
+      // browser/server pair by (event name, event id).
       if (process.env.NEXT_PUBLIC_FB_PIXEL_ID) {
-        window.fbq?.("track", "Lead", {
-          content_name: data.primaryService,
-        });
+        window.fbq?.(
+          "track",
+          "Lead",
+          { content_name: data.primaryService },
+          { eventID: leadId },
+        );
       }
       setSubmitted({
         firstName: data.firstName,

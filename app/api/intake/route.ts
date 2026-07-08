@@ -3,10 +3,14 @@
 // business via Resend. Falls back to local logging if Resend isn't configured
 // (e.g. dev/preview), so the form always succeeds for the user.
 
+import { after } from "next/server";
+
 import { getDeadlineDate, daysUntil, urgencyTagFor } from "@/lib/urgency";
 import type { UrgencyTag } from "@/lib/urgency";
 import { BUSINESS } from "@/lib/utils";
 import { translations } from "@/lib/translations";
+import { sendMetaLeadEvent, readCookie } from "@/lib/meta-capi";
+import { absoluteUrl } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
 
@@ -619,6 +623,32 @@ export async function POST(req: Request) {
   const submissionId = crypto.randomUUID();
   const submittedAt = new Date().toISOString();
 
+  // Server-side Meta "Lead" event (Conversions API). Called on every success
+  // response for a full submission — exactly when the browser pixel fires its
+  // Lead — and scheduled via after() so it runs once the response is sent and
+  // can never delay or fail the submission. Both events carry leadId as the
+  // event id, so Meta deduplicates the pair instead of double-counting; the
+  // server event survives iOS/Safari pixel blocking when the browser one is
+  // lost. No-ops unless META_CAPI_ACCESS_TOKEN is configured.
+  const scheduleMetaLead = () => {
+    if (partial) return;
+    const cookieHeader = req.headers.get("cookie");
+    const capiParams = {
+      eventId: data.leadId ?? submissionId,
+      eventSourceUrl: req.headers.get("referer") ?? absoluteUrl("/intake"),
+      email: data.email,
+      phone: data.phone,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      clientIp: ip !== "unknown" ? ip : undefined,
+      userAgent: req.headers.get("user-agent") ?? undefined,
+      fbp: readCookie(cookieHeader, "_fbp"),
+      fbc: readCookie(cookieHeader, "_fbc"),
+      contentName: data.primaryService,
+    };
+    after(() => sendMetaLeadEvent(capiParams));
+  };
+
   // Urgency — used to flag the subject line so time-sensitive leads stand out.
   const deadlineDate = getDeadlineDate(data);
   const urgencyTag = urgencyTagFor(daysUntil(deadlineDate));
@@ -651,6 +681,7 @@ export async function POST(req: Request) {
       primaryService: data.primaryService,
       urgency: urgencyTag,
     });
+    scheduleMetaLead();
     return Response.json({ success: true, mode: "local", submissionId });
   }
 
@@ -696,6 +727,7 @@ export async function POST(req: Request) {
   );
 
   if (result.ok) {
+    scheduleMetaLead();
     // Send the submitter a localized confirmation (full submissions only, and
     // only once the business notification succeeded so a retry can't duplicate
     // it). Best-effort: a failed confirmation never fails the submission.

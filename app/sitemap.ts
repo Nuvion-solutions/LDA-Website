@@ -2,53 +2,45 @@ import type { MetadataRoute } from "next";
 import { SITE_URL } from "@/lib/site";
 import { SERVICES } from "@/lib/services";
 
+// Each page is listed once (the English URL) with hreflang alternates pointing
+// to its Spanish counterpart, so Google indexes both language versions and
+// understands they're translations of each other.
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
 
-  const servicePages: MetadataRoute.Sitemap = SERVICES.map((s) => ({
-    url: `${SITE_URL}/services/${s.slug}`,
-    lastModified: now,
-    changeFrequency: "monthly",
-    priority: 0.8,
-  }));
+  type Page = {
+    path: string;
+    changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"];
+    priority: number;
+  };
 
-  return [
-    {
-      url: `${SITE_URL}/`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 1.0,
-    },
-    {
-      url: `${SITE_URL}/services`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.9,
-    },
-    ...servicePages,
-    {
-      url: `${SITE_URL}/about`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.7,
-    },
-    {
-      url: `${SITE_URL}/intake`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.9,
-    },
-    {
-      url: `${SITE_URL}/privacy`,
-      lastModified: now,
-      changeFrequency: "yearly",
-      priority: 0.3,
-    },
-    {
-      url: `${SITE_URL}/terms`,
-      lastModified: now,
-      changeFrequency: "yearly",
-      priority: 0.3,
-    },
+  const pages: Page[] = [
+    { path: "/", changeFrequency: "monthly", priority: 1.0 },
+    { path: "/services", changeFrequency: "monthly", priority: 0.9 },
+    ...SERVICES.map((s) => ({
+      path: `/services/${s.slug}`,
+      changeFrequency: "monthly" as const,
+      priority: 0.8,
+    })),
+    { path: "/about", changeFrequency: "monthly", priority: 0.7 },
+    { path: "/intake", changeFrequency: "monthly", priority: 0.9 },
+    { path: "/privacy", changeFrequency: "yearly", priority: 0.3 },
+    { path: "/terms", changeFrequency: "yearly", priority: 0.3 },
   ];
+
+  return pages.map((p) => {
+    const esPath = p.path === "/" ? "/es" : `/es${p.path}`;
+    return {
+      url: `${SITE_URL}${p.path}`,
+      lastModified: now,
+      changeFrequency: p.changeFrequency,
+      priority: p.priority,
+      alternates: {
+        languages: {
+          en: `${SITE_URL}${p.path}`,
+          es: `${SITE_URL}${esPath}`,
+        },
+      },
+    };
+  });
 }

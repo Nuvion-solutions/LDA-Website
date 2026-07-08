@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
-import { cookies } from "next/headers";
+import { headers } from "next/headers";
 import "./globals.css";
 import { Nav } from "@/components/layout/Nav";
 import { Footer } from "@/components/layout/Footer";
@@ -11,8 +11,8 @@ import { MetaPixel } from "@/components/analytics/MetaPixel";
 import { Analytics as VercelAnalytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { SITE_URL } from "@/lib/site";
-import { LanguageProvider, LANG_COOKIE } from "@/lib/language-context";
-import type { Language } from "@/lib/translations";
+import { LanguageProvider } from "@/lib/language-context";
+import { localeFromPathname } from "@/lib/i18n";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -100,9 +100,11 @@ export const viewport: Viewport = {
 export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const cookieStore = await cookies();
-  const stored = cookieStore.get(LANG_COOKIE)?.value;
-  const initialLang: Language = stored === "es" ? "es" : "en";
+  // Language is derived from the URL (set by middleware via x-pathname): "/es"
+  // routes render Spanish, everything else English. This is what makes the
+  // Spanish content server-rendered and indexable.
+  const hdrs = await headers();
+  const initialLang = localeFromPathname(hdrs.get("x-pathname") ?? "/");
 
   return (
     <html

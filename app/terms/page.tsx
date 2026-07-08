@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
-import { cookies } from "next/headers";
 import { BUSINESS } from "@/lib/utils";
-import { LANG_COOKIE } from "@/lib/language-context";
 import { translations, type Language } from "@/lib/translations";
+import { getServerLocale } from "@/lib/server-locale";
 import {
   LegalDocument,
   type LegalSection,
@@ -12,7 +11,10 @@ export const metadata: Metadata = {
   title: "Terms of Service",
   description:
     "The terms governing your use of our website and the document preparation services we provide as a Registered Legal Document Assistant (LDA #87).",
-  alternates: { canonical: "/terms" },
+  alternates: {
+    canonical: "/terms",
+    languages: { en: "/terms", es: "/es/terms", "x-default": "/terms" },
+  },
   openGraph: {
     title: "Terms of Service | California Legal Document Excellence",
     description:
@@ -190,9 +192,7 @@ const CONTENT: Record<Language, Content> = {
 };
 
 export default async function TermsPage() {
-  const cookieStore = await cookies();
-  const stored = cookieStore.get(LANG_COOKIE)?.value;
-  const lang: Language = stored === "es" ? "es" : "en";
+  const lang: Language = await getServerLocale();
   const content = CONTENT[lang];
 
   return (

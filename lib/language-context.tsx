@@ -5,10 +5,11 @@ import {
   useCallback,
   useContext,
   useEffect,
-  useState,
   type ReactNode,
 } from "react";
+import { usePathname } from "next/navigation";
 import { translations, type Language, type TranslationKey } from "./translations";
+import { localeFromPathname } from "./i18n";
 
 type LanguageContextValue = {
   lang: Language;
@@ -51,33 +52,27 @@ export function LanguageProvider({
   children: ReactNode;
   initialLang?: Language;
 }) {
-  const [lang, setLangState] = useState<Language>(initialLang);
+  const pathname = usePathname();
 
-  // Reconcile with localStorage on mount in case the server didn't see the
-  // cookie (first visit, edge cache, etc.). If localStorage says "es" but the
-  // server rendered "en", upgrade and re-persist the cookie.
+  // The URL is the source of truth for language: "/es/..." is Spanish,
+  // everything else English. Deriving it during render (rather than storing it)
+  // keeps the nav, footer, and other client chrome correct on every
+  // navigation — including soft ones, which don't re-run the server layout.
+  const lang: Language = pathname ? localeFromPathname(pathname) : initialLang;
+
+  // Keep <html lang> in sync on client-side navigations.
   useEffect(() => {
     try {
-      const stored = localStorage.getItem(LANG_STORAGE);
-      if ((stored === "en" || stored === "es") && stored !== lang) {
-        setLangState(stored);
-        persistLang(stored);
-        document.documentElement.lang = stored;
-      }
+      document.documentElement.lang = lang;
     } catch {
       /* ignore */
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [lang]);
 
   const setLang = useCallback((next: Language) => {
-    setLangState(next);
+    // The URL drives the language; persist the choice so it can inform future
+    // visits, but navigation is what actually switches languages.
     persistLang(next);
-    try {
-      document.documentElement.lang = next;
-    } catch {
-      /* ignore */
-    }
   }, []);
 
   const t = useCallback(

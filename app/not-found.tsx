@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { LocaleLink as Link } from "@/components/LocaleLink";
 import { Home, FileText } from "lucide-react";
 import { useLanguage } from "@/lib/language-context";
 

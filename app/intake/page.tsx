@@ -6,7 +6,10 @@ export const metadata: Metadata = {
   title: "Start Your Intake",
   description:
     "Tell us what documents you need prepared. We respond within 1 business day with pricing & next steps. Registered LDA #87, Sonoma County.",
-  alternates: { canonical: "/intake" },
+  alternates: {
+    canonical: "/intake",
+    languages: { en: "/intake", es: "/es/intake", "x-default": "/intake" },
+  },
   openGraph: {
     title: "Start Your Intake | California Legal Document Excellence",
     description:

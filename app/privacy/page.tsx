@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
-import { cookies } from "next/headers";
+import { getServerLocale } from "@/lib/server-locale";
 import { BUSINESS } from "@/lib/utils";
-import { LANG_COOKIE } from "@/lib/language-context";
 import { translations, type Language } from "@/lib/translations";
 import {
   LegalDocument,
@@ -12,7 +11,10 @@ export const metadata: Metadata = {
   title: "Privacy Policy",
   description:
     "How California Legal Document Excellence, LLC collects, uses, and protects the information you share through our website and intake form.",
-  alternates: { canonical: "/privacy" },
+  alternates: {
+    canonical: "/privacy",
+    languages: { en: "/privacy", es: "/es/privacy", "x-default": "/privacy" },
+  },
   openGraph: {
     title: "Privacy Policy | California Legal Document Excellence",
     description:
@@ -196,9 +198,7 @@ const CONTENT: Record<Language, Content> = {
 };
 
 export default async function PrivacyPage() {
-  const cookieStore = await cookies();
-  const stored = cookieStore.get(LANG_COOKIE)?.value;
-  const lang: Language = stored === "es" ? "es" : "en";
+  const lang: Language = await getServerLocale();
   const content = CONTENT[lang];
 
   return (

@@ -1,15 +1,19 @@
 "use client";
 
-import Link from "next/link";
+import { LocaleLink as Link } from "@/components/LocaleLink";
+import { usePathname, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { Menu, X, Phone, Languages } from "lucide-react";
 import { BUSINESS } from "@/lib/utils";
 import { CallLink } from "@/components/analytics/CallLink";
 import { useLanguage } from "@/lib/language-context";
+import { pathForLocale } from "@/lib/i18n";
 
 export function Nav() {
   const [open, setOpen] = useState(false);
   const { lang, setLang, t } = useLanguage();
+  const pathname = usePathname();
+  const router = useRouter();
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
@@ -18,7 +22,13 @@ export function Nav() {
     };
   }, [open]);
 
-  const toggleLang = () => setLang(lang === "en" ? "es" : "en");
+  // Switching language navigates to the same page in the other locale
+  // (e.g. /services ↔ /es/services). The provider then syncs from the new URL.
+  const toggleLang = () => {
+    const next = lang === "en" ? "es" : "en";
+    setLang(next);
+    router.push(pathForLocale(pathname, next));
+  };
 
   const links = [
     { href: "/", label: t("nav_home") },

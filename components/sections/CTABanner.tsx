@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { LocaleLink as Link } from "@/components/LocaleLink";
 import { motion } from "framer-motion";
 import { fadeUp, viewportOnce } from "@/lib/animations";
 import { useLanguage } from "@/lib/language-context";

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { LocaleLink as Link } from "@/components/LocaleLink";
 import { notFound } from "next/navigation";
-import { cookies } from "next/headers";
 import { ArrowRight, ArrowLeft, Check } from "lucide-react";
 import { SERVICES, localized } from "@/lib/services";
 import {
@@ -14,8 +13,8 @@ import {
 import { BUSINESS, SHORT_DISCLAIMER } from "@/lib/utils";
 import { SITE_URL } from "@/lib/site";
 import { CTABanner } from "@/components/sections/CTABanner";
-import { LANG_COOKIE } from "@/lib/language-context";
-import { translations, type Language } from "@/lib/translations";
+import { translations } from "@/lib/translations";
+import { getServerLocale } from "@/lib/server-locale";
 
 // One indexable page per service so we can rank for long-tail local searches
 // like "Sonoma County divorce paperwork" — each carries its own title,
@@ -88,7 +87,14 @@ export async function generateMetadata({
   return {
     title: { absolute: title },
     description,
-    alternates: { canonical: `/services/${slug}` },
+    alternates: {
+      canonical: `/services/${slug}`,
+      languages: {
+        en: `/services/${slug}`,
+        es: `/es/services/${slug}`,
+        "x-default": `/services/${slug}`,
+      },
+    },
     openGraph: {
       title,
       description,
@@ -107,9 +113,7 @@ export default async function ServiceDetailPage({
   const service = SERVICES.find((s) => s.slug === slug);
   if (!service) notFound();
 
-  const cookieStore = await cookies();
-  const stored = cookieStore.get(LANG_COOKIE)?.value;
-  const lang: Language = stored === "es" ? "es" : "en";
+  const lang = await getServerLocale();
   const dict = translations[lang];
 
   const title = localized(service, "title", lang);

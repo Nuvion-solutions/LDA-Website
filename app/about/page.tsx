@@ -1,16 +1,18 @@
 import type { Metadata } from "next";
-import { cookies } from "next/headers";
 import { ShieldCheck } from "lucide-react";
 import { BUSINESS, FULL_DISCLAIMER } from "@/lib/utils";
 import { CTABanner } from "@/components/sections/CTABanner";
-import { LANG_COOKIE } from "@/lib/language-context";
-import { translations, type Language } from "@/lib/translations";
+import { translations } from "@/lib/translations";
+import { getServerLocale } from "@/lib/server-locale";
 
 export const metadata: Metadata = {
   title: "About Us",
   description:
     "Meet the registered Legal Document Assistants behind California Legal Document Excellence — serving Sonoma County & the greater North Bay. LDA #87.",
-  alternates: { canonical: "/about" },
+  alternates: {
+    canonical: "/about",
+    languages: { en: "/about", es: "/es/about", "x-default": "/about" },
+  },
   openGraph: {
     title: "About Us | California Legal Document Excellence",
     description:
@@ -39,9 +41,7 @@ const TEAM = [
 ];
 
 export default async function AboutPage() {
-  const cookieStore = await cookies();
-  const stored = cookieStore.get(LANG_COOKIE)?.value;
-  const lang: Language = stored === "es" ? "es" : "en";
+  const lang = await getServerLocale();
   const dict = translations[lang];
 
   return (

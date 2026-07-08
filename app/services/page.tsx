@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { cookies } from "next/headers";
+import { LocaleLink as Link } from "@/components/LocaleLink";
 import { ArrowRight } from "lucide-react";
 import {
   SERVICES,
@@ -10,8 +9,8 @@ import {
 } from "@/lib/services";
 import { SHORT_DISCLAIMER } from "@/lib/utils";
 import { CTABanner } from "@/components/sections/CTABanner";
-import { LANG_COOKIE } from "@/lib/language-context";
-import { translations, type Language } from "@/lib/translations";
+import { translations } from "@/lib/translations";
+import { getServerLocale } from "@/lib/server-locale";
 
 // A-to-Z items that have a dedicated service page, keyed by the ENGLISH item
 // text (the EN/ES arrays are parallel, so the index maps localized items back
@@ -39,7 +38,10 @@ export const metadata: Metadata = {
   title: "Document Preparation Services",
   description:
     "Document preparation for divorce & family law, evictions, living trusts, wills, probate, powers of attorney, name changes, small claims, deeds & more. Registered LDA #87 serving Sonoma County & the North Bay.",
-  alternates: { canonical: "/services" },
+  alternates: {
+    canonical: "/services",
+    languages: { en: "/services", es: "/es/services", "x-default": "/services" },
+  },
   openGraph: {
     title: "Document Preparation Services | California Legal Document Excellence",
     description:
@@ -50,9 +52,7 @@ export const metadata: Metadata = {
 };
 
 export default async function ServicesPage() {
-  const cookieStore = await cookies();
-  const stored = cookieStore.get(LANG_COOKIE)?.value;
-  const lang: Language = stored === "es" ? "es" : "en";
+  const lang = await getServerLocale();
   const dict = translations[lang];
 
   return (

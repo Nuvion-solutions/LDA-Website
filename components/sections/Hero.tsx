@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { LocaleLink as Link } from "@/components/LocaleLink";
 import { motion } from "framer-motion";
 import { Phone, CheckCircle2 } from "lucide-react";
 import { BUSINESS } from "@/lib/utils";

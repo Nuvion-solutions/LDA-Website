@@ -19,6 +19,14 @@ type UrgencyInput = {
   taxDeadlineDate?: string;
   otherHasDeadline?: string;
   otherDeadlineDate?: string;
+  probateHasDeadline?: string;
+  probateDeadlineDate?: string;
+  nameChangeHasCourtDate?: string;
+  nameChangeCourtDate?: string;
+  smallClaimsHasHearing?: string;
+  smallClaimsHearingDate?: string;
+  guardianshipHasCourtDate?: string;
+  guardianshipCourtDate?: string;
 };
 
 /**
@@ -38,6 +46,22 @@ export function getDeadlineDate(data: UrgencyInput): string | null {
     case "Tax Document Organization (Clerical)":
       return data.taxHasDeadline === "Yes"
         ? data.taxDeadlineDate || null
+        : null;
+    case "Probate Documents":
+      return data.probateHasDeadline === "Yes"
+        ? data.probateDeadlineDate || null
+        : null;
+    case "Legal Name Change":
+      return data.nameChangeHasCourtDate === "Yes"
+        ? data.nameChangeCourtDate || null
+        : null;
+    case "Small Claims Paperwork":
+      return data.smallClaimsHasHearing === "Yes"
+        ? data.smallClaimsHearingDate || null
+        : null;
+    case "Guardianship Documents":
+      return data.guardianshipHasCourtDate === "Yes"
+        ? data.guardianshipCourtDate || null
         : null;
     case "Other / Not Sure":
       return data.otherHasDeadline === "Yes"

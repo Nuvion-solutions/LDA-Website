@@ -30,10 +30,10 @@ export const FAQS: FaqEntry[] = [
   {
     question: "What documents do you help prepare?",
     answer:
-      "We assist with divorce and family law forms, eviction (unlawful detainer) paperwork, immigration forms, living trust documents, power of attorney forms, DMV form assistance, and tax document organization (clerical).",
+      "We assist with divorce and family law forms, eviction (unlawful detainer) paperwork, immigration forms, living trusts, wills and health care directives, probate documents, legal name changes, small claims paperwork, guardianship petitions, deeds and property transfers, power of attorney forms, DMV form assistance, and tax document organization (clerical).",
     questionEs: "¿Qué documentos ayudan a preparar?",
     answerEs:
-      "Ayudamos con formularios de divorcio y derecho familiar, trámites de desalojo (unlawful detainer), formularios de inmigración, documentos de fideicomiso en vida, formularios de poder notarial, asistencia con formularios del DMV y organización de documentos de impuestos (clerical).",
+      "Ayudamos con formularios de divorcio y derecho familiar, trámites de desalojo (unlawful detainer), formularios de inmigración, fideicomisos en vida, testamentos y directivas de atención médica, documentos de sucesión, cambios de nombre legal, trámites de reclamos menores, peticiones de tutela, escrituras y transferencias de propiedad, formularios de poder notarial, asistencia con formularios del DMV y organización de documentos de impuestos (clerical).",
   },
   {
     question: "Do you submit the documents for me?",

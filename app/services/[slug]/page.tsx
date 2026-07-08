@@ -31,6 +31,12 @@ const CHECKLIST_KEYS: Record<string, string> = {
   "power-of-attorney": "Power of Attorney",
   dmv: "DMV Form Assistance",
   "tax-organization": "Tax Document Organization (Clerical)",
+  wills: "Wills & Health Care Directives",
+  probate: "Probate Documents",
+  "name-change": "Legal Name Change",
+  "small-claims": "Small Claims Paperwork",
+  guardianship: "Guardianship Documents",
+  deeds: "Deeds & Property Transfers",
 };
 
 const SERVICE_AREA = [
@@ -109,12 +115,33 @@ export default async function ServiceDetailPage({
     },
   };
 
+  // FAQPage schema for services that carry FAQs. Google requires the marked-up
+  // Q&As to be visible on the page — the section below renders the same data.
+  const faqLd =
+    service.faqs && service.faqs.length > 0
+      ? {
+          "@context": "https://schema.org",
+          "@type": "FAQPage",
+          mainEntity: service.faqs.map((f) => ({
+            "@type": "Question",
+            name: f.q,
+            acceptedAnswer: { "@type": "Answer", text: f.a },
+          })),
+        }
+      : null;
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceLd) }}
       />
+      {faqLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }}
+        />
+      )}
 
       {/* Hero */}
       <section className="bg-[var(--color-navy)] text-white">
@@ -209,6 +236,32 @@ export default async function ServiceDetailPage({
               <p className="mt-5 text-xs text-[var(--color-body-dark)] opacity-70 leading-relaxed">
                 {checklistNote(checklist, lang)}
               </p>
+            </div>
+          )}
+
+          {/* Per-service FAQs — visible twin of the FAQPage JSON-LD above. */}
+          {service.faqs && service.faqs.length > 0 && (
+            <div className="mt-12">
+              <h2 className="font-serif text-2xl md:text-3xl text-[var(--color-navy)] mb-6">
+                {lang === "es"
+                  ? "Preguntas Frecuentes"
+                  : "Frequently Asked Questions"}
+              </h2>
+              <div className="space-y-6">
+                {service.faqs.map((f) => (
+                  <div
+                    key={f.q}
+                    className="border-l-2 border-[var(--color-gold)] pl-5"
+                  >
+                    <h3 className="font-medium text-[var(--color-navy)] mb-1.5">
+                      {lang === "es" ? f.qEs : f.q}
+                    </h3>
+                    <p className="text-sm text-[var(--color-body-dark)] leading-relaxed">
+                      {lang === "es" ? f.aEs : f.a}
+                    </p>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 

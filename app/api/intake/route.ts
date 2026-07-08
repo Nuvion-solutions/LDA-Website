@@ -88,6 +88,50 @@ type IntakeBody = {
   taxDeadlineDate?: string;
   taxNotes?: string;
 
+  // Step 3 — Wills & Health Care Directives
+  willsFor?: string;
+  willsDocuments?: string;
+  willsOwnsProperty?: string;
+  willsHasMinors?: string;
+  willsExistingDocs?: string;
+
+  // Step 3 — Probate
+  probateRelation?: string;
+  probateHasWill?: string;
+  probateHasRealEstate?: string;
+  probateEstateValue?: string;
+  probateCounty?: string;
+  probateHasDeadline?: string;
+  probateDeadlineDate?: string;
+
+  // Step 3 — Name Change
+  nameChangeFor?: string;
+  nameChangeReason?: string;
+  nameChangeCounty?: string;
+  nameChangeHasCourtDate?: string;
+  nameChangeCourtDate?: string;
+
+  // Step 3 — Small Claims
+  smallClaimsRole?: string;
+  smallClaimsAmount?: string;
+  smallClaimsCounty?: string;
+  smallClaimsHasHearing?: string;
+  smallClaimsHearingDate?: string;
+  smallClaimsDescription?: string;
+
+  // Step 3 — Guardianship
+  guardianshipType?: string;
+  guardianshipRelation?: string;
+  guardianshipCounty?: string;
+  guardianshipHasCourtDate?: string;
+  guardianshipCourtDate?: string;
+
+  // Step 3 — Deeds & Property Transfers
+  deedType?: string;
+  deedReason?: string;
+  deedCounty?: string;
+  deedPropertyCount?: string;
+
   // Step 3 — Other
   otherDescription?: string;
   otherHasDeadline?: string;
@@ -202,6 +246,44 @@ function buildSections(data: IntakeBody): Section[] {
         { label: "Has deadline", value: data.taxHasDeadline },
         { label: "Deadline date", value: data.taxDeadlineDate },
         { label: "Notes", value: data.taxNotes },
+        // Wills & Health Care Directives
+        { label: "Documents for", value: data.willsFor },
+        { label: "Documents needed", value: data.willsDocuments },
+        { label: "Owns real estate", value: data.willsOwnsProperty },
+        { label: "Has minor children", value: data.willsHasMinors },
+        { label: "Existing will/directive", value: data.willsExistingDocs },
+        // Probate
+        { label: "Relationship to decedent", value: data.probateRelation },
+        { label: "Left a will", value: data.probateHasWill },
+        { label: "Estate includes real estate", value: data.probateHasRealEstate },
+        { label: "Estate value", value: data.probateEstateValue },
+        { label: "Decedent's county", value: data.probateCounty },
+        { label: "Has court date/deadline", value: data.probateHasDeadline },
+        { label: "Deadline date", value: data.probateDeadlineDate },
+        // Name change
+        { label: "Name change for", value: data.nameChangeFor },
+        { label: "Reason", value: data.nameChangeReason },
+        { label: "Filing county", value: data.nameChangeCounty },
+        { label: "Court date scheduled", value: data.nameChangeHasCourtDate },
+        { label: "Court date", value: data.nameChangeCourtDate },
+        // Small claims
+        { label: "Situation", value: data.smallClaimsRole },
+        { label: "Claim amount", value: data.smallClaimsAmount },
+        { label: "Case county", value: data.smallClaimsCounty },
+        { label: "Hearing scheduled", value: data.smallClaimsHasHearing },
+        { label: "Hearing date", value: data.smallClaimsHearingDate },
+        { label: "Dispute description", value: data.smallClaimsDescription },
+        // Guardianship
+        { label: "Guardianship type", value: data.guardianshipType },
+        { label: "Relationship to child", value: data.guardianshipRelation },
+        { label: "Filing county", value: data.guardianshipCounty },
+        { label: "Court date/urgent", value: data.guardianshipHasCourtDate },
+        { label: "Court date", value: data.guardianshipCourtDate },
+        // Deeds
+        { label: "Deed type", value: data.deedType },
+        { label: "Transfer reason", value: data.deedReason },
+        { label: "Property county", value: data.deedCounty },
+        { label: "Number of properties", value: data.deedPropertyCount },
         // Other
         { label: "Description", value: data.otherDescription },
         { label: "Has deadline", value: data.otherHasDeadline },

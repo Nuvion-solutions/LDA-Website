@@ -219,6 +219,173 @@ export const SERVICE_CHECKLISTS: Record<string, ServiceChecklist> = {
     noteEs:
       "Solo brindamos organización clerical y asistencia en la preparación de documentos. No brindamos asesoría fiscal. Usted presenta todos los documentos de impuestos directamente.",
   },
+  "Wills & Health Care Directives": {
+    title: "Information to Gather for Your Will & Health Care Directive",
+    intro: "Having these ready will help us prepare your documents faster:",
+    items: [
+      "Full legal names of the people you want to inherit (beneficiaries)",
+      "Who you want as executor of your will (and a backup)",
+      "Guardianship choices for minor children (if applicable)",
+      "Who should make medical decisions for you if you can't (health care agent)",
+      "A general list of major assets (home, accounts, vehicles)",
+      "Any specific gifts you want to leave to specific people",
+      "Your existing will or directive, if you have one",
+    ],
+    note:
+      "You do not need all of these to get started — bring what you have and we'll guide you through the rest.",
+    titleEs: "Información a Reunir para Su Testamento y Directiva Médica",
+    introEs:
+      "Tener esto listo nos ayudará a preparar sus documentos más rápido:",
+    itemsEs: [
+      "Nombres legales completos de las personas que heredarán (beneficiarios)",
+      "Quién será el albacea de su testamento (y un suplente)",
+      "Opciones de tutela para hijos menores (si aplica)",
+      "Quién tomará decisiones médicas por usted si usted no puede (agente de salud)",
+      "Una lista general de bienes principales (casa, cuentas, vehículos)",
+      "Cualquier regalo específico que desee dejar a personas específicas",
+      "Su testamento o directiva existente, si tiene uno",
+    ],
+    noteEs:
+      "No necesita todo esto para comenzar — traiga lo que tenga y le guiaremos con el resto.",
+  },
+  "Probate Documents": {
+    title: "Documents to Gather for Probate Paperwork",
+    intro: "Please have the following available when we follow up:",
+    items: [
+      "Certified copy of the death certificate",
+      "The original will, if one exists",
+      "List of the estate's assets (real estate, accounts, vehicles)",
+      "Approximate values of the major assets",
+      "Names and addresses of heirs and beneficiaries",
+      "Any court notices or deadlines you've received",
+      "Mortgage statements or property tax bills for estate real estate",
+    ],
+    note:
+      "You do not need all of these to get started — bring what you have and we'll guide you through the rest.",
+    titleEs: "Documentos a Reunir para los Trámites de Sucesión",
+    introEs: "Tenga lo siguiente disponible cuando le contactemos:",
+    itemsEs: [
+      "Copia certificada del certificado de defunción",
+      "El testamento original, si existe",
+      "Lista de los bienes del patrimonio (inmuebles, cuentas, vehículos)",
+      "Valores aproximados de los bienes principales",
+      "Nombres y direcciones de herederos y beneficiarios",
+      "Cualquier aviso judicial o plazo que haya recibido",
+      "Estados de hipoteca o facturas de impuestos de propiedad del patrimonio",
+    ],
+    noteEs:
+      "No necesita todo esto para comenzar — traiga lo que tenga y le guiaremos con el resto.",
+  },
+  "Legal Name Change": {
+    title: "Information to Gather for Your Name Change Petition",
+    intro: "Having these ready will help us prepare your petition faster:",
+    items: [
+      "Current full legal name exactly as it appears on your ID",
+      "The new name you want, spelled exactly as desired",
+      "Birth certificate (yours, or your child's for a minor name change)",
+      "Valid government-issued photo ID",
+      "Your county of residence",
+      "For a minor: the other parent's name and address, if known",
+      "Court date notice, if you've already filed anything",
+    ],
+    note:
+      "You do not need all of these to get started — bring what you have and we'll guide you through the rest.",
+    titleEs: "Información a Reunir para Su Petición de Cambio de Nombre",
+    introEs:
+      "Tener esto listo nos ayudará a preparar su petición más rápido:",
+    itemsEs: [
+      "Nombre legal actual completo exactamente como aparece en su identificación",
+      "El nuevo nombre que desea, escrito exactamente como lo quiere",
+      "Certificado de nacimiento (el suyo, o el de su hijo para un cambio de menor)",
+      "Identificación con foto válida emitida por el gobierno",
+      "Su condado de residencia",
+      "Para un menor: el nombre y la dirección del otro padre, si se conocen",
+      "Aviso de fecha de audiencia, si ya presentó algo",
+    ],
+    noteEs:
+      "No necesita todo esto para comenzar — traiga lo que tenga y le guiaremos con el resto.",
+  },
+  "Small Claims Paperwork": {
+    title: "Documents to Gather for Your Small Claims Case",
+    intro: "Please have the following available when we follow up:",
+    items: [
+      "Full legal name and address of the person or business involved",
+      "The exact amount in dispute and how you calculated it",
+      "Contracts, invoices, receipts, or estimates related to the claim",
+      "Photos, messages, or emails that document what happened",
+      "Key dates (when the debt arose, when you demanded payment)",
+      "Your hearing date and case number, if you were served or already filed",
+    ],
+    note:
+      "You do not need all of these to get started — bring what you have and we'll guide you through the rest.",
+    titleEs: "Documentos a Reunir para Su Caso de Reclamos Menores",
+    introEs: "Tenga lo siguiente disponible cuando le contactemos:",
+    itemsEs: [
+      "Nombre legal completo y dirección de la persona o negocio involucrado",
+      "La cantidad exacta en disputa y cómo la calculó",
+      "Contratos, facturas, recibos o presupuestos relacionados con el reclamo",
+      "Fotos, mensajes o correos que documenten lo que pasó",
+      "Fechas clave (cuándo surgió la deuda, cuándo exigió el pago)",
+      "Su fecha de audiencia y número de caso, si le notificaron o ya presentó",
+    ],
+    noteEs:
+      "No necesita todo esto para comenzar — traiga lo que tenga y le guiaremos con el resto.",
+  },
+  "Guardianship Documents": {
+    title: "Information to Gather for Your Guardianship Petition",
+    intro: "Having these ready will help us prepare the packet faster:",
+    items: [
+      "Child's full legal name, date of birth, and current address",
+      "Your relationship to the child",
+      "Names and addresses of the child's parents, if known",
+      "Names and addresses of the child's close relatives (grandparents, siblings)",
+      "A short summary of why guardianship is needed",
+      "Any existing court orders involving the child",
+      "School and doctor information for the child, if available",
+    ],
+    note:
+      "You do not need all of these to get started — bring what you have and we'll guide you through the rest.",
+    titleEs: "Información a Reunir para Su Petición de Tutela",
+    introEs:
+      "Tener esto listo nos ayudará a preparar el paquete más rápido:",
+    itemsEs: [
+      "Nombre legal completo del menor, fecha de nacimiento y dirección actual",
+      "Su relación con el menor",
+      "Nombres y direcciones de los padres del menor, si se conocen",
+      "Nombres y direcciones de familiares cercanos del menor (abuelos, hermanos)",
+      "Un breve resumen de por qué se necesita la tutela",
+      "Cualquier orden judicial existente que involucre al menor",
+      "Información de la escuela y del médico del menor, si está disponible",
+    ],
+    noteEs:
+      "No necesita todo esto para comenzar — traiga lo que tenga y le guiaremos con el resto.",
+  },
+  "Deeds & Property Transfers": {
+    title: "Documents to Gather for Your Deed",
+    intro: "Please have the following available when we follow up:",
+    items: [
+      "A copy of the current deed (or the property address so it can be looked up)",
+      "The property's Assessor's Parcel Number (APN), if you have it",
+      "Full legal names of everyone coming off or going onto title",
+      "How the new owner(s) will hold title (e.g., joint tenants, trust)",
+      "Your trust name and date, if transferring into a living trust",
+      "Divorce judgment or settlement, if the transfer is divorce-related",
+    ],
+    note:
+      "You do not need all of these to get started — bring what you have and we'll guide you through the rest.",
+    titleEs: "Documentos a Reunir para Su Escritura",
+    introEs: "Tenga lo siguiente disponible cuando le contactemos:",
+    itemsEs: [
+      "Una copia de la escritura actual (o la dirección de la propiedad para buscarla)",
+      "El Número de Parcela del Tasador (APN) de la propiedad, si lo tiene",
+      "Nombres legales completos de todos los que salen o entran al título",
+      "Cómo tendrán el título los nuevos propietarios (p. ej., copropietarios, fideicomiso)",
+      "El nombre y la fecha de su fideicomiso, si transfiere a un fideicomiso en vida",
+      "Sentencia o acuerdo de divorcio, si la transferencia es por divorcio",
+    ],
+    noteEs:
+      "No necesita todo esto para comenzar — traiga lo que tenga y le guiaremos con el resto.",
+  },
   default: {
     title: "Documents to Gather",
     intro: "While we review your intake, start gathering:",

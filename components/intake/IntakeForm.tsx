@@ -47,10 +47,101 @@ const PRIMARY_SERVICES = [
   "Eviction (Unlawful Detainer) Paperwork",
   "Immigration Documents",
   "Living Trust Documents",
+  "Wills & Health Care Directives",
+  "Probate Documents",
   "Power of Attorney",
+  "Legal Name Change",
+  "Small Claims Paperwork",
+  "Guardianship Documents",
+  "Deeds & Property Transfers",
   "DMV Form Assistance",
   "Tax Document Organization (Clerical)",
   "Other / Not Sure",
+] as const;
+
+const WILLS_FOR_OPTIONS = [
+  "Myself",
+  "Myself and spouse/partner",
+  "Family member",
+] as const;
+
+const WILLS_DOC_OPTIONS = [
+  "Last Will & Testament only",
+  "Health Care Directive only",
+  "Both will and directive",
+  "Not sure yet",
+] as const;
+
+const PROBATE_RELATIONS = [
+  "Spouse/partner",
+  "Adult child",
+  "Other family member",
+  "Other",
+] as const;
+
+const ESTATE_VALUE_RANGES = [
+  "Under $200,000",
+  "$200,000 – $500,000",
+  "Over $500,000",
+  "Not sure",
+] as const;
+
+const NAME_CHANGE_FOR = [
+  "Myself",
+  "My child",
+  "Myself and my child",
+] as const;
+
+const NAME_CHANGE_REASONS = [
+  "Marriage or divorce related",
+  "Personal preference",
+  "Gender identity",
+  "Other / prefer not to say",
+] as const;
+
+const SMALL_CLAIMS_ROLES = [
+  "Filing a claim (plaintiff)",
+  "Responding to a claim (defendant)",
+  "Collecting a judgment I won",
+] as const;
+
+const SMALL_CLAIMS_AMOUNTS = [
+  "Under $2,500",
+  "$2,500 – $7,500",
+  "$7,500 – $12,500",
+  "Over $12,500",
+] as const;
+
+const GUARDIANSHIP_TYPES = [
+  "Guardianship of the person (care & custody)",
+  "Guardianship of the estate (finances)",
+  "Both",
+  "Not sure",
+] as const;
+
+const GUARDIANSHIP_RELATIONS = [
+  "Grandparent",
+  "Aunt/uncle",
+  "Sibling",
+  "Other relative",
+  "Family friend",
+  "Other",
+] as const;
+
+const DEED_TYPES = [
+  "Quitclaim Deed",
+  "Grant Deed",
+  "Interspousal Transfer Deed",
+  "Trust Transfer Deed",
+  "Not sure",
+] as const;
+
+const DEED_REASONS = [
+  "Add or remove a spouse",
+  "Transfer into a living trust",
+  "Divorce settlement",
+  "Family gift or transfer",
+  "Other",
 ] as const;
 
 const COUNTIES = [
@@ -296,6 +387,50 @@ const intakeSchema = z
     taxDeadlineDate: optDate,
     taxNotes: optStr,
 
+    // Step 3 — Wills & Health Care Directives
+    willsFor: z.enum(WILLS_FOR_OPTIONS).optional(),
+    willsDocuments: z.enum(WILLS_DOC_OPTIONS).optional(),
+    willsOwnsProperty: z.enum(["Yes", "No"]).optional(),
+    willsHasMinors: z.enum(["Yes", "No"]).optional(),
+    willsExistingDocs: z.enum(["Yes", "No", "Not sure"]).optional(),
+
+    // Step 3 — Probate
+    probateRelation: z.enum(PROBATE_RELATIONS).optional(),
+    probateHasWill: z.enum(["Yes", "No", "Not sure"]).optional(),
+    probateHasRealEstate: z.enum(["Yes", "No", "Not sure"]).optional(),
+    probateEstateValue: z.enum(ESTATE_VALUE_RANGES).optional(),
+    probateCounty: z.enum(COUNTIES).optional(),
+    probateHasDeadline: z.enum(["Yes", "No"]).optional(),
+    probateDeadlineDate: optDate,
+
+    // Step 3 — Name Change
+    nameChangeFor: z.enum(NAME_CHANGE_FOR).optional(),
+    nameChangeReason: z.enum(NAME_CHANGE_REASONS).optional(),
+    nameChangeCounty: z.enum(COUNTIES).optional(),
+    nameChangeHasCourtDate: z.enum(["Yes", "No"]).optional(),
+    nameChangeCourtDate: optDate,
+
+    // Step 3 — Small Claims
+    smallClaimsRole: z.enum(SMALL_CLAIMS_ROLES).optional(),
+    smallClaimsAmount: z.enum(SMALL_CLAIMS_AMOUNTS).optional(),
+    smallClaimsCounty: z.enum(COUNTIES).optional(),
+    smallClaimsHasHearing: z.enum(["Yes", "No"]).optional(),
+    smallClaimsHearingDate: optDate,
+    smallClaimsDescription: optStr,
+
+    // Step 3 — Guardianship
+    guardianshipType: z.enum(GUARDIANSHIP_TYPES).optional(),
+    guardianshipRelation: z.enum(GUARDIANSHIP_RELATIONS).optional(),
+    guardianshipCounty: z.enum(COUNTIES).optional(),
+    guardianshipHasCourtDate: z.enum(["Yes", "No"]).optional(),
+    guardianshipCourtDate: optDate,
+
+    // Step 3 — Deeds & Property Transfers
+    deedType: z.enum(DEED_TYPES).optional(),
+    deedReason: z.enum(DEED_REASONS).optional(),
+    deedCounty: z.enum(COUNTIES).optional(),
+    deedPropertyCount: optStr,
+
     // Step 3 — Other
     otherDescription: optStr,
     otherHasDeadline: z.enum(["Yes", "No"]).optional(),
@@ -437,6 +572,51 @@ function step3FieldsFor(
         "taxDeadlineDate",
         "taxNotes",
       ];
+    case "Wills & Health Care Directives":
+      return [
+        "willsFor",
+        "willsDocuments",
+        "willsOwnsProperty",
+        "willsHasMinors",
+        "willsExistingDocs",
+      ];
+    case "Probate Documents":
+      return [
+        "probateRelation",
+        "probateHasWill",
+        "probateHasRealEstate",
+        "probateEstateValue",
+        "probateCounty",
+        "probateHasDeadline",
+        "probateDeadlineDate",
+      ];
+    case "Legal Name Change":
+      return [
+        "nameChangeFor",
+        "nameChangeReason",
+        "nameChangeCounty",
+        "nameChangeHasCourtDate",
+        "nameChangeCourtDate",
+      ];
+    case "Small Claims Paperwork":
+      return [
+        "smallClaimsRole",
+        "smallClaimsAmount",
+        "smallClaimsCounty",
+        "smallClaimsHasHearing",
+        "smallClaimsHearingDate",
+        "smallClaimsDescription",
+      ];
+    case "Guardianship Documents":
+      return [
+        "guardianshipType",
+        "guardianshipRelation",
+        "guardianshipCounty",
+        "guardianshipHasCourtDate",
+        "guardianshipCourtDate",
+      ];
+    case "Deeds & Property Transfers":
+      return ["deedType", "deedReason", "deedCounty", "deedPropertyCount"];
     case "Other / Not Sure":
       return ["otherDescription", "otherHasDeadline", "otherDeadlineDate"];
     default:
@@ -463,6 +643,18 @@ const ALL_STEP3_FIELDS: FieldName[] = [
   "poaTypes", "poaAgent", "poaHasReason", "poaReason", "poaNotarize",
   "dmvFormTypes", "dmvHasAppointment", "dmvAppointmentDate", "dmvDetails",
   "taxTypes", "taxYear", "taxHasDeadline", "taxDeadlineDate", "taxNotes",
+  "willsFor", "willsDocuments", "willsOwnsProperty", "willsHasMinors",
+  "willsExistingDocs",
+  "probateRelation", "probateHasWill", "probateHasRealEstate",
+  "probateEstateValue", "probateCounty", "probateHasDeadline",
+  "probateDeadlineDate",
+  "nameChangeFor", "nameChangeReason", "nameChangeCounty",
+  "nameChangeHasCourtDate", "nameChangeCourtDate",
+  "smallClaimsRole", "smallClaimsAmount", "smallClaimsCounty",
+  "smallClaimsHasHearing", "smallClaimsHearingDate", "smallClaimsDescription",
+  "guardianshipType", "guardianshipRelation", "guardianshipCounty",
+  "guardianshipHasCourtDate", "guardianshipCourtDate",
+  "deedType", "deedReason", "deedCounty", "deedPropertyCount",
   "otherDescription", "otherHasDeadline", "otherDeadlineDate",
 ];
 
@@ -489,6 +681,10 @@ function prunePayload(data: IntakeData): Record<string, unknown> {
   if (out.poaHasReason !== "Yes") delete out.poaReason;
   if (out.dmvHasAppointment !== "Yes") delete out.dmvAppointmentDate;
   if (out.taxHasDeadline !== "Yes") delete out.taxDeadlineDate;
+  if (out.probateHasDeadline !== "Yes") delete out.probateDeadlineDate;
+  if (out.nameChangeHasCourtDate !== "Yes") delete out.nameChangeCourtDate;
+  if (out.smallClaimsHasHearing !== "Yes") delete out.smallClaimsHearingDate;
+  if (out.guardianshipHasCourtDate !== "Yes") delete out.guardianshipCourtDate;
   if (out.otherHasDeadline !== "Yes") delete out.otherDeadlineDate;
   return out;
 }
@@ -581,6 +777,12 @@ export function IntakeForm() {
       immigrationDeadlineDate: "",
       dmvAppointmentDate: "",
       taxDeadlineDate: "",
+      probateDeadlineDate: "",
+      nameChangeCourtDate: "",
+      smallClaimsHearingDate: "",
+      smallClaimsDescription: "",
+      guardianshipCourtDate: "",
+      deedPropertyCount: "",
       otherDeadlineDate: "",
       referralName: "",
       additionalNotes: "",
@@ -601,6 +803,14 @@ export function IntakeForm() {
     dmvAppointmentDate: watch("dmvAppointmentDate"),
     taxHasDeadline: watch("taxHasDeadline"),
     taxDeadlineDate: watch("taxDeadlineDate"),
+    probateHasDeadline: watch("probateHasDeadline"),
+    probateDeadlineDate: watch("probateDeadlineDate"),
+    nameChangeHasCourtDate: watch("nameChangeHasCourtDate"),
+    nameChangeCourtDate: watch("nameChangeCourtDate"),
+    smallClaimsHasHearing: watch("smallClaimsHasHearing"),
+    smallClaimsHearingDate: watch("smallClaimsHearingDate"),
+    guardianshipHasCourtDate: watch("guardianshipHasCourtDate"),
+    guardianshipCourtDate: watch("guardianshipCourtDate"),
     otherHasDeadline: watch("otherHasDeadline"),
     otherDeadlineDate: watch("otherDeadlineDate"),
   };
@@ -1601,6 +1811,66 @@ function BranchFields({
           lang={lang}
         />
       );
+    case "Wills & Health Care Directives":
+      return (
+        <WillsBranch
+          register={register}
+          watch={watch}
+          errors={errors}
+          t={t}
+          lang={lang}
+        />
+      );
+    case "Probate Documents":
+      return (
+        <ProbateBranch
+          register={register}
+          watch={watch}
+          errors={errors}
+          t={t}
+          lang={lang}
+        />
+      );
+    case "Legal Name Change":
+      return (
+        <NameChangeBranch
+          register={register}
+          watch={watch}
+          errors={errors}
+          t={t}
+          lang={lang}
+        />
+      );
+    case "Small Claims Paperwork":
+      return (
+        <SmallClaimsBranch
+          register={register}
+          watch={watch}
+          errors={errors}
+          t={t}
+          lang={lang}
+        />
+      );
+    case "Guardianship Documents":
+      return (
+        <GuardianshipBranch
+          register={register}
+          watch={watch}
+          errors={errors}
+          t={t}
+          lang={lang}
+        />
+      );
+    case "Deeds & Property Transfers":
+      return (
+        <DeedsBranch
+          register={register}
+          watch={watch}
+          errors={errors}
+          t={t}
+          lang={lang}
+        />
+      );
     case "Other / Not Sure":
       return (
         <OtherBranch
@@ -2237,6 +2507,356 @@ function OtherBranch({ register, watch, errors, t, lang }: any) {
   );
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function WillsBranch({ register, errors, t, lang }: any) {
+  return (
+    <div className="space-y-6">
+      <RadioGroup
+        legend={t("wills_q_for")}
+        options={WILLS_FOR_OPTIONS}
+        name="willsFor"
+        register={register}
+        error={tErr(errors.willsFor?.message, t)}
+        lang={lang}
+      />
+      <RadioGroup
+        legend={t("wills_q_documents")}
+        options={WILLS_DOC_OPTIONS}
+        name="willsDocuments"
+        register={register}
+        error={tErr(errors.willsDocuments?.message, t)}
+        lang={lang}
+      />
+      <RadioGroup
+        legend={t("wills_q_property")}
+        options={["Yes", "No"]}
+        name="willsOwnsProperty"
+        register={register}
+        error={tErr(errors.willsOwnsProperty?.message, t)}
+        lang={lang}
+      />
+      <RadioGroup
+        legend={t("wills_q_minors")}
+        options={["Yes", "No"]}
+        name="willsHasMinors"
+        register={register}
+        error={tErr(errors.willsHasMinors?.message, t)}
+        lang={lang}
+      />
+      <RadioGroup
+        legend={t("wills_q_existing")}
+        options={["Yes", "No", "Not sure"]}
+        name="willsExistingDocs"
+        register={register}
+        error={tErr(errors.willsExistingDocs?.message, t)}
+        lang={lang}
+      />
+    </div>
+  );
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function ProbateBranch({ register, watch, errors, t, lang }: any) {
+  const hasDeadline = watch("probateHasDeadline");
+  return (
+    <div className="space-y-6">
+      <RadioGroup
+        legend={t("prob_q_relation")}
+        options={PROBATE_RELATIONS}
+        name="probateRelation"
+        register={register}
+        error={tErr(errors.probateRelation?.message, t)}
+        lang={lang}
+      />
+      <RadioGroup
+        legend={t("prob_q_will")}
+        options={["Yes", "No", "Not sure"]}
+        name="probateHasWill"
+        register={register}
+        error={tErr(errors.probateHasWill?.message, t)}
+        lang={lang}
+      />
+      <RadioGroup
+        legend={t("prob_q_realestate")}
+        options={["Yes", "No", "Not sure"]}
+        name="probateHasRealEstate"
+        register={register}
+        error={tErr(errors.probateHasRealEstate?.message, t)}
+        lang={lang}
+      />
+      <RadioGroup
+        legend={t("prob_q_value")}
+        options={ESTATE_VALUE_RANGES}
+        name="probateEstateValue"
+        register={register}
+        error={tErr(errors.probateEstateValue?.message, t)}
+        lang={lang}
+      />
+      <Select
+        id="probateCounty"
+        label={t("prob_q_county")}
+        options={COUNTIES}
+        register={register}
+        name="probateCounty"
+        error={tErr(errors.probateCounty?.message, t)}
+        lang={lang}
+      />
+      <RadioGroup
+        legend={t("prob_q_deadline")}
+        options={["Yes", "No"]}
+        name="probateHasDeadline"
+        register={register}
+        error={tErr(errors.probateHasDeadline?.message, t)}
+        lang={lang}
+      />
+      {hasDeadline === "Yes" && (
+        <Field
+          id="probateDeadlineDate"
+          label={t("prob_q_deadline_date")}
+          error={tErr(errors.probateDeadlineDate?.message, t)}
+        >
+          <input
+            id="probateDeadlineDate"
+            type="date"
+            min={new Date().toISOString().slice(0, 10)}
+            {...register("probateDeadlineDate")}
+            className={inputBase}
+          />
+        </Field>
+      )}
+    </div>
+  );
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function NameChangeBranch({ register, watch, errors, t, lang }: any) {
+  const hasCourtDate = watch("nameChangeHasCourtDate");
+  return (
+    <div className="space-y-6">
+      <RadioGroup
+        legend={t("name_q_for")}
+        options={NAME_CHANGE_FOR}
+        name="nameChangeFor"
+        register={register}
+        error={tErr(errors.nameChangeFor?.message, t)}
+        lang={lang}
+      />
+      <RadioGroup
+        legend={t("name_q_reason")}
+        options={NAME_CHANGE_REASONS}
+        name="nameChangeReason"
+        register={register}
+        error={tErr(errors.nameChangeReason?.message, t)}
+        lang={lang}
+      />
+      <Select
+        id="nameChangeCounty"
+        label={t("name_q_county")}
+        options={COUNTIES}
+        register={register}
+        name="nameChangeCounty"
+        error={tErr(errors.nameChangeCounty?.message, t)}
+        lang={lang}
+      />
+      <RadioGroup
+        legend={t("name_q_courtdate")}
+        options={["Yes", "No"]}
+        name="nameChangeHasCourtDate"
+        register={register}
+        error={tErr(errors.nameChangeHasCourtDate?.message, t)}
+        lang={lang}
+      />
+      {hasCourtDate === "Yes" && (
+        <Field
+          id="nameChangeCourtDate"
+          label={t("name_q_courtdate_date")}
+          error={tErr(errors.nameChangeCourtDate?.message, t)}
+        >
+          <input
+            id="nameChangeCourtDate"
+            type="date"
+            min={new Date().toISOString().slice(0, 10)}
+            {...register("nameChangeCourtDate")}
+            className={inputBase}
+          />
+        </Field>
+      )}
+    </div>
+  );
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function SmallClaimsBranch({ register, watch, errors, t, lang }: any) {
+  const hasHearing = watch("smallClaimsHasHearing");
+  return (
+    <div className="space-y-6">
+      <RadioGroup
+        legend={t("sc_q_role")}
+        options={SMALL_CLAIMS_ROLES}
+        name="smallClaimsRole"
+        register={register}
+        error={tErr(errors.smallClaimsRole?.message, t)}
+        lang={lang}
+      />
+      <RadioGroup
+        legend={t("sc_q_amount")}
+        options={SMALL_CLAIMS_AMOUNTS}
+        name="smallClaimsAmount"
+        register={register}
+        error={tErr(errors.smallClaimsAmount?.message, t)}
+        lang={lang}
+      />
+      <Select
+        id="smallClaimsCounty"
+        label={t("sc_q_county")}
+        options={COUNTIES}
+        register={register}
+        name="smallClaimsCounty"
+        error={tErr(errors.smallClaimsCounty?.message, t)}
+        lang={lang}
+      />
+      <RadioGroup
+        legend={t("sc_q_hearing")}
+        options={["Yes", "No"]}
+        name="smallClaimsHasHearing"
+        register={register}
+        error={tErr(errors.smallClaimsHasHearing?.message, t)}
+        lang={lang}
+      />
+      {hasHearing === "Yes" && (
+        <Field
+          id="smallClaimsHearingDate"
+          label={t("sc_q_hearing_date")}
+          error={tErr(errors.smallClaimsHearingDate?.message, t)}
+        >
+          <input
+            id="smallClaimsHearingDate"
+            type="date"
+            min={new Date().toISOString().slice(0, 10)}
+            {...register("smallClaimsHearingDate")}
+            className={inputBase}
+          />
+        </Field>
+      )}
+      <Field
+        id="smallClaimsDescription"
+        label={t("sc_q_desc")}
+        error={tErr(errors.smallClaimsDescription?.message, t)}
+      >
+        <textarea
+          id="smallClaimsDescription"
+          rows={4}
+          {...register("smallClaimsDescription")}
+          className={inputBase}
+        />
+      </Field>
+    </div>
+  );
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function GuardianshipBranch({ register, watch, errors, t, lang }: any) {
+  const hasCourtDate = watch("guardianshipHasCourtDate");
+  return (
+    <div className="space-y-6">
+      <RadioGroup
+        legend={t("guard_q_type")}
+        options={GUARDIANSHIP_TYPES}
+        name="guardianshipType"
+        register={register}
+        error={tErr(errors.guardianshipType?.message, t)}
+        lang={lang}
+      />
+      <RadioGroup
+        legend={t("guard_q_relation")}
+        options={GUARDIANSHIP_RELATIONS}
+        name="guardianshipRelation"
+        register={register}
+        error={tErr(errors.guardianshipRelation?.message, t)}
+        lang={lang}
+      />
+      <Select
+        id="guardianshipCounty"
+        label={t("guard_q_county")}
+        options={COUNTIES}
+        register={register}
+        name="guardianshipCounty"
+        error={tErr(errors.guardianshipCounty?.message, t)}
+        lang={lang}
+      />
+      <RadioGroup
+        legend={t("guard_q_courtdate")}
+        options={["Yes", "No"]}
+        name="guardianshipHasCourtDate"
+        register={register}
+        error={tErr(errors.guardianshipHasCourtDate?.message, t)}
+        lang={lang}
+      />
+      {hasCourtDate === "Yes" && (
+        <Field
+          id="guardianshipCourtDate"
+          label={t("guard_q_courtdate_date")}
+          error={tErr(errors.guardianshipCourtDate?.message, t)}
+        >
+          <input
+            id="guardianshipCourtDate"
+            type="date"
+            min={new Date().toISOString().slice(0, 10)}
+            {...register("guardianshipCourtDate")}
+            className={inputBase}
+          />
+        </Field>
+      )}
+    </div>
+  );
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function DeedsBranch({ register, errors, t, lang }: any) {
+  return (
+    <div className="space-y-6">
+      <RadioGroup
+        legend={t("deed_q_type")}
+        options={DEED_TYPES}
+        name="deedType"
+        register={register}
+        error={tErr(errors.deedType?.message, t)}
+        lang={lang}
+      />
+      <RadioGroup
+        legend={t("deed_q_reason")}
+        options={DEED_REASONS}
+        name="deedReason"
+        register={register}
+        error={tErr(errors.deedReason?.message, t)}
+        lang={lang}
+      />
+      <Select
+        id="deedCounty"
+        label={t("deed_q_county")}
+        options={COUNTIES}
+        register={register}
+        name="deedCounty"
+        error={tErr(errors.deedCounty?.message, t)}
+        lang={lang}
+      />
+      <Field
+        id="deedPropertyCount"
+        label={t("deed_q_count")}
+        error={tErr(errors.deedPropertyCount?.message, t)}
+      >
+        <input
+          id="deedPropertyCount"
+          type="number"
+          min={1}
+          {...register("deedPropertyCount")}
+          className={inputBase}
+        />
+      </Field>
+    </div>
+  );
+}
+
 // ---------------------------------------------------------------------------
 // Review summary
 // ---------------------------------------------------------------------------
@@ -2356,6 +2976,66 @@ function ReviewSummary({
         : opt(data.taxHasDeadline),
     ],
     [t("rs_tax_notes"), data.taxNotes],
+
+    // Wills & Health Care Directives
+    [t("rs_wills_for"), opt(data.willsFor)],
+    [t("rs_wills_documents"), opt(data.willsDocuments)],
+    [t("rs_owns_real_property"), opt(data.willsOwnsProperty)],
+    [t("rs_minor_children"), opt(data.willsHasMinors)],
+    [t("rs_existing_will"), opt(data.willsExistingDocs)],
+
+    // Probate
+    [t("rs_probate_relation"), opt(data.probateRelation)],
+    [t("rs_probate_will"), opt(data.probateHasWill)],
+    [t("rs_owns_real_property"), opt(data.probateHasRealEstate)],
+    [t("rs_estate_value"), opt(data.probateEstateValue)],
+    [t("rs_filing_county"), opt(data.probateCounty)],
+    [
+      t("rs_deadline"),
+      data.probateHasDeadline === "Yes"
+        ? data.probateDeadlineDate || optionLabel("Yes", lang)
+        : opt(data.probateHasDeadline),
+    ],
+
+    // Name change
+    [t("rs_name_change_for"), opt(data.nameChangeFor)],
+    [t("rs_name_change_reason"), opt(data.nameChangeReason)],
+    [t("rs_filing_county"), opt(data.nameChangeCounty)],
+    [
+      t("rs_court_date"),
+      data.nameChangeHasCourtDate === "Yes"
+        ? data.nameChangeCourtDate || optionLabel("Yes", lang)
+        : opt(data.nameChangeHasCourtDate),
+    ],
+
+    // Small claims
+    [t("rs_small_claims_role"), opt(data.smallClaimsRole)],
+    [t("rs_claim_amount"), opt(data.smallClaimsAmount)],
+    [t("rs_filing_county"), opt(data.smallClaimsCounty)],
+    [
+      t("rs_hearing_date"),
+      data.smallClaimsHasHearing === "Yes"
+        ? data.smallClaimsHearingDate || optionLabel("Yes", lang)
+        : opt(data.smallClaimsHasHearing),
+    ],
+    [t("rs_description"), data.smallClaimsDescription],
+
+    // Guardianship
+    [t("rs_guardianship_type"), opt(data.guardianshipType)],
+    [t("rs_guardianship_relation"), opt(data.guardianshipRelation)],
+    [t("rs_filing_county"), opt(data.guardianshipCounty)],
+    [
+      t("rs_court_date"),
+      data.guardianshipHasCourtDate === "Yes"
+        ? data.guardianshipCourtDate || optionLabel("Yes", lang)
+        : opt(data.guardianshipHasCourtDate),
+    ],
+
+    // Deeds
+    [t("rs_deed_type"), opt(data.deedType)],
+    [t("rs_deed_reason"), opt(data.deedReason)],
+    [t("rs_property_county"), opt(data.deedCounty)],
+    [t("rs_property_count"), data.deedPropertyCount],
 
     // Other
     [t("rs_description"), data.otherDescription],

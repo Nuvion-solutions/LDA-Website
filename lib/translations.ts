@@ -342,6 +342,50 @@ const en = {
   other_q_deadline: "Do you have a deadline or court date?",
   other_q_deadline_date: "What is the date?",
 
+  // Step 3 — Wills & Health Care Directives
+  wills_q_for: "Who are the documents for?",
+  wills_q_documents: "Which documents do you need prepared?",
+  wills_q_property: "Do you own a home or other real estate?",
+  wills_q_minors: "Do you have children under 18?",
+  wills_q_existing: "Do you have an existing will or directive to update?",
+
+  // Step 3 — Probate
+  prob_q_relation: "What was your relationship to the person who passed away?",
+  prob_q_will: "Did they leave a will?",
+  prob_q_realestate: "Does the estate include real estate?",
+  prob_q_value: "Approximate value of the estate",
+  prob_q_county: "Which county did they live in?",
+  prob_q_deadline: "Do you have a court date or deadline?",
+  prob_q_deadline_date: "What is the date?",
+
+  // Step 3 — Name Change
+  name_q_for: "Who is the name change for?",
+  name_q_reason: "Reason for the name change (optional)",
+  name_q_county: "Which county will you file in?",
+  name_q_courtdate: "Has a court date already been scheduled?",
+  name_q_courtdate_date: "What is the date?",
+
+  // Step 3 — Small Claims
+  sc_q_role: "What best describes your situation?",
+  sc_q_amount: "How much is the claim for?",
+  sc_q_county: "Which county is (or will be) the case in?",
+  sc_q_hearing: "Is there a hearing date scheduled?",
+  sc_q_hearing_date: "What is the date?",
+  sc_q_desc: "Briefly, what is the dispute about? (optional)",
+
+  // Step 3 — Guardianship
+  guard_q_type: "What type of guardianship do you need documents for?",
+  guard_q_relation: "What is your relationship to the child?",
+  guard_q_county: "Which county will you file in?",
+  guard_q_courtdate: "Is there a court date scheduled, or is this urgent?",
+  guard_q_courtdate_date: "What is the date?",
+
+  // Step 3 — Deeds & Property Transfers
+  deed_q_type: "What type of deed do you need prepared?",
+  deed_q_reason: "What is the transfer for?",
+  deed_q_county: "Which county is the property in?",
+  deed_q_count: "How many properties are being transferred?",
+
   // Step 3 — Generic
   branch_no_service: "Please select a service on the previous step.",
 
@@ -395,6 +439,22 @@ const en = {
   rs_tax_deadline: "Tax deadline",
   rs_tax_notes: "Tax notes",
   rs_description: "Description",
+  rs_wills_for: "Documents for",
+  rs_wills_documents: "Documents needed",
+  rs_existing_will: "Existing will/directive",
+  rs_probate_relation: "Relationship to decedent",
+  rs_probate_will: "Left a will",
+  rs_estate_value: "Estate value",
+  rs_name_change_for: "Name change for",
+  rs_name_change_reason: "Reason",
+  rs_court_date: "Court date",
+  rs_small_claims_role: "Situation",
+  rs_claim_amount: "Claim amount",
+  rs_hearing_date: "Hearing date",
+  rs_guardianship_type: "Guardianship type",
+  rs_guardianship_relation: "Relationship to child",
+  rs_deed_type: "Deed type",
+  rs_deed_reason: "Transfer reason",
   rs_your_county: "Your county",
   rs_heard_via: "Heard about us via",
   rs_referred_by: "Referred by",
@@ -782,6 +842,50 @@ const es: Dict = {
   other_q_deadline: "¿Tiene una fecha límite o fecha de tribunal?",
   other_q_deadline_date: "¿Cuál es la fecha?",
 
+  // Step 3 — Wills & Health Care Directives
+  wills_q_for: "¿Para quién son los documentos?",
+  wills_q_documents: "¿Qué documentos necesita preparar?",
+  wills_q_property: "¿Es dueño de una casa u otra propiedad inmueble?",
+  wills_q_minors: "¿Tiene hijos menores de 18 años?",
+  wills_q_existing: "¿Tiene un testamento o directiva existente para actualizar?",
+
+  // Step 3 — Probate
+  prob_q_relation: "¿Cuál era su relación con la persona que falleció?",
+  prob_q_will: "¿Dejó un testamento?",
+  prob_q_realestate: "¿El patrimonio incluye bienes inmuebles?",
+  prob_q_value: "Valor aproximado del patrimonio",
+  prob_q_county: "¿En qué condado vivía?",
+  prob_q_deadline: "¿Tiene una fecha de audiencia o fecha límite?",
+  prob_q_deadline_date: "¿Cuál es la fecha?",
+
+  // Step 3 — Name Change
+  name_q_for: "¿Para quién es el cambio de nombre?",
+  name_q_reason: "Razón del cambio de nombre (opcional)",
+  name_q_county: "¿En qué condado presentará?",
+  name_q_courtdate: "¿Ya hay una fecha de audiencia programada?",
+  name_q_courtdate_date: "¿Cuál es la fecha?",
+
+  // Step 3 — Small Claims
+  sc_q_role: "¿Qué describe mejor su situación?",
+  sc_q_amount: "¿Por cuánto es el reclamo?",
+  sc_q_county: "¿En qué condado está (o estará) el caso?",
+  sc_q_hearing: "¿Hay una fecha de audiencia programada?",
+  sc_q_hearing_date: "¿Cuál es la fecha?",
+  sc_q_desc: "Brevemente, ¿de qué se trata la disputa? (opcional)",
+
+  // Step 3 — Guardianship
+  guard_q_type: "¿Para qué tipo de tutela necesita documentos?",
+  guard_q_relation: "¿Cuál es su relación con el menor?",
+  guard_q_county: "¿En qué condado presentará?",
+  guard_q_courtdate: "¿Hay una fecha de audiencia programada, o es urgente?",
+  guard_q_courtdate_date: "¿Cuál es la fecha?",
+
+  // Step 3 — Deeds & Property Transfers
+  deed_q_type: "¿Qué tipo de escritura necesita preparar?",
+  deed_q_reason: "¿Para qué es la transferencia?",
+  deed_q_county: "¿En qué condado está la propiedad?",
+  deed_q_count: "¿Cuántas propiedades se están transfiriendo?",
+
   // Step 3 — Generic
   branch_no_service: "Por favor seleccione un servicio en el paso anterior.",
 
@@ -835,6 +939,22 @@ const es: Dict = {
   rs_tax_deadline: "Fecha límite de impuestos",
   rs_tax_notes: "Notas de impuestos",
   rs_description: "Descripción",
+  rs_wills_for: "Documentos para",
+  rs_wills_documents: "Documentos necesarios",
+  rs_existing_will: "Testamento/directiva existente",
+  rs_probate_relation: "Relación con el difunto",
+  rs_probate_will: "Dejó testamento",
+  rs_estate_value: "Valor del patrimonio",
+  rs_name_change_for: "Cambio de nombre para",
+  rs_name_change_reason: "Razón",
+  rs_court_date: "Fecha de audiencia",
+  rs_small_claims_role: "Situación",
+  rs_claim_amount: "Cantidad del reclamo",
+  rs_hearing_date: "Fecha de audiencia",
+  rs_guardianship_type: "Tipo de tutela",
+  rs_guardianship_relation: "Relación con el menor",
+  rs_deed_type: "Tipo de escritura",
+  rs_deed_reason: "Razón de la transferencia",
   rs_your_county: "Su condado",
   rs_heard_via: "Se enteró de nosotros vía",
   rs_referred_by: "Referido por",
@@ -1071,6 +1191,117 @@ export const OPTION_LABELS: Record<string, { en: string; es: string }> = {
   "Social Media": { en: "Social Media", es: "Redes sociales" },
   Referral: { en: "Referral", es: "Referencia" },
   Nextdoor: { en: "Nextdoor", es: "Nextdoor" },
+
+  // Wills & Health Care Directives
+  "Myself and spouse/partner": {
+    en: "Myself and spouse/partner",
+    es: "Para mí y mi cónyuge/pareja",
+  },
+  "Last Will & Testament only": {
+    en: "Last Will & Testament only",
+    es: "Solo Testamento",
+  },
+  "Health Care Directive only": {
+    en: "Health Care Directive only",
+    es: "Solo Directiva de Atención Médica",
+  },
+  "Both will and directive": {
+    en: "Both will and directive",
+    es: "Testamento y directiva",
+  },
+  // ("Not sure yet" defined above with the divorce options)
+
+  // Probate
+  "Under $200,000": { en: "Under $200,000", es: "Menos de $200,000" },
+  "$200,000 – $500,000": {
+    en: "$200,000 – $500,000",
+    es: "$200,000 – $500,000",
+  },
+  "Over $500,000": { en: "Over $500,000", es: "Más de $500,000" },
+
+  // Name change ("Myself" defined above with the immigration options)
+  "My child": { en: "My child", es: "Mi hijo/a" },
+  "Myself and my child": {
+    en: "Myself and my child",
+    es: "Para mí y mi hijo/a",
+  },
+  "Marriage or divorce related": {
+    en: "Marriage or divorce related",
+    es: "Relacionado con matrimonio o divorcio",
+  },
+  "Personal preference": {
+    en: "Personal preference",
+    es: "Preferencia personal",
+  },
+  "Gender identity": { en: "Gender identity", es: "Identidad de género" },
+  "Other / prefer not to say": {
+    en: "Other / prefer not to say",
+    es: "Otro / prefiero no decir",
+  },
+
+  // Small claims
+  "Filing a claim (plaintiff)": {
+    en: "Filing a claim (plaintiff)",
+    es: "Presentar un reclamo (demandante)",
+  },
+  "Responding to a claim (defendant)": {
+    en: "Responding to a claim (defendant)",
+    es: "Responder a un reclamo (demandado)",
+  },
+  "Collecting a judgment I won": {
+    en: "Collecting a judgment I won",
+    es: "Cobrar una sentencia que gané",
+  },
+  "Under $2,500": { en: "Under $2,500", es: "Menos de $2,500" },
+  "$2,500 – $7,500": { en: "$2,500 – $7,500", es: "$2,500 – $7,500" },
+  "$7,500 – $12,500": { en: "$7,500 – $12,500", es: "$7,500 – $12,500" },
+  "Over $12,500": { en: "Over $12,500", es: "Más de $12,500" },
+
+  // Guardianship
+  "Guardianship of the person (care & custody)": {
+    en: "Guardianship of the person (care & custody)",
+    es: "Tutela de la persona (cuidado y custodia)",
+  },
+  "Guardianship of the estate (finances)": {
+    en: "Guardianship of the estate (finances)",
+    es: "Tutela del patrimonio (finanzas)",
+  },
+  Grandparent: { en: "Grandparent", es: "Abuelo/a" },
+  "Aunt/uncle": { en: "Aunt/uncle", es: "Tío/a" },
+  Sibling: { en: "Sibling", es: "Hermano/a" },
+  "Other relative": { en: "Other relative", es: "Otro familiar" },
+  "Family friend": { en: "Family friend", es: "Amigo de la familia" },
+
+  // Deeds
+  "Quitclaim Deed": {
+    en: "Quitclaim Deed",
+    es: "Escritura de Finiquito (Quitclaim)",
+  },
+  "Grant Deed": { en: "Grant Deed", es: "Escritura de Concesión (Grant Deed)" },
+  "Interspousal Transfer Deed": {
+    en: "Interspousal Transfer Deed",
+    es: "Escritura de Transferencia Interconyugal",
+  },
+  "Trust Transfer Deed": {
+    en: "Trust Transfer Deed",
+    es: "Escritura de Transferencia a Fideicomiso",
+  },
+  "Add or remove a spouse": {
+    en: "Add or remove a spouse",
+    es: "Agregar o quitar a un cónyuge",
+  },
+  "Transfer into a living trust": {
+    en: "Transfer into a living trust",
+    es: "Transferir a un fideicomiso en vida",
+  },
+  "Divorce settlement": {
+    en: "Divorce settlement",
+    es: "Acuerdo de divorcio",
+  },
+  "Family gift or transfer": {
+    en: "Family gift or transfer",
+    es: "Regalo o transferencia familiar",
+  },
 };
 
 export function optionLabel(value: string, lang: Language): string {
@@ -1107,6 +1338,30 @@ export const SERVICE_NAME_TRANSLATIONS: Record<string, { en: string; es: string 
   "Tax Document Organization (Clerical)": {
     en: "Tax Document Organization (Clerical)",
     es: "Organización de Documentos de Impuestos (Clerical)",
+  },
+  "Wills & Health Care Directives": {
+    en: "Wills & Health Care Directives",
+    es: "Testamentos y Directivas de Atención Médica",
+  },
+  "Probate Documents": {
+    en: "Probate Documents",
+    es: "Documentos de Sucesión (Probate)",
+  },
+  "Legal Name Change": {
+    en: "Legal Name Change",
+    es: "Cambio de Nombre Legal",
+  },
+  "Small Claims Paperwork": {
+    en: "Small Claims Paperwork",
+    es: "Trámites de Reclamos Menores",
+  },
+  "Guardianship Documents": {
+    en: "Guardianship Documents",
+    es: "Documentos de Tutela",
+  },
+  "Deeds & Property Transfers": {
+    en: "Deeds & Property Transfers",
+    es: "Escrituras y Transferencias de Propiedad",
   },
   "Other / Not Sure": {
     en: "Other / Not Sure",

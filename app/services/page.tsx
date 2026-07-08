@@ -13,6 +13,29 @@ import { CTABanner } from "@/components/sections/CTABanner";
 import { LANG_COOKIE } from "@/lib/language-context";
 import { translations, type Language } from "@/lib/translations";
 
+// A-to-Z items that have a dedicated service page, keyed by the ENGLISH item
+// text (the EN/ES arrays are parallel, so the index maps localized items back
+// to these keys). Internal links here pass topical relevance to the pages.
+const ITEM_LINKS: Record<string, string> = {
+  "Divorce & legal separation": "divorce-family-law",
+  "Child custody & visitation": "divorce-family-law",
+  "Child & spousal support (and modifications)": "divorce-family-law",
+  "Marital settlement agreements": "divorce-family-law",
+  Guardianships: "guardianship",
+  "Name changes": "name-change",
+  "Living trusts": "living-trust",
+  Wills: "wills-health-care-directives",
+  "Certification of trust": "living-trust",
+  "Health care directives": "wills-health-care-directives",
+  "Powers of attorney": "power-of-attorney",
+  Probate: "probate-documents",
+  "Evictions / unlawful detainer": "eviction-paperwork",
+  "Deeds & quitclaim deeds": "deeds-property-transfers",
+  "Small claims": "small-claims",
+  "Wage garnishments": "small-claims",
+  "Immigration & citizenship documents": "immigration-documents",
+};
+
 export const metadata: Metadata = {
   title: "Document Preparation Services",
   description:
@@ -157,11 +180,26 @@ export default async function ServicesPage() {
                     {c.title}
                   </h3>
                   <ul className="space-y-1.5 text-sm text-[var(--color-body-dark)]">
-                    {c.items.map((item) => (
-                      <li key={item} className="leading-snug">
-                        {item}
-                      </li>
-                    ))}
+                    {/* EN/ES item arrays are parallel, so the English item at
+                        the same index keys the link lookup while the localized
+                        text is displayed. */}
+                    {c.items.map((item, i) => {
+                      const slug = ITEM_LINKS[cat.items[i]];
+                      return (
+                        <li key={item} className="leading-snug">
+                          {slug ? (
+                            <Link
+                              href={`/services/${slug}`}
+                              className="hover:text-[var(--color-gold)] underline decoration-[var(--color-border-light)] underline-offset-2 transition-colors"
+                            >
+                              {item}
+                            </Link>
+                          ) : (
+                            item
+                          )}
+                        </li>
+                      );
+                    })}
                   </ul>
                 </div>
               );

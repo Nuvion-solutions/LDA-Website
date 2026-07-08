@@ -49,6 +49,25 @@ const SERVICE_AREA = [
   "Sacramento County, California",
 ];
 
+// Topical clusters for the "Related services" section — internal links that
+// pass relevance between related pages (e.g. probate ↔ wills ↔ trusts) and
+// give visitors who landed on the wrong page a next step instead of a dead end.
+const RELATED_SERVICES: Record<string, string[]> = {
+  divorce: ["name-change", "deeds", "guardianship"],
+  eviction: ["small-claims", "deeds"],
+  immigration: ["name-change", "power-of-attorney"],
+  "living-trust": ["wills", "deeds", "probate"],
+  "power-of-attorney": ["wills", "living-trust"],
+  dmv: ["power-of-attorney", "tax-organization"],
+  "tax-organization": ["dmv", "small-claims"],
+  wills: ["living-trust", "probate", "power-of-attorney"],
+  probate: ["wills", "living-trust", "deeds"],
+  "name-change": ["divorce", "immigration"],
+  "small-claims": ["eviction", "deeds"],
+  guardianship: ["wills", "divorce", "power-of-attorney"],
+  deeds: ["living-trust", "probate", "divorce"],
+};
+
 export function generateStaticParams() {
   return SERVICES.map((s) => ({ slug: s.slug }));
 }
@@ -115,6 +134,31 @@ export default async function ServiceDetailPage({
     },
   };
 
+  const related = (RELATED_SERVICES[service.id] ?? [])
+    .map((id) => SERVICES.find((s) => s.id === id))
+    .filter((s): s is NonNullable<typeof s> => Boolean(s));
+
+  // Breadcrumb trail (Home → Services → this page) for search result display.
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Services",
+        item: `${SITE_URL}/services`,
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: service.title,
+        item: `${SITE_URL}/services/${slug}`,
+      },
+    ],
+  };
+
   // FAQPage schema for services that carry FAQs. Google requires the marked-up
   // Q&As to be visible on the page — the section below renders the same data.
   const faqLd =
@@ -135,6 +179,10 @@ export default async function ServiceDetailPage({
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
       />
       {faqLd && (
         <script
@@ -272,6 +320,41 @@ export default async function ServiceDetailPage({
             {dict.services_page_get_help} {title.split(" ")[0]}
             <ArrowRight className="h-4 w-4" aria-hidden />
           </Link>
+
+          {/* Related services — topical internal links */}
+          {related.length > 0 && (
+            <div className="mt-14 pt-10 border-t border-[var(--color-border-light)]">
+              <h2 className="text-xs uppercase tracking-[0.18em] text-[var(--color-navy)] opacity-60 mb-5">
+                {lang === "es" ? "Servicios relacionados" : "Related services"}
+              </h2>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {related.map((r) => {
+                  const RIcon = r.icon;
+                  return (
+                    <Link
+                      key={r.slug}
+                      href={`/services/${r.slug}`}
+                      className="group flex items-start gap-3 border border-[var(--color-border-light)] rounded-sm p-4 hover:border-[var(--color-gold)] transition-colors"
+                    >
+                      <RIcon
+                        className="h-5 w-5 mt-0.5 text-[var(--color-gold)] shrink-0"
+                        aria-hidden
+                        strokeWidth={1.5}
+                      />
+                      <span>
+                        <span className="block text-sm font-medium text-[var(--color-navy)] group-hover:text-[var(--color-gold)] transition-colors">
+                          {localized(r, "title", lang)}
+                        </span>
+                        <span className="mt-1 block text-xs text-[var(--color-body-dark)] opacity-80 leading-snug">
+                          {localized(r, "short", lang)}
+                        </span>
+                      </span>
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
       </section>
 

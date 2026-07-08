@@ -11,8 +11,6 @@ export type UrgencyTag =
 
 type UrgencyInput = {
   primaryService?: string;
-  immigrationHasDeadline?: string;
-  immigrationDeadlineDate?: string;
   dmvHasAppointment?: string;
   dmvAppointmentDate?: string;
   taxHasDeadline?: string;
@@ -35,10 +33,6 @@ type UrgencyInput = {
  */
 export function getDeadlineDate(data: UrgencyInput): string | null {
   switch (data.primaryService) {
-    case "Immigration Documents":
-      return data.immigrationHasDeadline === "Yes"
-        ? data.immigrationDeadlineDate || null
-        : null;
     case "DMV Form Assistance":
       return data.dmvHasAppointment === "Yes"
         ? data.dmvAppointmentDate || null

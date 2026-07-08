@@ -290,16 +290,6 @@ const en = {
   evi_q_rent: "Approximate monthly rent amount",
   evi_q_rent_placeholder: "Select range…",
 
-  // Step 3 — Immigration
-  imm_q_forms: "What type of immigration form do you need help preparing?",
-  imm_q_forms_other: "Please describe which other form(s)",
-  imm_q_for_whom: "Is this application for yourself or a family member?",
-  imm_q_status: "What is your current immigration status?",
-  imm_q_status_placeholder: "Select status…",
-  imm_q_deadline: "Do you have a filing deadline or appointment date?",
-  imm_q_deadline_date: "What is the date?",
-  imm_q_previously_filed: "Have you previously filed any immigration forms?",
-
   // Step 3 — Living Trust
   trust_q_type: "Is this trust for an individual or a couple?",
   trust_q_minors:
@@ -415,12 +405,7 @@ const en = {
   rs_property_county: "Property county",
   rs_tenant_vacated: "Tenant vacated",
   rs_monthly_rent: "Monthly rent",
-  rs_immigration_forms: "Immigration forms",
-  rs_other_forms_detail: "Other forms detail",
-  rs_application_for: "Application for",
-  rs_immigration_status: "Immigration status",
   rs_deadline: "Deadline",
-  rs_previously_filed: "Previously filed",
   rs_trust_for: "Trust for",
   rs_minor_beneficiaries: "Minor beneficiaries",
   rs_owns_real_property: "Owns real property",
@@ -782,19 +767,6 @@ const es: Dict = {
   evi_q_rent: "Monto aproximado de alquiler mensual",
   evi_q_rent_placeholder: "Seleccione rango…",
 
-  // Step 3 — Immigration
-  imm_q_forms:
-    "¿Qué tipo de formulario de inmigración necesita ayuda para preparar?",
-  imm_q_forms_other: "Por favor describa cuál(es) otro(s) formulario(s)",
-  imm_q_for_whom: "¿Esta solicitud es para usted o un familiar?",
-  imm_q_status: "¿Cuál es su estatus migratorio actual?",
-  imm_q_status_placeholder: "Seleccione estatus…",
-  imm_q_deadline:
-    "¿Tiene una fecha límite de presentación o fecha de cita?",
-  imm_q_deadline_date: "¿Cuál es la fecha?",
-  imm_q_previously_filed:
-    "¿Ha presentado formularios de inmigración previamente?",
-
   // Step 3 — Living Trust
   trust_q_type: "¿Este fideicomiso es para un individuo o una pareja?",
   trust_q_minors:
@@ -915,12 +887,7 @@ const es: Dict = {
   rs_property_county: "Condado de la propiedad",
   rs_tenant_vacated: "Inquilino desocupó",
   rs_monthly_rent: "Alquiler mensual",
-  rs_immigration_forms: "Formularios de inmigración",
-  rs_other_forms_detail: "Detalle de otros formularios",
-  rs_application_for: "Solicitud para",
-  rs_immigration_status: "Estatus migratorio",
   rs_deadline: "Fecha límite",
-  rs_previously_filed: "Presentado previamente",
   rs_trust_for: "Fideicomiso para",
   rs_minor_beneficiaries: "Beneficiarios menores",
   rs_owns_real_property: "Posee bienes inmuebles",
@@ -1052,42 +1019,6 @@ export const OPTION_LABELS: Record<string, { en: string; es: string }> = {
   "$3,000+": { en: "$3,000+", es: "$3,000+" },
   "Prefer not to say": { en: "Prefer not to say", es: "Prefiero no decir" },
 
-  // Immigration statuses
-  "US Citizen": { en: "US Citizen", es: "Ciudadano estadounidense" },
-  "Lawful Permanent Resident": {
-    en: "Lawful Permanent Resident",
-    es: "Residente Permanente Legal",
-  },
-  DACA: { en: "DACA", es: "DACA" },
-  Pending: { en: "Pending", es: "En trámite" },
-  "Visa holder": { en: "Visa holder", es: "Titular de visa" },
-
-  // Immigration forms (display only — values stay English for GHL)
-  "I-130 (Petition for Alien Relative)": {
-    en: "I-130 (Petition for Alien Relative)",
-    es: "I-130 (Petición para Familiar)",
-  },
-  "I-485 (Adjustment of Status)": {
-    en: "I-485 (Adjustment of Status)",
-    es: "I-485 (Ajuste de Estatus)",
-  },
-  "N-400 (Naturalization Application)": {
-    en: "N-400 (Naturalization Application)",
-    es: "N-400 (Solicitud de Naturalización)",
-  },
-  "I-131 (Travel Document/Advance Parole)": {
-    en: "I-131 (Travel Document/Advance Parole)",
-    es: "I-131 (Documento de Viaje/Permiso Adelantado)",
-  },
-  "I-765 (Employment Authorization)": {
-    en: "I-765 (Employment Authorization)",
-    es: "I-765 (Autorización de Empleo)",
-  },
-  "DACA Renewal": { en: "DACA Renewal", es: "Renovación de DACA" },
-  "I-751 (Remove Conditions on Residence)": {
-    en: "I-751 (Remove Conditions on Residence)",
-    es: "I-751 (Remover Condiciones de Residencia)",
-  },
   "Other / Not Sure": { en: "Other / Not Sure", es: "Otro / No estoy seguro" },
 
   // POA types
@@ -1219,7 +1150,7 @@ export const OPTION_LABELS: Record<string, { en: string; es: string }> = {
   },
   "Over $500,000": { en: "Over $500,000", es: "Más de $500,000" },
 
-  // Name change ("Myself" defined above with the immigration options)
+  // Name change
   "My child": { en: "My child", es: "Mi hijo/a" },
   "Myself and my child": {
     en: "Myself and my child",
@@ -1318,10 +1249,6 @@ export const SERVICE_NAME_TRANSLATIONS: Record<string, { en: string; es: string 
   "Eviction (Unlawful Detainer) Paperwork": {
     en: "Eviction (Unlawful Detainer) Paperwork",
     es: "Trámites de Desalojo (Unlawful Detainer)",
-  },
-  "Immigration Documents": {
-    en: "Immigration Documents",
-    es: "Documentos de Inmigración",
   },
   "Living Trust Documents": {
     en: "Living Trust Documents",

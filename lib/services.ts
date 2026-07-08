@@ -1,7 +1,6 @@
 import {
   Scale,
   Home,
-  Plane,
   FileSignature,
   Stamp,
   Car,
@@ -87,28 +86,6 @@ export const SERVICES: Service[] = [
     who: "For landlords who need eviction paperwork prepared correctly.",
     whoEs:
       "Para propietarios que necesitan trámites de desalojo preparados correctamente.",
-  },
-  {
-    id: "immigration",
-    slug: "immigration-documents",
-    title: "Immigration Documents",
-    titleEs: "Documentos de Inmigración",
-    short:
-      "USCIS forms including I-130, I-485, N-400, I-131, and supporting paperwork.",
-    shortEs:
-      "Formularios USCIS incluyendo I-130, I-485, N-400, I-131 y documentación de apoyo.",
-    icon: Plane,
-    what:
-      "Document preparation assistance for individuals completing their own USCIS filings.",
-    whatEs:
-      "Asistencia en la preparación de documentos para personas que presentan sus propias solicitudes ante USCIS.",
-    documents:
-      "USCIS forms including I-130, I-485, N-400, I-131, and related supporting documentation.",
-    documentsEs:
-      "Formularios USCIS incluyendo I-130, I-485, N-400, I-131 y documentación de apoyo relacionada.",
-    who: "For individuals preparing their own immigration paperwork.",
-    whoEs:
-      "Para personas que preparan sus propios trámites de inmigración.",
   },
   {
     id: "living-trust",
@@ -493,10 +470,10 @@ export const SERVICES: Service[] = [
 const HOMEPAGE_IDS = [
   "divorce",
   "eviction",
-  "immigration",
   "living-trust",
   "wills",
   "probate",
+  "power-of-attorney",
 ];
 export const HOMEPAGE_SERVICES = HOMEPAGE_IDS.map(
   (id) => SERVICES.find((s) => s.id === id)!,
@@ -607,12 +584,6 @@ export const ADDITIONAL_SERVICE_CATEGORIES: ServiceCategory[] = [
     titleEs: "Negocios",
     items: ["Corporations, partnerships & LLCs"],
     itemsEs: ["Corporaciones, sociedades y LLCs"],
-  },
-  {
-    title: "Immigration",
-    titleEs: "Inmigración",
-    items: ["Immigration & citizenship documents"],
-    itemsEs: ["Documentos de inmigración y ciudadanía"],
   },
   {
     title: "Other Document Services",

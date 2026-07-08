@@ -26,7 +26,6 @@ import { translations, type Language } from "@/lib/translations";
 const CHECKLIST_KEYS: Record<string, string> = {
   divorce: "Divorce & Family Law Documents",
   eviction: "Eviction (Unlawful Detainer) Paperwork",
-  immigration: "Immigration Documents",
   "living-trust": "Living Trust Documents",
   "power-of-attorney": "Power of Attorney",
   dmv: "DMV Form Assistance",
@@ -55,14 +54,13 @@ const SERVICE_AREA = [
 const RELATED_SERVICES: Record<string, string[]> = {
   divorce: ["name-change", "deeds", "guardianship"],
   eviction: ["small-claims", "deeds"],
-  immigration: ["name-change", "power-of-attorney"],
   "living-trust": ["wills", "deeds", "probate"],
   "power-of-attorney": ["wills", "living-trust"],
   dmv: ["power-of-attorney", "tax-organization"],
   "tax-organization": ["dmv", "small-claims"],
   wills: ["living-trust", "probate", "power-of-attorney"],
   probate: ["wills", "living-trust", "deeds"],
-  "name-change": ["divorce", "immigration"],
+  "name-change": ["divorce", "wills"],
   "small-claims": ["eviction", "deeds"],
   guardianship: ["wills", "divorce", "power-of-attorney"],
   deeds: ["living-trust", "probate", "divorce"],

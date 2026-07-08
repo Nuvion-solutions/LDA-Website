@@ -58,7 +58,7 @@ export function StructuredData() {
     name: BUSINESS.name,
     alternateName: "California Legal Document Excellence",
     description:
-      "Registered Legal Document Assistant (LDA #87, Sonoma County) providing professional document preparation services for divorce, eviction, immigration, living trusts, wills and health care directives, probate, legal name changes, small claims, guardianship, deeds and property transfers, power of attorney, DMV forms, and tax document organization. Not a law firm; we do not provide legal advice or representation.",
+      "Registered Legal Document Assistant (LDA #87, Sonoma County) providing professional document preparation services for divorce, eviction, living trusts, wills and health care directives, probate, legal name changes, small claims, guardianship, deeds and property transfers, power of attorney, DMV forms, and tax document organization. Not a law firm; we do not provide legal advice or representation.",
     url: SITE_URL,
     // The auto-generated brand images double as the org logo/image so Google's
     // Knowledge Panel and local results have something to render.

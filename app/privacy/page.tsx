@@ -43,7 +43,7 @@ const CONTENT: Record<Language, Content> = {
         heading: "Information We Collect",
         paragraphs: [
           "When you contact us or complete our intake form, we collect the information you choose to provide. This includes your name, phone number, email address, preferred contact method, and details about the document preparation services you are requesting.",
-          "Depending on the service, our intake form may ask for sensitive details you voluntarily share — such as information about your family, marriage, children, property, finances, immigration status, or rental situation. You decide what to share; you may leave optional fields blank or contact us by phone instead.",
+          "Depending on the service, our intake form may ask for sensitive details you voluntarily share — such as information about your family, marriage, children, property, finances, or rental situation. You decide what to share; you may leave optional fields blank or contact us by phone instead.",
           "We also automatically receive limited technical information, such as your browser type and the pages you view, through standard website operation and our hosting provider.",
         ],
       },

@@ -77,38 +77,6 @@ export const SERVICE_CHECKLISTS: Record<string, ServiceChecklist> = {
     noteEs:
       "Si ya entregó un aviso, traiga una copia — la fecha y el método de entrega son importantes para los trámites.",
   },
-  "Immigration Documents": {
-    title: "Documents to Gather for Your Immigration Paperwork",
-    intro:
-      "The exact documents needed depend on which forms you're filing, but generally you'll need:",
-    items: [
-      "Valid government-issued photo ID",
-      "Passport (yours and any family members involved)",
-      "Birth certificates for all applicants",
-      "Marriage certificate (if filing for a spouse)",
-      "Any prior immigration documents (visa, green card, prior applications)",
-      "USCIS receipt notices for any pending applications",
-      "Proof of address (utility bill, lease, bank statement)",
-      "Two passport-sized photos per applicant",
-    ],
-    note:
-      "Immigration forms have specific photo and document requirements. We'll confirm exactly what's needed for your specific forms when we follow up.",
-    titleEs: "Documentos a Reunir para Sus Trámites de Inmigración",
-    introEs:
-      "Los documentos exactos necesarios dependen de los formularios que presente, pero generalmente necesitará:",
-    itemsEs: [
-      "Identificación con foto válida emitida por el gobierno",
-      "Pasaporte (suyo y de los familiares involucrados)",
-      "Certificados de nacimiento de todos los solicitantes",
-      "Certificado de matrimonio (si presenta para un cónyuge)",
-      "Cualquier documento de inmigración previo (visa, residencia, solicitudes anteriores)",
-      "Avisos de recibo de USCIS para cualquier solicitud pendiente",
-      "Comprobante de domicilio (factura de servicios, contrato, estado bancario)",
-      "Dos fotos tamaño pasaporte por solicitante",
-    ],
-    noteEs:
-      "Los formularios de inmigración tienen requisitos específicos de fotos y documentos. Confirmaremos exactamente qué se necesita para sus formularios específicos cuando le contactemos.",
-  },
   "Living Trust Documents": {
     title: "Documents to Gather for Your Living Trust",
     intro: "To prepare your trust documents, please gather:",

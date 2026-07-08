@@ -50,15 +50,6 @@ type IntakeBody = {
   evictionTenantVacated?: string;
   evictionRent?: string;
 
-  // Step 3 — Immigration
-  immigrationForms?: string[];
-  immigrationFormsOther?: string;
-  immigrationForWhom?: string;
-  immigrationStatus?: string;
-  immigrationHasDeadline?: string;
-  immigrationDeadlineDate?: string;
-  immigrationPreviouslyFiled?: string;
-
   // Step 3 — Living Trust
   trustType?: string;
   trustHasMinors?: string;
@@ -213,14 +204,6 @@ function buildSections(data: IntakeBody): Section[] {
         { label: "County", value: data.evictionCounty },
         { label: "Tenant vacated", value: data.evictionTenantVacated },
         { label: "Monthly rent", value: data.evictionRent },
-        // Immigration
-        { label: "Forms", value: join(data.immigrationForms) },
-        { label: "Forms (other)", value: data.immigrationFormsOther },
-        { label: "For whom", value: data.immigrationForWhom },
-        { label: "Current status", value: data.immigrationStatus },
-        { label: "Has deadline", value: data.immigrationHasDeadline },
-        { label: "Deadline date", value: data.immigrationDeadlineDate },
-        { label: "Previously filed", value: data.immigrationPreviouslyFiled },
         // Living Trust
         { label: "Trust type", value: data.trustType },
         { label: "Has minor children", value: data.trustHasMinors },
@@ -632,7 +615,7 @@ function spamReason(data: IntakeBody, partial: boolean): string | null {
       data.dmvDetails,
       data.taxNotes,
       data.poaReason,
-      data.immigrationFormsOther,
+      data.smallClaimsDescription,
       data.firstName,
       data.lastName,
     )

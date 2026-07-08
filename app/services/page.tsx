@@ -33,18 +33,17 @@ const ITEM_LINKS: Record<string, string> = {
   "Deeds & quitclaim deeds": "deeds-property-transfers",
   "Small claims": "small-claims",
   "Wage garnishments": "small-claims",
-  "Immigration & citizenship documents": "immigration-documents",
 };
 
 export const metadata: Metadata = {
   title: "Document Preparation Services",
   description:
-    "Document preparation for divorce & family law, evictions, immigration, living trusts, wills, probate, powers of attorney, name changes, small claims, deeds & more. Registered LDA #87 serving Sonoma County & the North Bay.",
+    "Document preparation for divorce & family law, evictions, living trusts, wills, probate, powers of attorney, name changes, small claims, deeds & more. Registered LDA #87 serving Sonoma County & the North Bay.",
   alternates: { canonical: "/services" },
   openGraph: {
     title: "Document Preparation Services | California Legal Document Excellence",
     description:
-      "Divorce, eviction, immigration, living trust, power of attorney, DMV & tax document preparation. Registered LDA #87, Sonoma County.",
+      "Divorce, eviction, living trust, wills, probate, power of attorney, DMV & tax document preparation. Registered LDA #87, Sonoma County.",
     url: "/services",
     type: "website",
   },

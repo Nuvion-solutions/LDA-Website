@@ -45,7 +45,6 @@ import {
 const PRIMARY_SERVICES = [
   "Divorce & Family Law Documents",
   "Eviction (Unlawful Detainer) Paperwork",
-  "Immigration Documents",
   "Living Trust Documents",
   "Wills & Health Care Directives",
   "Probate Documents",
@@ -196,27 +195,6 @@ const RENT_RANGES = [
   "Prefer not to say",
 ] as const;
 
-const IMMIGRATION_FORM_OPTIONS = [
-  "I-130 (Petition for Alien Relative)",
-  "I-485 (Adjustment of Status)",
-  "N-400 (Naturalization Application)",
-  "I-131 (Travel Document/Advance Parole)",
-  "I-765 (Employment Authorization)",
-  "DACA Renewal",
-  "I-751 (Remove Conditions on Residence)",
-  "Other / Not Sure",
-] as const;
-
-const IMMIGRATION_STATUSES = [
-  "US Citizen",
-  "Lawful Permanent Resident",
-  "DACA",
-  "Pending",
-  "Visa holder",
-  "Other",
-  "Prefer not to say",
-] as const;
-
 const POA_TYPES = [
   "General / Financial Power of Attorney",
   "Durable Power of Attorney",
@@ -346,17 +324,6 @@ const intakeSchema = z
     evictionCounty: z.enum(COUNTIES).optional(),
     evictionTenantVacated: z.enum(["Yes", "No", "Partially"]).optional(),
     evictionRent: z.enum(RENT_RANGES).optional(),
-
-    // Step 3 — Immigration
-    immigrationForms: z.array(z.string()).optional(),
-    immigrationFormsOther: optStr,
-    immigrationForWhom: z
-      .enum(["Myself", "Family member", "Both"])
-      .optional(),
-    immigrationStatus: z.enum(IMMIGRATION_STATUSES).optional(),
-    immigrationHasDeadline: z.enum(["Yes", "No"]).optional(),
-    immigrationDeadlineDate: optDate,
-    immigrationPreviouslyFiled: z.enum(["Yes", "No", "Not sure"]).optional(),
 
     // Step 3 — Living Trust
     trustType: z.enum(["Individual", "Married couple"]).optional(),
@@ -529,16 +496,6 @@ function step3FieldsFor(
         "evictionTenantVacated",
         "evictionRent",
       ];
-    case "Immigration Documents":
-      return [
-        "immigrationForms",
-        "immigrationFormsOther",
-        "immigrationForWhom",
-        "immigrationStatus",
-        "immigrationHasDeadline",
-        "immigrationDeadlineDate",
-        "immigrationPreviouslyFiled",
-      ];
     case "Living Trust Documents":
       return [
         "trustType",
@@ -635,9 +592,6 @@ const ALL_STEP3_FIELDS: FieldName[] = [
   "evictionParty", "evictionPropertyType", "evictionReason",
   "evictionNoticeServed", "evictionNoticeType", "evictionNoticeDate",
   "evictionCounty", "evictionTenantVacated", "evictionRent",
-  "immigrationForms", "immigrationFormsOther", "immigrationForWhom",
-  "immigrationStatus", "immigrationHasDeadline", "immigrationDeadlineDate",
-  "immigrationPreviouslyFiled",
   "trustType", "trustHasMinors", "trustOwnsProperty", "trustPropertyCount",
   "trustHasAssets", "trustExistingDocs", "trustSuccessor",
   "poaTypes", "poaAgent", "poaHasReason", "poaReason", "poaNotarize",
@@ -676,7 +630,6 @@ function prunePayload(data: IntakeData): Record<string, unknown> {
     delete out.evictionNoticeType;
     delete out.evictionNoticeDate;
   }
-  if (out.immigrationHasDeadline !== "Yes") delete out.immigrationDeadlineDate;
   if (out.trustOwnsProperty !== "Yes") delete out.trustPropertyCount;
   if (out.poaHasReason !== "Yes") delete out.poaReason;
   if (out.dmvHasAppointment !== "Yes") delete out.dmvAppointmentDate;
@@ -761,8 +714,6 @@ export function IntakeForm() {
       phone: "",
       email: "",
       additionalServices: [],
-      immigrationForms: [],
-      immigrationFormsOther: "",
       poaTypes: [],
       poaReason: "",
       dmvFormTypes: [],
@@ -774,7 +725,6 @@ export function IntakeForm() {
       divorceChildrenAges: "",
       trustPropertyCount: "",
       evictionNoticeDate: "",
-      immigrationDeadlineDate: "",
       dmvAppointmentDate: "",
       taxDeadlineDate: "",
       probateDeadlineDate: "",
@@ -797,8 +747,6 @@ export function IntakeForm() {
   // updates live as the client fills out Step 3.
   const watchedDeadline = {
     primaryService,
-    immigrationHasDeadline: watch("immigrationHasDeadline"),
-    immigrationDeadlineDate: watch("immigrationDeadlineDate"),
     dmvHasAppointment: watch("dmvHasAppointment"),
     dmvAppointmentDate: watch("dmvAppointmentDate"),
     taxHasDeadline: watch("taxHasDeadline"),
@@ -1757,17 +1705,6 @@ function BranchFields({
           lang={lang}
         />
       );
-    case "Immigration Documents":
-      return (
-        <ImmigrationBranch
-          register={register}
-          control={control}
-          watch={watch}
-          errors={errors}
-          t={t}
-          lang={lang}
-        />
-      );
     case "Living Trust Documents":
       return (
         <TrustBranch
@@ -2134,88 +2071,6 @@ function CheckboxGrid({
       />
       {error && <p className={errorBase}>{error}</p>}
     </fieldset>
-  );
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function ImmigrationBranch({ register, control, watch, errors, t, lang }: any) {
-  const hasDeadline = watch("immigrationHasDeadline");
-  const forms: string[] = watch("immigrationForms") ?? [];
-  const showOther = forms.includes("Other / Not Sure");
-  return (
-    <div className="space-y-6">
-      <CheckboxGrid
-        legend={t("imm_q_forms")}
-        options={IMMIGRATION_FORM_OPTIONS}
-        name="immigrationForms"
-        control={control}
-        error={tErr(errors.immigrationForms?.message, t)}
-        lang={lang}
-      />
-      {showOther && (
-        <Field
-          id="immigrationFormsOther"
-          label={t("imm_q_forms_other")}
-          error={tErr(errors.immigrationFormsOther?.message, t)}
-        >
-          <textarea
-            id="immigrationFormsOther"
-            rows={3}
-            {...register("immigrationFormsOther")}
-            className={inputBase}
-          />
-        </Field>
-      )}
-      <RadioGroup
-        legend={t("imm_q_for_whom")}
-        options={["Myself", "Family member", "Both"]}
-        name="immigrationForWhom"
-        register={register}
-        error={tErr(errors.immigrationForWhom?.message, t)}
-        lang={lang}
-      />
-      <Select
-        id="immigrationStatus"
-        label={t("imm_q_status")}
-        options={IMMIGRATION_STATUSES}
-        register={register}
-        name="immigrationStatus"
-        placeholder={t("imm_q_status_placeholder")}
-        error={tErr(errors.immigrationStatus?.message, t)}
-        lang={lang}
-      />
-      <RadioGroup
-        legend={t("imm_q_deadline")}
-        options={["Yes", "No"]}
-        name="immigrationHasDeadline"
-        register={register}
-        error={tErr(errors.immigrationHasDeadline?.message, t)}
-        lang={lang}
-      />
-      {hasDeadline === "Yes" && (
-        <Field
-          id="immigrationDeadlineDate"
-          label={t("imm_q_deadline_date")}
-          error={tErr(errors.immigrationDeadlineDate?.message, t)}
-        >
-          <input
-            id="immigrationDeadlineDate"
-            type="date"
-            min={new Date().toISOString().slice(0, 10)}
-            {...register("immigrationDeadlineDate")}
-            className={inputBase}
-          />
-        </Field>
-      )}
-      <RadioGroup
-        legend={t("imm_q_previously_filed")}
-        options={["Yes", "No", "Not sure"]}
-        name="immigrationPreviouslyFiled"
-        register={register}
-        error={tErr(errors.immigrationPreviouslyFiled?.message, t)}
-        lang={lang}
-      />
-    </div>
   );
 }
 
@@ -2922,19 +2777,6 @@ function ReviewSummary({
     [t("rs_property_county"), opt(data.evictionCounty)],
     [t("rs_tenant_vacated"), opt(data.evictionTenantVacated)],
     [t("rs_monthly_rent"), opt(data.evictionRent)],
-
-    // Immigration
-    [t("rs_immigration_forms"), optList(data.immigrationForms)],
-    [t("rs_other_forms_detail"), data.immigrationFormsOther],
-    [t("rs_application_for"), opt(data.immigrationForWhom)],
-    [t("rs_immigration_status"), opt(data.immigrationStatus)],
-    [
-      t("rs_deadline"),
-      data.immigrationHasDeadline === "Yes"
-        ? data.immigrationDeadlineDate || optionLabel("Yes", lang)
-        : opt(data.immigrationHasDeadline),
-    ],
-    [t("rs_previously_filed"), opt(data.immigrationPreviouslyFiled)],
 
     // Trust
     [t("rs_trust_for"), opt(data.trustType)],

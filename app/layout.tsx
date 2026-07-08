@@ -28,7 +28,7 @@ const playfair = Playfair_Display({
 
 const TITLE = "Sonoma County Legal Document Assistant | Divorce, Eviction & Trusts";
 const DESCRIPTION =
-  "Registered Legal Document Assistant (LDA #87) in Sonoma County, serving the greater North Bay. Divorce, eviction, immigration, living trusts, power of attorney & more. Call (707) 909-1240.";
+  "Registered Legal Document Assistant (LDA #87) in Sonoma County, serving the greater North Bay. Divorce, eviction, living trusts, wills, probate, power of attorney & more. Call (707) 909-1240.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -49,7 +49,8 @@ export const metadata: Metadata = {
     "document preparation Santa Rosa CA",
     "registered LDA California",
     "living trust preparation",
-    "immigration document preparation",
+    "will preparation Sonoma County",
+    "probate document preparation",
   ],
   authors: [{ name: "California Legal Document Excellence, LLC" }],
   creator: "California Legal Document Excellence, LLC",
@@ -60,7 +61,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: TITLE,
     description:
-      "Registered LDA #87 in Sonoma County, serving the greater North Bay. Divorce, eviction, immigration, living trusts & more. Free consultation.",
+      "Registered LDA #87 in Sonoma County, serving the greater North Bay. Divorce, eviction, living trusts, wills, probate & more. Free consultation.",
     type: "website",
     locale: "en_US",
     url: SITE_URL,
@@ -70,7 +71,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: TITLE,
     description:
-      "Registered LDA #87 in Sonoma County, serving the greater North Bay. Divorce, eviction, trusts, immigration & more.",
+      "Registered LDA #87 in Sonoma County, serving the greater North Bay. Divorce, eviction, trusts, wills, probate & more.",
   },
   robots: {
     index: true,

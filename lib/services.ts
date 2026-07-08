@@ -64,6 +64,32 @@ export const SERVICES: Service[] = [
     who: "For individuals seeking to prepare their own family law paperwork.",
     whoEs:
       "Para personas que buscan preparar sus propios trámites de derecho familiar.",
+    faqs: [
+      {
+        q: "Do I need a lawyer to file for divorce in California?",
+        qEs: "¿Necesito un abogado para solicitar el divorcio en California?",
+        a: "No. California allows you to represent yourself in a divorce, and many uncontested divorces are handled without an attorney. As Registered Legal Document Assistants (LDA #87), we prepare all your forms at your direction — you decide the terms, and we make sure the paperwork is complete and correct for the court.",
+        aEs: "No. California le permite representarse a sí mismo en un divorcio, y muchos divorcios sin oposición se manejan sin abogado. Como Asistentes Legales Registrados (LDA #87), preparamos todos sus formularios según sus instrucciones — usted decide los términos y nosotros nos aseguramos de que los trámites estén completos y correctos para el tribunal.",
+      },
+      {
+        q: "How much does an uncontested divorce cost with an LDA?",
+        qEs: "¿Cuánto cuesta un divorcio sin oposición con un LDA?",
+        a: "Far less than an attorney, who bills by the hour. We charge a flat document-preparation fee, quoted up front after your free intake — separate from the court's filing fee. You'll know the full price before any work begins.",
+        aEs: "Mucho menos que un abogado, que cobra por hora. Cobramos una tarifa fija de preparación de documentos, cotizada por adelantado después de su consulta gratuita — separada de la tarifa de presentación del tribunal. Sabrá el precio completo antes de comenzar cualquier trabajo.",
+      },
+      {
+        q: "How long does a divorce take in California?",
+        qEs: "¿Cuánto tarda un divorcio en California?",
+        a: "California has a mandatory six-month waiting period from the date the responding spouse is served before a divorce can be final. Getting the paperwork right the first time avoids rejections that add months — which is exactly what we prepare for you.",
+        aEs: "California tiene un período de espera obligatorio de seis meses desde la fecha en que se notifica al cónyuge que responde antes de que un divorcio pueda finalizar. Preparar los trámites correctamente desde el principio evita rechazos que agregan meses — que es exactamente lo que preparamos para usted.",
+      },
+      {
+        q: "Can you help with custody, support, and property division?",
+        qEs: "¿Pueden ayudar con la custodia, la manutención y la división de bienes?",
+        a: "Yes. We prepare the child custody, visitation, support, and marital settlement forms that go with a dissolution, at your direction. We can't give legal advice on what to ask for, but we make sure the documents reflect your decisions and meet California's requirements.",
+        aEs: "Sí. Preparamos los formularios de custodia, visitas, manutención y acuerdo matrimonial que acompañan a una disolución, según sus instrucciones. No podemos dar asesoría legal sobre qué pedir, pero nos aseguramos de que los documentos reflejen sus decisiones y cumplan con los requisitos de California.",
+      },
+    ],
   },
   {
     id: "eviction",
@@ -86,6 +112,32 @@ export const SERVICES: Service[] = [
     who: "For landlords who need eviction paperwork prepared correctly.",
     whoEs:
       "Para propietarios que necesitan trámites de desalojo preparados correctamente.",
+    faqs: [
+      {
+        q: "How do I start an eviction in California?",
+        qEs: "¿Cómo inicio un desalojo en California?",
+        a: "It starts with serving the correct written notice (for example, a 3-Day Notice to Pay or Quit), and if the tenant doesn't comply, filing an unlawful detainer case. We prepare the notice and the court forms at your direction — getting them exactly right matters, because a single error can force you to restart the whole process.",
+        aEs: "Comienza con la entrega del aviso escrito correcto (por ejemplo, un Aviso de 3 días para Pagar o Desalojar), y si el inquilino no cumple, presentando un caso de desalojo (unlawful detainer). Preparamos el aviso y los formularios judiciales según sus instrucciones — hacerlos exactamente bien es importante, porque un solo error puede obligarle a reiniciar todo el proceso.",
+      },
+      {
+        q: "How long does an eviction take?",
+        qEs: "¿Cuánto tarda un desalojo?",
+        a: "An uncontested California unlawful detainer often resolves in roughly 30–45 days, but a mistake in the notice or paperwork can add weeks or restart the clock. Correct documents are the single biggest thing you control — which is what we prepare.",
+        aEs: "Un desalojo sin oposición en California a menudo se resuelve en aproximadamente 30 a 45 días, pero un error en el aviso o los trámites puede agregar semanas o reiniciar el reloj. Los documentos correctos son lo más importante que usted controla — que es lo que preparamos.",
+      },
+      {
+        q: "Do you serve the tenant or go to court for me?",
+        qEs: "¿Notifican al inquilino o van al tribunal por mí?",
+        a: "No. We prepare the documents; you file them and arrange service as required. We are not attorneys and don't provide legal representation — but we make sure every form is complete and correctly formatted for the court.",
+        aEs: "No. Preparamos los documentos; usted los presenta y coordina la notificación según se requiera. No somos abogados y no brindamos representación legal — pero nos aseguramos de que cada formulario esté completo y con el formato correcto para el tribunal.",
+      },
+      {
+        q: "How much does eviction paperwork cost?",
+        qEs: "¿Cuánto cuestan los trámites de desalojo?",
+        a: "A flat document-preparation fee, quoted up front after your free intake — a fraction of attorney rates, separate from the court's filing fee. If you have a time-sensitive situation, tell us and we'll prioritize it.",
+        aEs: "Una tarifa fija de preparación de documentos, cotizada por adelantado después de su consulta gratuita — una fracción de las tarifas de un abogado, separada de la tarifa de presentación del tribunal. Si tiene una situación urgente, indíquenoslo y le daremos prioridad.",
+      },
+    ],
   },
   {
     id: "living-trust",
@@ -108,6 +160,32 @@ export const SERVICES: Service[] = [
     who: "For individuals who want to prepare their estate planning documents.",
     whoEs:
       "Para personas que desean preparar sus documentos de planificación patrimonial.",
+    faqs: [
+      {
+        q: "What's the difference between a living trust and a will?",
+        qEs: "¿Cuál es la diferencia entre un fideicomiso en vida y un testamento?",
+        a: "A will directs who gets your property but still goes through probate — the public, often lengthy court process. A living trust generally lets your estate pass to your beneficiaries without probate, saving time and cost. We prepare the trust documents at your direction; you decide what goes in it.",
+        aEs: "Un testamento indica quién recibe sus bienes pero aún pasa por la sucesión (probate) — el proceso judicial público y a menudo largo. Un fideicomiso en vida generalmente permite que su patrimonio pase a sus beneficiarios sin sucesión, ahorrando tiempo y costo. Preparamos los documentos del fideicomiso según sus instrucciones; usted decide qué incluir.",
+      },
+      {
+        q: "Does a living trust avoid probate in California?",
+        qEs: "¿Un fideicomiso en vida evita la sucesión en California?",
+        a: "That's the main reason people create one — a properly funded revocable living trust generally lets assets pass to your beneficiaries without going through California probate. Whether it's right for you is a legal decision we can't advise on, but if you direct us to prepare one, we handle the documents.",
+        aEs: "Esa es la razón principal por la que las personas crean uno — un fideicomiso revocable en vida debidamente financiado generalmente permite que los bienes pasen a sus beneficiarios sin pasar por la sucesión de California. Si es adecuado para usted es una decisión legal sobre la que no podemos asesorar, pero si nos indica que preparemos uno, manejamos los documentos.",
+      },
+      {
+        q: "How much does a living trust cost compared to an attorney?",
+        qEs: "¿Cuánto cuesta un fideicomiso en vida comparado con un abogado?",
+        a: "Preparing your trust documents through an LDA typically costs a fraction of law-firm estate-planning fees. After your free intake we quote a flat price up front — no hourly billing.",
+        aEs: "Preparar los documentos de su fideicomiso a través de un LDA normalmente cuesta una fracción de los honorarios de planificación patrimonial de un bufete. Después de su consulta gratuita cotizamos un precio fijo por adelantado — sin facturación por hora.",
+      },
+      {
+        q: "What documents come with a living trust package?",
+        qEs: "¿Qué documentos vienen con un paquete de fideicomiso en vida?",
+        a: "Typically the Revocable Living Trust itself, a Pour-Over Will, a Certification of Trust, and a Schedule of Assets — and we can prepare a trust transfer deed if real estate goes into the trust. You direct what to include.",
+        aEs: "Normalmente el Fideicomiso Revocable en Vida, un Testamento Pour-Over, una Certificación de Fideicomiso y un Inventario de Bienes — y podemos preparar una escritura de transferencia a fideicomiso si incluye bienes inmuebles. Usted indica qué incluir.",
+      },
+    ],
   },
   {
     id: "power-of-attorney",
@@ -130,6 +208,26 @@ export const SERVICES: Service[] = [
     who: "For individuals who need to designate decision-making authority.",
     whoEs:
       "Para personas que necesitan designar autoridad para tomar decisiones.",
+    faqs: [
+      {
+        q: "What is a power of attorney and when do I need one?",
+        qEs: "¿Qué es un poder notarial y cuándo necesito uno?",
+        a: "A power of attorney lets someone you trust (your 'agent') act on your behalf — for finances, or for health care decisions if you become unable to make them. People often set one up before surgery, travel, aging, or simply as part of planning ahead. We prepare the document at your direction.",
+        aEs: "Un poder notarial permite que alguien de su confianza (su 'apoderado') actúe en su nombre — para finanzas, o para decisiones de atención médica si usted no puede tomarlas. Las personas a menudo lo establecen antes de una cirugía, viaje, en la vejez, o simplemente como parte de planificar con anticipación. Preparamos el documento según sus instrucciones.",
+      },
+      {
+        q: "What's the difference between a general and a durable power of attorney?",
+        qEs: "¿Cuál es la diferencia entre un poder general y uno duradero?",
+        a: "A general power of attorney typically ends if you become incapacitated; a durable one stays in effect. Which you need is your decision — we prepare whichever type you direct, correctly formatted for California.",
+        aEs: "Un poder general normalmente termina si usted queda incapacitado; uno duradero permanece vigente. Cuál necesita es su decisión — preparamos el tipo que usted indique, con el formato correcto para California.",
+      },
+      {
+        q: "Does a power of attorney need to be notarized?",
+        qEs: "¿Un poder notarial necesita ser notarizado?",
+        a: "California powers of attorney generally need to be notarized (and sometimes witnessed) to be valid. We prepare the document; you arrange the notarization, which we can point you toward.",
+        aEs: "Los poderes notariales de California generalmente necesitan ser notarizados (y a veces atestiguados) para ser válidos. Preparamos el documento; usted coordina la notarización, hacia la cual podemos orientarle.",
+      },
+    ],
   },
   {
     id: "dmv",
@@ -152,6 +250,26 @@ export const SERVICES: Service[] = [
     who: "For individuals who need help completing DMV and administrative forms accurately.",
     whoEs:
       "Para personas que necesitan ayuda para completar formularios del DMV y administrativos con precisión.",
+    faqs: [
+      {
+        q: "What DMV paperwork can you help with?",
+        qEs: "¿Con qué trámites del DMV pueden ayudar?",
+        a: "Vehicle title transfers, registration forms, address changes, license plate applications, disabled placard applications, and similar administrative paperwork. We complete the forms accurately at your direction — you submit them to the DMV yourself.",
+        aEs: "Transferencias de título de vehículo, formularios de registro, cambios de dirección, solicitudes de placa, solicitudes de placa para discapacitados y trámites administrativos similares. Completamos los formularios con precisión según sus instrucciones — usted los presenta al DMV.",
+      },
+      {
+        q: "Why use a document assistant instead of doing DMV forms myself?",
+        qEs: "¿Por qué usar un asistente de documentos en lugar de hacer los formularios del DMV yo mismo?",
+        a: "DMV rejections over small paperwork errors mean another trip and more waiting. We make sure the forms are filled out correctly the first time, which saves you the repeat visits.",
+        aEs: "Los rechazos del DMV por pequeños errores de papeleo significan otro viaje y más espera. Nos aseguramos de que los formularios se completen correctamente la primera vez, lo que le ahorra las visitas repetidas.",
+      },
+      {
+        q: "Do you submit the forms to the DMV for me?",
+        qEs: "¿Presentan los formularios al DMV por mí?",
+        a: "No — we prepare and organize the paperwork at your direction, and you submit it to the DMV. We're a clerical document-preparation service, not a registration agent.",
+        aEs: "No — preparamos y organizamos los trámites según sus instrucciones, y usted los presenta al DMV. Somos un servicio clerical de preparación de documentos, no un agente de registro.",
+      },
+    ],
   },
   {
     id: "tax-organization",
@@ -174,6 +292,26 @@ export const SERVICES: Service[] = [
     who: "For individuals who need organizational support for their tax documents.",
     whoEs:
       "Para personas que necesitan apoyo de organización para sus documentos de impuestos.",
+    faqs: [
+      {
+        q: "Do you give tax advice or prepare my tax return?",
+        qEs: "¿Dan asesoría fiscal o preparan mi declaración de impuestos?",
+        a: "No. We provide clerical organization and document-preparation support only — we do not give tax advice or act as a tax preparer, and you submit everything yourself. For tax advice you'd see a CPA or tax professional; we help you get your paperwork organized and in order.",
+        aEs: "No. Brindamos solo organización clerical y apoyo en la preparación de documentos — no damos asesoría fiscal ni actuamos como preparadores de impuestos, y usted presenta todo por su cuenta. Para asesoría fiscal consultaría a un contador (CPA) o profesional de impuestos; nosotros le ayudamos a organizar y ordenar sus documentos.",
+      },
+      {
+        q: "What does tax document organization actually include?",
+        qEs: "¿Qué incluye realmente la organización de documentos de impuestos?",
+        a: "Sorting and organizing your records, clerical assembly of documents, and preparation support so your paperwork is complete and orderly — useful before meeting a tax professional or filing yourself.",
+        aEs: "Clasificar y organizar sus registros, ensamblaje clerical de documentos y apoyo en la preparación para que sus trámites estén completos y ordenados — útil antes de reunirse con un profesional de impuestos o presentar por su cuenta.",
+      },
+      {
+        q: "How much does it cost?",
+        qEs: "¿Cuánto cuesta?",
+        a: "A flat clerical fee based on the volume of documents, quoted up front after your free intake. No hourly billing.",
+        aEs: "Una tarifa clerical fija basada en el volumen de documentos, cotizada por adelantado después de su consulta gratuita. Sin facturación por hora.",
+      },
+    ],
   },
   {
     id: "wills",

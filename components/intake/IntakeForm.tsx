@@ -1346,7 +1346,11 @@ export function IntakeForm() {
                 subtitle={t("intake_sub_confirm")}
               />
 
-              <ReviewSummary data={getValues()} t={t} lang={lang} />
+              <ReviewSummary
+                data={prunePayload(getValues()) as Partial<IntakeData>}
+                t={t}
+                lang={lang}
+              />
 
               <div className="mt-8 space-y-4">
                 <label className="flex items-start gap-3 p-4 border border-[var(--color-border-light)] rounded-sm cursor-pointer hover:border-[var(--color-gold)] transition-colors has-checked:border-[var(--color-gold)] has-checked:bg-[var(--color-gold)]/5">

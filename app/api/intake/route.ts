@@ -553,6 +553,7 @@ function spamReason(data: IntakeBody, partial: boolean): string | null {
       data.taxNotes,
       data.poaReason,
       data.smallClaimsDescription,
+      data.referralName,
       data.firstName,
       data.lastName,
     )

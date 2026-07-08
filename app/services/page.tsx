@@ -7,7 +7,6 @@ import {
   ADDITIONAL_SERVICE_CATEGORIES,
   localizedCategory,
 } from "@/lib/services";
-import { SHORT_DISCLAIMER } from "@/lib/utils";
 import { CTABanner } from "@/components/sections/CTABanner";
 import { translations } from "@/lib/translations";
 import { getServerLocale } from "@/lib/server-locale";
@@ -70,7 +69,7 @@ export default async function ServicesPage() {
             {dict.services_page_sub}
           </p>
           <p className="mt-4 text-xs text-[var(--color-muted-light)] max-w-2xl">
-            {SHORT_DISCLAIMER}
+            {dict.short_disclaimer}
           </p>
         </div>
       </section>

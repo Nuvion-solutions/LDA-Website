@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { ShieldCheck } from "lucide-react";
-import { BUSINESS, FULL_DISCLAIMER } from "@/lib/utils";
+import { BUSINESS } from "@/lib/utils";
 import { CTABanner } from "@/components/sections/CTABanner";
 import { translations } from "@/lib/translations";
 import { getServerLocale } from "@/lib/server-locale";
@@ -26,17 +26,24 @@ const TEAM = [
   {
     name: "Carson C. Newton",
     role: "Principal/Founder",
+    roleEs: "Principal/Fundador",
     bio: "Co-founder and principal of California Legal Document Excellence, LLC. Oversees document preparation operations and quality standards.",
+    bioEs:
+      "Cofundador y principal de California Legal Document Excellence, LLC. Supervisa las operaciones de preparación de documentos y los estándares de calidad.",
   },
   {
     name: "S. Khan",
     role: "Principal/Founder",
+    roleEs: "Principal/Fundador",
     bio: "Co-founder and principal of California Legal Document Excellence, LLC.",
+    bioEs: "Cofundador y principal de California Legal Document Excellence, LLC.",
   },
   {
     name: "A. Khan",
     role: "Principal/Founder",
+    roleEs: "Principal/Fundador",
     bio: "Co-founder and principal of California Legal Document Excellence, LLC.",
+    bioEs: "Cofundador y principal de California Legal Document Excellence, LLC.",
   },
 ];
 
@@ -92,10 +99,10 @@ export default async function AboutPage() {
                   {member.name}
                 </h3>
                 <p className="text-sm uppercase tracking-[0.15em] text-[var(--color-gold)] mb-4 font-medium">
-                  {member.role}
+                  {lang === "es" ? member.roleEs : member.role}
                 </p>
                 <p className="text-[var(--color-body-dark)] leading-relaxed text-sm md:text-base opacity-90">
-                  {member.bio}
+                  {lang === "es" ? member.bioEs : member.bio}
                 </p>
               </article>
             ))}
@@ -133,7 +140,7 @@ export default async function AboutPage() {
                   {dict.about_disclosure_title}
                 </h2>
                 <p className="text-[var(--color-body-light)] leading-relaxed">
-                  {FULL_DISCLAIMER}
+                  {dict.full_disclaimer}
                 </p>
               </div>
             </div>

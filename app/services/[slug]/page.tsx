@@ -10,7 +10,7 @@ import {
   checklistItems,
   checklistNote,
 } from "@/lib/checklists";
-import { BUSINESS, SHORT_DISCLAIMER } from "@/lib/utils";
+import { BUSINESS } from "@/lib/utils";
 import { SITE_URL } from "@/lib/site";
 import { CTABanner } from "@/components/sections/CTABanner";
 import { translations } from "@/lib/translations";
@@ -120,14 +120,19 @@ export default async function ServiceDetailPage({
   const Icon = service.icon;
   const checklist = SERVICE_CHECKLISTS[CHECKLIST_KEYS[service.id]];
 
+  // Structured data must match the language of the page it's on, so on /es it
+  // uses the localized names/descriptions and the /es URLs.
+  const localePrefix = lang === "es" ? "/es" : "";
+  const pageUrl = `${SITE_URL}${localePrefix}/services/${slug}`;
+
   // Per-service structured data, linked to the site-wide LegalService entity.
   const serviceLd = {
     "@context": "https://schema.org",
     "@type": "Service",
-    name: service.title,
+    name: title,
     serviceType: "Document Preparation",
-    description: service.what,
-    url: `${SITE_URL}/services/${slug}`,
+    description: localized(service, "what", lang),
+    url: pageUrl,
     areaServed: SERVICE_AREA.map((name) => ({ "@type": "Place", name })),
     provider: {
       "@type": "LegalService",
@@ -145,24 +150,30 @@ export default async function ServiceDetailPage({
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: dict.nav_home,
+        item: `${SITE_URL}${localePrefix}/`,
+      },
       {
         "@type": "ListItem",
         position: 2,
-        name: "Services",
-        item: `${SITE_URL}/services`,
+        name: dict.nav_services,
+        item: `${SITE_URL}${localePrefix}/services`,
       },
       {
         "@type": "ListItem",
         position: 3,
-        name: service.title,
-        item: `${SITE_URL}/services/${slug}`,
+        name: title,
+        item: pageUrl,
       },
     ],
   };
 
   // FAQPage schema for services that carry FAQs. Google requires the marked-up
-  // Q&As to be visible on the page — the section below renders the same data.
+  // Q&As to be visible on the page — the section below renders the same data,
+  // so on /es both the schema and the visible text use the Spanish fields.
   const faqLd =
     service.faqs && service.faqs.length > 0
       ? {
@@ -170,8 +181,11 @@ export default async function ServiceDetailPage({
           "@type": "FAQPage",
           mainEntity: service.faqs.map((f) => ({
             "@type": "Question",
-            name: f.q,
-            acceptedAnswer: { "@type": "Answer", text: f.a },
+            name: lang === "es" ? f.qEs : f.q,
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: lang === "es" ? f.aEs : f.a,
+            },
           })),
         }
       : null;
@@ -221,7 +235,7 @@ export default async function ServiceDetailPage({
             </div>
           </div>
           <p className="mt-6 text-xs text-[var(--color-muted-light)] max-w-2xl">
-            {SHORT_DISCLAIMER}
+            {dict.short_disclaimer}
           </p>
         </div>
       </section>

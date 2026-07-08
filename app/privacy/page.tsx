@@ -125,7 +125,7 @@ const CONTENT: Record<Language, Content> = {
         heading: "Información Que Recopilamos",
         paragraphs: [
           "Cuando se comunica con nosotros o completa nuestro formulario de admisión, recopilamos la información que usted decide proporcionar. Esto incluye su nombre, número de teléfono, correo electrónico, método de contacto preferido y detalles sobre los servicios de preparación de documentos que solicita.",
-          "Según el servicio, nuestro formulario puede solicitar detalles delicados que usted comparte de forma voluntaria, como información sobre su familia, matrimonio, hijos, propiedades, finanzas, estatus migratorio o situación de alquiler. Usted decide qué compartir; puede dejar en blanco los campos opcionales o comunicarse con nosotros por teléfono.",
+          "Según el servicio, nuestro formulario puede solicitar detalles delicados que usted comparte de forma voluntaria, como información sobre su familia, matrimonio, hijos, propiedades, finanzas o situación de alquiler. Usted decide qué compartir; puede dejar en blanco los campos opcionales o comunicarse con nosotros por teléfono.",
           "También recibimos automáticamente información técnica limitada, como el tipo de navegador y las páginas que visita, a través del funcionamiento normal del sitio web y nuestro proveedor de alojamiento.",
         ],
       },

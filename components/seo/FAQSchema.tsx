@@ -1,18 +1,21 @@
 import { FAQS } from "@/lib/faqs";
+import { getServerLocale } from "@/lib/server-locale";
 
-// JSON-LD FAQPage schema — emits the same Q/A pairs visible in the
-// homepage FAQ component so Google can surface them as rich snippets.
+// JSON-LD FAQPage schema — emits the same Q/A pairs visible in the homepage FAQ
+// component so Google can surface them as rich snippets. Localized to match the
+// visible text on /es (Google requires the markup to match the visible copy).
 
-export function FAQSchema() {
+export async function FAQSchema() {
+  const lang = await getServerLocale();
   const schema = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
     mainEntity: FAQS.map((faq) => ({
       "@type": "Question",
-      name: faq.question,
+      name: lang === "es" ? faq.questionEs : faq.question,
       acceptedAnswer: {
         "@type": "Answer",
-        text: faq.answer,
+        text: lang === "es" ? faq.answerEs : faq.answer,
       },
     })),
   };

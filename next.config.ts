@@ -13,6 +13,11 @@ const nextConfig: NextConfig = {
         destination: "/services",
         permanent: true,
       },
+      {
+        source: "/es/services/immigration-documents",
+        destination: "/es/services",
+        permanent: true,
+      },
     ];
   },
 };

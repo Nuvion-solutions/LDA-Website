@@ -604,7 +604,7 @@ export const SERVICES: Service[] = [
 ];
 
 // Curated homepage grid (2×3) — the highest-intent services lead; the full
-// list of 13 lives on /services, the footer, and the sitemap.
+// list of services lives on /services, the footer, and the sitemap.
 const HOMEPAGE_IDS = [
   "divorce",
   "eviction",

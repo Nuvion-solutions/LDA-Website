@@ -676,7 +676,7 @@ const es: Dict = {
   short_disclaimer:
     "California Legal Document Excellence, LLC no es un bufete de abogados y no brinda asesoramiento legal ni representación legal.",
   full_disclaimer:
-    "California Legal Document Excellence, LLC es un Asistente Legal Registrado (LDA #87, Condado de Sonoma). No somos un bufete de abogados y no brindamos asesoramiento legal, representación legal ni consejo legal. Todos los servicios de preparación de documentos se proporcionan según las instrucciones del cliente. Si su asunto requiere representación legal, podemos referirlo a un abogado con licencia.",
+    "California Legal Document Excellence, LLC es un Asistente Legal Registrado (LDA #87, Condado de Sonoma). No somos un bufete de abogados y no brindamos asesoramiento legal, representación legal ni consejo legal. Todos los servicios de preparación de documentos se proporcionan según las instrucciones del cliente. No somos abogados. Si su asunto requiere representación legal, podemos referirlo a un abogado con licencia.",
 
   // Services page
   services_page_eyebrow: "Lo Que Preparamos",

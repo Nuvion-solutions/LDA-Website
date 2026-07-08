@@ -6,6 +6,7 @@ import { Phone } from "lucide-react";
 import { BUSINESS } from "@/lib/utils";
 import { CallLink } from "@/components/analytics/CallLink";
 import { useLanguage } from "@/lib/language-context";
+import { stripLocale } from "@/lib/i18n";
 
 // Persistent bottom action bar on mobile, where most paid (Facebook) traffic
 // lands. Keeps "Call" and "Start Intake" one tap away no matter how far the
@@ -15,7 +16,8 @@ export function MobileCTABar() {
   const pathname = usePathname();
   const { t } = useLanguage();
 
-  if (pathname?.startsWith("/intake")) return null;
+  // Hide on the intake page (English or Spanish) where the form is the focus.
+  if (stripLocale(pathname ?? "/").startsWith("/intake")) return null;
 
   return (
     <div className="md:hidden fixed bottom-0 inset-x-0 z-40 flex border-t border-[var(--color-border-light)] bg-white shadow-[0_-2px_12px_rgba(0,0,0,0.08)]">

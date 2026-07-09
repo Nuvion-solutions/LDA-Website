@@ -859,6 +859,14 @@ export function IntakeForm() {
           { eventID: leadId },
         );
       }
+      // Google Ads "Submit lead form" conversion. Fires on a successful
+      // submission (not just a button click), so only real leads count. The
+      // full send_to value (AW-XXXX/label) lives in the env var.
+      if (process.env.NEXT_PUBLIC_GOOGLE_ADS_CONVERSION_LABEL) {
+        window.gtag?.("event", "conversion", {
+          send_to: process.env.NEXT_PUBLIC_GOOGLE_ADS_CONVERSION_LABEL,
+        });
+      }
       setSubmitted({
         firstName: data.firstName,
         service: data.primaryService,

@@ -7,6 +7,7 @@ import { Footer } from "@/components/layout/Footer";
 import { MobileCTABar } from "@/components/layout/MobileCTABar";
 import { StructuredData } from "@/components/seo/StructuredData";
 import { Analytics } from "@/components/analytics/Analytics";
+import { GoogleAds } from "@/components/analytics/GoogleAds";
 import { MetaPixel } from "@/components/analytics/MetaPixel";
 import { Analytics as VercelAnalytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -132,6 +133,7 @@ export default async function RootLayout({
         <VercelAnalytics />
         <SpeedInsights />
         <MetaPixel />
+        <GoogleAds />
       </body>
       <Analytics />
     </html>

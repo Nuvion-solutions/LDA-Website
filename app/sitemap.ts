@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { SITE_URL } from "@/lib/site";
 import { SERVICES } from "@/lib/services";
+import { COUNTIES } from "@/lib/counties";
 
 // Each page is listed once (the English URL) with hreflang alternates pointing
 // to its Spanish counterpart, so Google indexes both language versions and
@@ -21,6 +22,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       path: `/services/${s.slug}`,
       changeFrequency: "monthly" as const,
       priority: 0.8,
+    })),
+    { path: "/service-areas", changeFrequency: "monthly", priority: 0.7 },
+    ...COUNTIES.map((c) => ({
+      path: `/service-areas/${c.slug}`,
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
     })),
     { path: "/about", changeFrequency: "monthly", priority: 0.7 },
     { path: "/intake", changeFrequency: "monthly", priority: 0.9 },

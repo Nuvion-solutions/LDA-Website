@@ -63,6 +63,14 @@ export function Footer() {
                 </Link>
               </li>
               <li>
+                <Link
+                  href="/service-areas"
+                  className="hover:text-[var(--color-gold)]"
+                >
+                  {lang === "es" ? "Áreas de Servicio" : "Service Areas"}
+                </Link>
+              </li>
+              <li>
                 <Link href="/intake" className="hover:text-[var(--color-gold)]">
                   {t("footer_link_intake")}
                 </Link>

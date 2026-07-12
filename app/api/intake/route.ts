@@ -148,6 +148,11 @@ type IntakeBody = {
   // Visitor's site language, used to localize the confirmation email.
   lang?: "en" | "es";
 
+  // Which surface submitted the lead (e.g. "quick_consult_hero"). Lightweight
+  // sources collect only name/phone/service and skip the full-intake email +
+  // consent, so the spam filter treats them like the early partial ping.
+  source?: string;
+
   // Spam mitigation (not user-facing; see POST handler)
   website?: string;
   elapsedMs?: number;
@@ -536,6 +541,14 @@ function isFakePhone(phone?: string): boolean {
   return !!phone && /555[\s.\-]?01\d\d/.test(phone);
 }
 
+// A usable phone number: at least 10 digits and not a reserved fake number.
+// Lets phone-first leads (the hero quick-form) through without an email.
+function isBadPhone(phone?: string): boolean {
+  if (!phone) return true;
+  if (phone.replace(/[^0-9]/g, "").length < 10) return true;
+  return isFakePhone(phone);
+}
+
 function hasLinks(...texts: (string | undefined)[]): boolean {
   const blob = texts.filter(Boolean).join(" ");
   return /https?:\/\/|www\.|\[url|<a\s|href=/i.test(blob);
@@ -543,8 +556,14 @@ function hasLinks(...texts: (string | undefined)[]): boolean {
 
 // Returns a short reason string if the submission looks like spam, else null.
 function spamReason(data: IntakeBody, partial: boolean): string | null {
-  if (isBadEmail(data.email)) return "bad_email";
-  if (isFakePhone(data.phone)) return "fake_phone";
+  const emailProvided = !!(data.email && data.email.trim());
+  const phoneOk = !isBadPhone(data.phone);
+
+  // A provided email must look real (catches example.com/test bots). A missing
+  // email is fine on its own — phone-first leads (the hero quick-form) have none.
+  if (emailProvided && isBadEmail(data.email)) return "bad_email";
+  // Every real lead must be reachable: require a valid email OR a valid phone.
+  if (!emailProvided && !phoneOk) return "no_contact";
   if (
     hasLinks(
       data.additionalNotes,
@@ -559,9 +578,11 @@ function spamReason(data: IntakeBody, partial: boolean): string | null {
     )
   )
     return "link_spam";
-  // Full submissions must carry the things the real multi-step form always
-  // sends; direct-to-API bots usually skip them.
-  if (!partial) {
+  // Consent + service are markers the full multi-step intake always sends. The
+  // lightweight hero quick-form (name + phone + service) and the early partial
+  // ping legitimately omit them, so only enforce them on full submissions.
+  const lightweight = partial || data.source === "quick_consult_hero";
+  if (!lightweight) {
     if (data.consentLDA !== true || data.consentContact !== true)
       return "missing_consent";
     if (!data.primaryService || data.primaryService.trim() === "")

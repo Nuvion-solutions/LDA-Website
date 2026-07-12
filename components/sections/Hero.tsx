@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Phone, CheckCircle2 } from "lucide-react";
 import { BUSINESS } from "@/lib/utils";
 import { CallLink } from "@/components/analytics/CallLink";
+import { QuickConsultForm } from "@/components/forms/QuickConsultForm";
 import { fadeUp, staggerContainer } from "@/lib/animations";
 import { useLanguage } from "@/lib/language-context";
 
@@ -29,12 +30,13 @@ export function Hero() {
             "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(201,168,76,0.10), transparent 70%)",
         }}
       />
-      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20 md:py-32">
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 md:py-24 lg:py-28">
+        <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-10 lg:gap-16 items-center">
         <motion.div
           variants={staggerContainer}
           initial="hidden"
           animate="visible"
-          className="max-w-4xl"
+          className="max-w-2xl"
         >
           <motion.p
             variants={fadeUp}
@@ -98,6 +100,15 @@ export function Hero() {
             {t("short_disclaimer")}
           </motion.p>
         </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15, duration: 0.5 }}
+        >
+          <QuickConsultForm />
+        </motion.div>
+        </div>
       </div>
     </section>
   );

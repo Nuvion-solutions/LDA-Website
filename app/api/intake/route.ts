@@ -201,7 +201,7 @@ function buildSections(data: IntakeBody): Section[] {
         { label: "Filing county", value: data.divorceFilingCounty },
         { label: "Already filed paperwork", value: data.divorceFiledPaperwork },
         // Eviction
-        { label: "Landlord or tenant", value: data.evictionParty },
+        { label: "Role", value: data.evictionParty },
         { label: "Property type", value: data.evictionPropertyType },
         { label: "Reason", value: data.evictionReason },
         { label: "Notice served", value: data.evictionNoticeServed },

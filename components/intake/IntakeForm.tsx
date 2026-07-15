@@ -314,8 +314,10 @@ const intakeSchema = z
     divorceFilingCounty: z.enum(COUNTIES).optional(),
     divorceFiledPaperwork: z.enum(["Yes", "No"]).optional(),
 
-    // Step 3 — Eviction
-    evictionParty: z.enum(["Landlord", "Tenant"]).optional(),
+    // Step 3 — Eviction. We prepare unlawful-detainer paperwork for landlords
+    // only, so the party field is locked to "Landlord" (kept so the intake
+    // summary and CRM still record it explicitly).
+    evictionParty: z.enum(["Landlord"]).optional(),
     evictionPropertyType: z.enum(["Residential", "Commercial"]).optional(),
     evictionReason: z.enum(EVICTION_REASONS).optional(),
     evictionNoticeServed: z.enum(["Yes", "No"]).optional(),
@@ -724,6 +726,7 @@ export function IntakeForm() {
       divorceChildrenCount: "",
       divorceChildrenAges: "",
       trustPropertyCount: "",
+      evictionParty: "Landlord",
       evictionNoticeDate: "",
       dmvAppointmentDate: "",
       taxDeadlineDate: "",
@@ -1938,7 +1941,7 @@ function EvictionBranch({ register, watch, errors, t, lang }: any) {
     <div className="space-y-6">
       <RadioGroup
         legend={t("evi_q_party")}
-        options={["Landlord", "Tenant"]}
+        options={["Landlord"]}
         name="evictionParty"
         register={register}
         error={tErr(errors.evictionParty?.message, t)}

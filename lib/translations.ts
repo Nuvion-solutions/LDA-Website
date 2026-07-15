@@ -276,7 +276,7 @@ const en = {
   div_q_filed_paperwork: "Have you already filed any paperwork with the court?",
 
   // Step 3 — Eviction
-  evi_q_party: "Are you the landlord or the tenant?",
+  evi_q_party: "Your role (we prepare eviction paperwork for landlords)",
   evi_q_property_type: "Is this a residential or commercial property?",
   evi_q_reason: "What is the reason for the eviction?",
   evi_q_reason_placeholder: "Select reason…",
@@ -752,7 +752,7 @@ const es: Dict = {
     "¿Ya ha presentado algún documento ante el tribunal?",
 
   // Step 3 — Eviction
-  evi_q_party: "¿Es usted el propietario o el inquilino?",
+  evi_q_party: "Su rol (preparamos trámites de desalojo para propietarios)",
   evi_q_property_type: "¿Es una propiedad residencial o comercial?",
   evi_q_reason: "¿Cuál es la razón del desalojo?",
   evi_q_reason_placeholder: "Seleccione razón…",

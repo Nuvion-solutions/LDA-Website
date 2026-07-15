@@ -10,8 +10,8 @@ export const BUSINESS = {
   shortName: "CLDE",
   lda: "LDA #87",
   county: "Sonoma County",
-  phone: "(707) 909-1240",
-  phoneTel: "+17079091240",
+  phone: "(707) 318-7031",
+  phoneTel: "+17073187031",
   email: "contact@calegaldocumenthelp.com",
   hours: "Monday–Saturday, 9:00 AM – 5:00 PM",
 } as const;

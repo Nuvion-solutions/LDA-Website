@@ -7,7 +7,7 @@ export { default } from "../page";
 export const metadata: Metadata = {
   title: "Asistente de Documentos Legales en el Condado de Sonoma",
   description:
-    "Asistente Legal Registrado (LDA #87) en el Condado de Sonoma, sirviendo el North Bay. Divorcio, desalojo, fideicomisos en vida, testamentos, sucesión, poder notarial y más. Llame al (707) 909-1240.",
+    "Asistente Legal Registrado (LDA #87) en el Condado de Sonoma, sirviendo el North Bay. Divorcio, desalojo, fideicomisos en vida, testamentos, sucesión, poder notarial y más. Llame al (707) 318-7031.",
   alternates: {
     canonical: "/es",
     languages: { en: "/", es: "/es", "x-default": "/" },

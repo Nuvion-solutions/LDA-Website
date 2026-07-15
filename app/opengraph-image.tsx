@@ -101,7 +101,7 @@ export default async function Image() {
               opacity: 0.85,
             }}
           >
-            Not a law firm. Document preparation at your direction. (707) 909-1240
+            Not a law firm. Document preparation at your direction. (707) 318-7031
           </div>
         </div>
 

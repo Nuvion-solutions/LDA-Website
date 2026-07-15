@@ -29,7 +29,7 @@ const playfair = Playfair_Display({
 
 const TITLE = "Sonoma County Legal Document Assistant | Divorce, Eviction & Trusts";
 const DESCRIPTION =
-  "Registered Legal Document Assistant (LDA #87) in Sonoma County, serving the greater North Bay. Divorce, eviction, living trusts, wills, probate, power of attorney & more. Call (707) 909-1240.";
+  "Registered Legal Document Assistant (LDA #87) in Sonoma County, serving the greater North Bay. Divorce, eviction, living trusts, wills, probate, power of attorney & more. Call (707) 318-7031.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

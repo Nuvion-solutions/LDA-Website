@@ -121,7 +121,9 @@ export function QuickConsultForm() {
           {es ? "Empiece en 30 segundos" : "Get Started in 30 Seconds"}
         </h3>
         <p className="text-sm text-[var(--color-body-dark)]/70 mt-1">
-          {es ? "Sin compromiso. Le respondemos rápido." : "No obligation. We reply fast."}
+          {es
+            ? "Sin compromiso. Respuesta el mismo día — a menudo en menos de una hora."
+            : "No obligation. Same-day response — often within the hour."}
         </p>
       </div>
 

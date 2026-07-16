@@ -27,10 +27,10 @@ const en = {
     "California Legal Document Excellence, LLC helps individuals and families prepare court forms, documents, and administrative paperwork — accurately, professionally, and at your direction.",
   hero_cta_primary: "Start Your Intake",
   hero_cta_secondary: "Call",
-  hero_trust_1: "LDA #87 Registered",
-  hero_trust_2: "Sonoma County",
+  hero_trust_1: "Registered & Bonded LDA #87",
+  hero_trust_2: "Locally Owned · Sonoma County",
   hero_trust_3: "Free Consultation",
-  hero_trust_4: "Remote Services Available",
+  hero_trust_4: "Same-Day Response",
   hero_trust_5: "Attorney Referrals Available",
 
   // Services preview
@@ -92,7 +92,7 @@ const en = {
   footer_link_terms: "Terms of Service",
   footer_payment_heading: "Payment Methods Accepted",
   footer_service_area:
-    "Serving Sonoma County and the greater North Bay — including Napa, Marin, and the surrounding Bay Area. Remote services available.",
+    "Serving Santa Rosa, Petaluma, Rohnert Park, Windsor, Sonoma, Napa, San Rafael, Fairfield, and neighbors across the North Bay. Remote services available.",
   footer_disclosure_label: "Important Disclosure:",
   footer_rights: "All rights reserved.",
 
@@ -497,10 +497,10 @@ const es: Dict = {
     "California Legal Document Excellence, LLC ayuda a individuos y familias a preparar formularios judiciales, documentos y trámites administrativos — con precisión, profesionalismo y según sus instrucciones.",
   hero_cta_primary: "Comenzar Solicitud",
   hero_cta_secondary: "Llamar",
-  hero_trust_1: "LDA #87 Registrado",
-  hero_trust_2: "Condado de Sonoma",
+  hero_trust_1: "LDA #87 Registrado y con Fianza",
+  hero_trust_2: "Empresa Local · Condado de Sonoma",
   hero_trust_3: "Consulta Gratuita",
-  hero_trust_4: "Servicios Remotos Disponibles",
+  hero_trust_4: "Respuesta el Mismo Día",
   hero_trust_5: "Referencias a Abogados Disponibles",
 
   // Services preview
@@ -563,7 +563,7 @@ const es: Dict = {
   footer_link_terms: "Términos de Servicio",
   footer_payment_heading: "Métodos de Pago Aceptados",
   footer_service_area:
-    "Atendemos el Condado de Sonoma y la región de North Bay — incluyendo Napa, Marin y el Área de la Bahía. Servicios remotos disponibles.",
+    "Atendemos Santa Rosa, Petaluma, Rohnert Park, Windsor, Sonoma, Napa, San Rafael, Fairfield y comunidades de todo el North Bay. Servicios remotos disponibles.",
   footer_disclosure_label: "Divulgación Importante:",
   footer_rights: "Todos los derechos reservados.",
 

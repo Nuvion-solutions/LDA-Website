@@ -27,6 +27,13 @@ export function CallLink({
       onClick={() => {
         try {
           sendGAEvent("event", "phone_click", { source });
+          // Google Ads "Website click-to-call" conversion (Contact category).
+          // The full send_to value (AW-XXXX/label) lives in the env var.
+          if (process.env.NEXT_PUBLIC_GOOGLE_ADS_CALL_CONVERSION_LABEL) {
+            window.gtag?.("event", "conversion", {
+              send_to: process.env.NEXT_PUBLIC_GOOGLE_ADS_CALL_CONVERSION_LABEL,
+            });
+          }
         } catch {
           // Never let analytics block the call.
         }

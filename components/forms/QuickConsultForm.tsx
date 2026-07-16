@@ -223,6 +223,13 @@ export function QuickConsultForm() {
           onClick={() => {
             try {
               sendGAEvent("event", "text_click", { source: "quick_form" });
+              // Texting is the same "Contact" conversion as a call click.
+              if (process.env.NEXT_PUBLIC_GOOGLE_ADS_CALL_CONVERSION_LABEL) {
+                window.gtag?.("event", "conversion", {
+                  send_to:
+                    process.env.NEXT_PUBLIC_GOOGLE_ADS_CALL_CONVERSION_LABEL,
+                });
+              }
             } catch {
               /* never block */
             }

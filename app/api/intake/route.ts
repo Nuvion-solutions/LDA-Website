@@ -444,8 +444,8 @@ function buildConfirmationEmail(
           greeting: firstName ? `Hola ${firstName},` : "Hola,",
           body: `Gracias por comunicarse con California Legal Document Excellence. Recibimos su solicitud${
             service ? ` sobre ${service}` : ""
-          } — le responderemos hoy mismo con los próximos pasos y el precio, normalmente dentro de una hora en horario de atención (lunes a sábado, 9am–5pm).`,
-          contact: `¿Necesita ayuda de inmediato? Llámenos o envíenos un mensaje de texto al ${phone}, o simplemente responda a este correo.`,
+          } y la revisaremos para responderle dentro de 1 día hábil con los próximos pasos y el precio.`,
+          contact: `Si necesita comunicarse antes, llámenos al ${phone} o simplemente responda a este correo.`,
           signoff:
             "California Legal Document Excellence\nAsistente Legal Registrado · LDA #87 · Condado de Sonoma",
         }

@@ -1,7 +1,15 @@
 import type { Metadata } from "next";
 import { LocaleLink as Link } from "@/components/LocaleLink";
 import { notFound } from "next/navigation";
-import { ArrowRight, ArrowLeft, Check } from "lucide-react";
+import {
+  ArrowRight,
+  ArrowLeft,
+  Check,
+  BadgeCheck,
+  Scale,
+  FileCheck2,
+  Zap,
+} from "lucide-react";
 import { SERVICES, localized } from "@/lib/services";
 import {
   SERVICE_CHECKLISTS,
@@ -262,6 +270,65 @@ export default async function ServiceDetailPage({
 
             <QuickConsultForm defaultService={QUICK_FORM_SERVICE[service.id]} />
           </div>
+        </div>
+      </section>
+
+      {/* Value strip — answers the two biggest conversion blockers for the paid
+          clicks that land here (trust + price) right under the hero form. */}
+      <section className="bg-[var(--color-offwhite)] border-b border-[var(--color-border-light)]">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 md:py-7">
+          <ul className="grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-5">
+            {[
+              {
+                Icon: BadgeCheck,
+                title: lang === "es" ? "Registrado y Afianzado" : "Registered & Bonded",
+                sub: lang === "es" ? "LDA #87 · Condado de Sonoma" : "LDA #87 · Sonoma County",
+              },
+              {
+                Icon: Scale,
+                title:
+                  lang === "es"
+                    ? "Una fracción del costo de un abogado"
+                    : "A Fraction of Attorney Fees",
+                sub:
+                  lang === "es"
+                    ? "Consulta gratis, presupuesto claro"
+                    : "Free consultation, clear quote",
+              },
+              {
+                Icon: FileCheck2,
+                title: lang === "es" ? "Documentos listos para la corte" : "Court-Ready Documents",
+                sub:
+                  lang === "es"
+                    ? "Preparados correctamente y a tiempo"
+                    : "Prepared right, filed on time",
+              },
+              {
+                Icon: Zap,
+                title: lang === "es" ? "Respuesta el mismo día" : "Same-Day Response",
+                sub:
+                  lang === "es"
+                    ? "A menudo en menos de una hora, Lun–Sáb"
+                    : "Often within the hour, Mon–Sat",
+              },
+            ].map(({ Icon: ValueIcon, title: vTitle, sub }) => (
+              <li key={vTitle} className="flex items-start gap-3">
+                <ValueIcon
+                  className="h-5 w-5 mt-0.5 text-[var(--color-gold)] shrink-0"
+                  aria-hidden
+                  strokeWidth={1.5}
+                />
+                <div>
+                  <p className="text-sm font-medium text-[var(--color-navy)] leading-snug">
+                    {vTitle}
+                  </p>
+                  <p className="mt-0.5 text-xs text-[var(--color-body-dark)] opacity-75 leading-snug">
+                    {sub}
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
 

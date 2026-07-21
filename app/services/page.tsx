@@ -8,6 +8,7 @@ import {
   localizedCategory,
 } from "@/lib/services";
 import { CTABanner } from "@/components/sections/CTABanner";
+import { QuickConsultForm } from "@/components/forms/QuickConsultForm";
 import { translations } from "@/lib/translations";
 import { getServerLocale } from "@/lib/server-locale";
 
@@ -56,21 +57,28 @@ export default async function ServicesPage() {
 
   return (
     <>
-      {/* Hero */}
+      {/* Hero — content on the left, a quick-consult form card on the right so
+          visitors (including ad clicks) can start a lead without leaving. */}
       <section className="bg-[var(--color-navy)] text-white">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20 md:py-28">
-          <p className="text-[var(--color-gold)] text-xs tracking-[0.22em] uppercase mb-5">
-            {dict.services_page_eyebrow}
-          </p>
-          <h1 className="font-serif text-4xl md:text-6xl leading-tight max-w-3xl">
-            {dict.services_page_h1}
-          </h1>
-          <p className="mt-6 text-[var(--color-body-light)] text-base md:text-lg max-w-2xl leading-relaxed">
-            {dict.services_page_sub}
-          </p>
-          <p className="mt-4 text-xs text-[var(--color-muted-light)] max-w-2xl">
-            {dict.short_disclaimer}
-          </p>
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 md:py-24">
+          <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-10 lg:gap-16 items-start">
+            <div>
+              <p className="text-[var(--color-gold)] text-xs tracking-[0.22em] uppercase mb-5">
+                {dict.services_page_eyebrow}
+              </p>
+              <h1 className="font-serif text-4xl md:text-5xl leading-tight">
+                {dict.services_page_h1}
+              </h1>
+              <p className="mt-6 text-[var(--color-body-light)] text-base md:text-lg leading-relaxed">
+                {dict.services_page_sub}
+              </p>
+              <p className="mt-4 text-xs text-[var(--color-muted-light)] max-w-2xl">
+                {dict.short_disclaimer}
+              </p>
+            </div>
+
+            <QuickConsultForm />
+          </div>
         </div>
       </section>
 

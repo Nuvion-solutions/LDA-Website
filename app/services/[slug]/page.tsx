@@ -13,6 +13,7 @@ import {
 import { BUSINESS } from "@/lib/utils";
 import { SITE_URL } from "@/lib/site";
 import { CTABanner } from "@/components/sections/CTABanner";
+import { QuickConsultForm } from "@/components/forms/QuickConsultForm";
 import { translations } from "@/lib/translations";
 import { getServerLocale } from "@/lib/server-locale";
 
@@ -35,6 +36,23 @@ const CHECKLIST_KEYS: Record<string, string> = {
   "small-claims": "Small Claims Paperwork",
   guardianship: "Guardianship Documents",
   deeds: "Deeds & Property Transfers",
+};
+
+// Pre-select the quick-consult form to the service the visitor landed on, so an
+// ad click arrives at a form already about their need. Keyed by service.id;
+// values must match the QuickConsultForm SERVICES options. Ids with no clean
+// match (dmv, tax-organization, guardianship) are omitted — the form still shows
+// with every option, just no preselection.
+const QUICK_FORM_SERVICE: Record<string, string> = {
+  divorce: "Divorce & Family",
+  eviction: "Eviction (Unlawful Detainer)",
+  "living-trust": "Living Trust / Estate",
+  "power-of-attorney": "Wills & Power of Attorney",
+  wills: "Wills & Power of Attorney",
+  probate: "Probate",
+  "name-change": "Name Change",
+  "small-claims": "Small Claims",
+  deeds: "Deeds / Property",
 };
 
 const SERVICE_AREA = [
@@ -207,36 +225,43 @@ export default async function ServiceDetailPage({
         />
       )}
 
-      {/* Hero */}
+      {/* Hero — content on the left, a quick-consult form card on the right so
+          paid ad clicks (which land here) hit a form immediately. */}
       <section className="bg-[var(--color-navy)] text-white">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20 md:py-28">
-          <Link
-            href="/services"
-            className="inline-flex items-center gap-2 text-sm text-[var(--color-muted-light)] hover:text-[var(--color-gold)] transition-colors mb-8"
-          >
-            <ArrowLeft className="h-4 w-4" aria-hidden />
-            {dict.services_page_h1}
-          </Link>
-          <div className="flex items-start gap-5">
-            <div className="shrink-0 hidden sm:flex items-center justify-center w-14 h-14 rounded-sm bg-[var(--color-navy-mid)] border border-[var(--color-gold)]/40">
-              <Icon
-                className="h-7 w-7 text-[var(--color-gold)]"
-                aria-hidden
-                strokeWidth={1.5}
-              />
-            </div>
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 md:py-24">
+          <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-10 lg:gap-16 items-start">
             <div>
-              <h1 className="font-serif text-4xl md:text-6xl leading-tight max-w-3xl">
-                {title}
-              </h1>
-              <p className="mt-5 text-[var(--color-body-light)] text-base md:text-lg max-w-2xl leading-relaxed">
-                {localized(service, "short", lang)}
+              <Link
+                href="/services"
+                className="inline-flex items-center gap-2 text-sm text-[var(--color-muted-light)] hover:text-[var(--color-gold)] transition-colors mb-8"
+              >
+                <ArrowLeft className="h-4 w-4" aria-hidden />
+                {dict.services_page_h1}
+              </Link>
+              <div className="flex items-start gap-5">
+                <div className="shrink-0 hidden sm:flex items-center justify-center w-14 h-14 rounded-sm bg-[var(--color-navy-mid)] border border-[var(--color-gold)]/40">
+                  <Icon
+                    className="h-7 w-7 text-[var(--color-gold)]"
+                    aria-hidden
+                    strokeWidth={1.5}
+                  />
+                </div>
+                <div>
+                  <h1 className="font-serif text-3xl md:text-5xl leading-tight">
+                    {title}
+                  </h1>
+                  <p className="mt-5 text-[var(--color-body-light)] text-base md:text-lg leading-relaxed">
+                    {localized(service, "short", lang)}
+                  </p>
+                </div>
+              </div>
+              <p className="mt-6 text-xs text-[var(--color-muted-light)] max-w-2xl">
+                {dict.short_disclaimer}
               </p>
             </div>
+
+            <QuickConsultForm defaultService={QUICK_FORM_SERVICE[service.id]} />
           </div>
-          <p className="mt-6 text-xs text-[var(--color-muted-light)] max-w-2xl">
-            {dict.short_disclaimer}
-          </p>
         </div>
       </section>
 

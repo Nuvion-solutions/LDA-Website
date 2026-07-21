@@ -9,11 +9,17 @@ import { sendGAEvent } from "@next/third-parties/google";
 import { useLanguage } from "@/lib/language-context";
 
 // Low-friction "Free Consultation" lead card. Three fields only (name, phone,
-// service) — the fastest path to a lead, shown above the fold in the hero. On
+// service) — the fastest path to a lead. Shown above the fold in the homepage
+// hero AND on every service landing page (so paid ad clicks, which mostly land
+// on /services/* pages, hit a form immediately instead of a button-hunt). On
 // success it fires the SAME conversions as the full intake form
 // (GA4 generate_lead + Meta Lead + Google Ads conversion) so a quick lead counts
 // exactly like a full intake. The full multi-step intake lives at /intake for
 // people who want to give more detail.
+//
+// `defaultService` pre-selects the service dropdown (e.g. the divorce landing
+// page passes "Divorce & Family") so the form arrives already about the
+// visitor's need. It must match one of the SERVICES values below, or be omitted.
 
 const SERVICES: { value: string; en: string; es: string }[] = [
   { value: "Divorce & Family", en: "Divorce & Family", es: "Divorcio y Familia" },
@@ -27,12 +33,16 @@ const SERVICES: { value: string; en: string; es: string }[] = [
   { value: "Other", en: "Something else", es: "Otro" },
 ];
 
-export function QuickConsultForm() {
+export function QuickConsultForm({
+  defaultService = "",
+}: {
+  defaultService?: string;
+}) {
   const { lang } = useLanguage();
   const es = lang === "es";
   const [firstName, setFirstName] = useState("");
   const [phone, setPhone] = useState("");
-  const [service, setService] = useState("");
+  const [service, setService] = useState(defaultService);
   const [website, setWebsite] = useState(""); // honeypot
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);

@@ -238,7 +238,7 @@ export default async function ServiceDetailPage({
       <section className="bg-[var(--color-navy)] text-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-16 md:py-24">
           <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-10 lg:gap-16 items-start">
-            <div>
+            <div className="order-2 lg:order-1">
               <Link
                 href="/services"
                 className="inline-flex items-center gap-2 text-sm text-[var(--color-muted-light)] hover:text-[var(--color-gold)] transition-colors mb-8"
@@ -268,7 +268,9 @@ export default async function ServiceDetailPage({
               </p>
             </div>
 
-            <QuickConsultForm defaultService={QUICK_FORM_SERVICE[service.id]} />
+            <div className="order-1 lg:order-2">
+              <QuickConsultForm defaultService={QUICK_FORM_SERVICE[service.id]} />
+            </div>
           </div>
         </div>
       </section>

@@ -630,11 +630,78 @@ export async function POST(req: Request) {
     data.elapsedMs >= 0 &&
     data.elapsedMs < 5000;
   const spam = spamReason(data, partial);
+
+  // Email delivery config — read once here so both the filtered-submission
+  // fail-safe (immediately below) and the normal lead send can use it.
+  const apiKey = process.env.RESEND_API_KEY;
+  const emailTo = (process.env.INTAKE_EMAIL_TO ?? "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  // Optional monitoring copy, invisible to the primary recipient. Set this to
+  // silently receive every lead (e.g. while verifying delivery); remove the
+  // env var to stop, no code change needed.
+  const emailBcc = (process.env.INTAKE_EMAIL_BCC ?? "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  const emailFrom = process.env.INTAKE_EMAIL_FROM;
+
   if (honeypotTripped || tooFast || spam) {
     console.warn("[intake] Dropped likely-bot submission:", {
       reason: honeypotTripped ? "honeypot" : tooFast ? "too_fast" : spam,
       elapsedMs: data.elapsedMs,
+      firstName: data.firstName,
+      phone: data.phone,
+      email: data.email,
     });
+
+    // Fail-safe so a real person is NEVER silently lost to a false positive.
+    // Honeypot / too-fast / link-spam are near-certain bots and stay silent.
+    // But the content filters (bad_email / no_contact / missing_consent /
+    // no_service) once dropped real hero quick-form leads while the visitor saw
+    // a success screen — see git "Fix: hero quick-consult form now delivers its
+    // lead email". So when a filtered submission is still reachable (has a phone
+    // or email), email the business a "review this" copy of the lead instead of
+    // discarding it — it lands durably in the inbox. Scheduled via after() so it
+    // never delays or fails the response, and reuses the normal lead template.
+    const nearCertainBot = honeypotTripped || tooFast || spam === "link_spam";
+    const reachable = !!(data.phone?.trim() || data.email?.trim());
+    if (!nearCertainBot && reachable && apiKey && emailTo.length > 0 && emailFrom) {
+      const who =
+        `${data.firstName ?? ""} ${data.lastName ?? ""}`.trim() || "Unknown";
+      const { html: alertHtml, text: alertText } = renderEmail(
+        buildSections(data),
+        {
+          urgencyLabel: "⚠️ Auto-filtered — review (possible real lead)",
+          note: `Our spam filter flagged this submission as "${spam}", but it has real contact info and may be a real person. Review and reach out if so.`,
+          submissionId: crypto.randomUUID(),
+          submittedAt: new Date().toISOString(),
+          contact: {
+            name: who,
+            phone: data.phone,
+            email: data.email,
+            preferredContact: data.contactMethod,
+            bestTime: data.bestTime,
+          },
+        },
+      );
+      after(async () => {
+        await sendLeadEmail(
+          {
+            from: emailFrom,
+            to: emailTo,
+            ...(emailBcc.length > 0 ? { bcc: emailBcc } : {}),
+            subject: `⚠️ Filtered submission — review: ${who}`,
+            html: alertHtml,
+            text: alertText,
+            ...(data.email ? { reply_to: data.email } : {}),
+          },
+          apiKey,
+        );
+      });
+    }
+
     return Response.json({ success: true, mode: "ignored" });
   }
 
@@ -677,20 +744,6 @@ export async function POST(req: Request) {
   const deadlineDate = getDeadlineDate(data);
   const urgencyTag = urgencyTagFor(daysUntil(deadlineDate));
   const urgencyLabel = URGENCY_LABEL[urgencyTag];
-
-  const apiKey = process.env.RESEND_API_KEY;
-  const emailTo = (process.env.INTAKE_EMAIL_TO ?? "")
-    .split(",")
-    .map((s) => s.trim())
-    .filter(Boolean);
-  // Optional monitoring copy, invisible to the primary recipient. Set this to
-  // silently receive every lead (e.g. while verifying delivery); remove the
-  // env var to stop, no code change needed.
-  const emailBcc = (process.env.INTAKE_EMAIL_BCC ?? "")
-    .split(",")
-    .map((s) => s.trim())
-    .filter(Boolean);
-  const emailFrom = process.env.INTAKE_EMAIL_FROM;
 
   // Graceful fallback when Resend isn't configured (dev/preview): log and
   // succeed so the form still works locally.

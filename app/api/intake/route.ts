@@ -745,10 +745,17 @@ export async function POST(req: Request) {
   const urgencyTag = urgencyTagFor(daysUntil(deadlineDate));
   const urgencyLabel = URGENCY_LABEL[urgencyTag];
 
-  // Graceful fallback when Resend isn't configured (dev/preview): log and
-  // succeed so the form still works locally.
+  // Fallback when Resend isn't configured. In dev/preview: log and succeed so
+  // the form still works without email config. On PRODUCTION: a missing config
+  // is a misconfiguration (e.g. an env var was rotated or removed) — NEVER
+  // silently accept a lead we can't deliver. Return an error so the form tells
+  // the visitor to call instead of showing a false "thank you" and firing a
+  // phantom conversion. This is a last-resort guard; env is normally set.
   if (!apiKey || emailTo.length === 0 || !emailFrom) {
-    console.log("[intake] Resend not configured — logging submission locally:", {
+    const isProd = process.env.VERCEL_ENV === "production";
+    console.error("[intake] Resend not configured:", {
+      env: process.env.VERCEL_ENV ?? "unknown",
+      action: isProd ? "REJECTED — production misconfiguration" : "logged locally",
       submissionId,
       submittedAt,
       firstName: data.firstName,
@@ -758,6 +765,12 @@ export async function POST(req: Request) {
       primaryService: data.primaryService,
       urgency: urgencyTag,
     });
+    if (isProd) {
+      return Response.json(
+        { success: false, error: "email_not_configured" },
+        { status: 503 },
+      );
+    }
     scheduleMetaLead();
     return Response.json({ success: true, mode: "local", submissionId });
   }

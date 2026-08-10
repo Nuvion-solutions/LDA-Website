@@ -67,9 +67,9 @@ const en = {
   why_3_title: "Clear Communication",
   why_3_body:
     "We keep you informed at every step so you always know where your documents stand.",
-  why_4_title: "Attorney Referrals",
+  why_4_title: "Attorney Referrals When You Need Them",
   why_4_body:
-    "We're not a law firm — but if your matter needs legal advice or representation, we work with a licensed attorney and can refer you. You're never left without options.",
+    "Most document matters never need a lawyer — but if yours does, you're not left to figure it out alone. We're not a law firm and don't give legal advice, but when a case calls for legal representation we'll connect you with a licensed California attorney. You always have a path forward.",
 
   // FAQ
   faq_eyebrow: "Common Questions",
@@ -539,9 +539,9 @@ const es: Dict = {
   why_3_title: "Comunicación Clara",
   why_3_body:
     "Le mantenemos informado en cada paso para que siempre sepa el estado de sus documentos.",
-  why_4_title: "Referencias a Abogados",
+  why_4_title: "Referencias a Abogados Cuando Las Necesite",
   why_4_body:
-    "No somos un bufete de abogados, pero si su asunto requiere asesoría o representación legal, trabajamos con un abogado con licencia y podemos referirlo. Nunca se queda sin opciones.",
+    "La mayoría de los trámites de documentos nunca necesitan un abogado — pero si el suyo lo necesita, no lo dejamos resolverlo solo. No somos un bufete de abogados y no damos asesoría legal, pero cuando un caso requiere representación legal, lo conectamos con un abogado con licencia en California. Siempre tiene un camino a seguir.",
 
   // FAQ
   faq_eyebrow: "Preguntas Comunes",

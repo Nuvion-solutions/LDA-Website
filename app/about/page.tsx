@@ -22,28 +22,42 @@ export const metadata: Metadata = {
   },
 };
 
+// Equal co-founders. We present them by initial (privacy preference — no full
+// names, no photos). Trust is carried by the verifiable LDA registration and
+// bond, and by distinct, human bios — not by faces. A. Khan holds LDA #87.
 const TEAM = [
   {
-    name: "Carson C. Newton",
-    role: "Principal/Founder",
-    roleEs: "Principal/Fundador",
-    bio: "Co-founder and principal of California Legal Document Excellence, LLC. Oversees document preparation operations and quality standards.",
-    bioEs:
-      "Cofundador y principal de California Legal Document Excellence, LLC. Supervisa las operaciones de preparación de documentos y los estándares de calidad.",
-  },
-  {
-    name: "S. Khan",
-    role: "Principal/Founder",
-    roleEs: "Principal/Fundador",
-    bio: "Co-founder and principal of California Legal Document Excellence, LLC.",
-    bioEs: "Cofundador y principal de California Legal Document Excellence, LLC.",
-  },
-  {
+    initials: "A",
     name: "A. Khan",
-    role: "Principal/Founder",
-    roleEs: "Principal/Fundador",
-    bio: "Co-founder and principal of California Legal Document Excellence, LLC.",
-    bioEs: "Cofundador y principal de California Legal Document Excellence, LLC.",
+    role: "Co-Founder & Principal",
+    roleEs: "Cofundador y Principal",
+    credential: "Registered LDA #87",
+    credentialEs: "Asistente Legal Registrado · LDA #87",
+    bio: "Our Registered Legal Document Assistant (LDA #87) — personally bound by California's registration and bonding requirements, and personally accountable for every document we prepare. The standard is simple: each form leaves complete, correctly formatted, and ready for the court or agency the first time.",
+    bioEs:
+      "Nuestro Asistente Legal de Documentos Registrado (LDA #87) — personalmente sujeto a los requisitos de registro y fianza de California, y personalmente responsable de cada documento que preparamos. El estándar es simple: cada formulario sale completo, con el formato correcto y listo para el tribunal o la agencia a la primera.",
+  },
+  {
+    initials: "C",
+    name: "C. Newton",
+    role: "Co-Founder & Principal",
+    roleEs: "Cofundador y Principal",
+    credential: "",
+    credentialEs: "",
+    bio: "Focused on making the process feel human — plain English, no jargon, and answers to the questions people are often too intimidated to ask. You'll always know exactly where your documents stand.",
+    bioEs:
+      "Enfocado en hacer que el proceso se sienta humano — lenguaje claro, sin tecnicismos y respuestas a las preguntas que muchos tienen miedo de hacer. Siempre sabrá exactamente en qué punto están sus documentos.",
+  },
+  {
+    initials: "S",
+    name: "S. Khan",
+    role: "Co-Founder & Principal",
+    roleEs: "Cofundadora y Principal",
+    credential: "",
+    credentialEs: "",
+    bio: "Our details person — watching deadlines, county-specific requirements, and the small formatting rules that keep a filing from getting bounced. Built the step-by-step way we work so nothing slips through.",
+    bioEs:
+      "Nuestra persona de los detalles — atenta a los plazos, los requisitos específicos de cada condado y las pequeñas reglas de formato que evitan que una presentación sea rechazada. Creó el método paso a paso con el que trabajamos para que nada se escape.",
   },
 ];
 
@@ -86,21 +100,56 @@ export default async function AboutPage() {
           <p className="text-[var(--color-navy)] text-xs tracking-[0.22em] uppercase mb-4 opacity-70">
             {dict.about_team_eyebrow}
           </p>
-          <h2 className="font-serif text-3xl md:text-5xl text-[var(--color-navy)] leading-tight mb-12">
+          <h2 className="font-serif text-3xl md:text-5xl text-[var(--color-navy)] leading-tight mb-6">
             {dict.about_team_heading}
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+          <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm mb-12">
+            <ShieldCheck
+              className="h-4 w-4 text-[var(--color-gold)] shrink-0"
+              aria-hidden
+              strokeWidth={1.75}
+            />
+            <span className="font-medium text-[var(--color-navy)]">
+              {lang === "es"
+                ? "LDA #87 registrado — verificable públicamente con el Secretario del Condado de Sonoma."
+                : "Registered LDA #87 — publicly verifiable with the Sonoma County Clerk."}
+            </span>
+            <span className="text-[var(--color-body-dark)] opacity-70">
+              {lang === "es"
+                ? "· Afianzado · LLC con licencia · Condado de Sonoma"
+                : "· Bonded · Licensed LLC · Sonoma County"}
+            </span>
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
             {TEAM.map((member) => (
               <article
                 key={member.name}
                 className="bg-white border border-[var(--color-border-light)] p-7 md:p-8 rounded-sm"
               >
+                <div
+                  className="mb-5 flex items-center justify-center w-14 h-14 rounded-full bg-[var(--color-navy)] border border-[var(--color-gold)]/40"
+                  aria-hidden
+                >
+                  <span className="font-serif text-xl text-[var(--color-gold)]">
+                    {member.initials}
+                  </span>
+                </div>
                 <h3 className="font-serif text-2xl text-[var(--color-navy)] mb-1">
                   {member.name}
                 </h3>
-                <p className="text-sm uppercase tracking-[0.15em] text-[var(--color-gold)] mb-4 font-medium">
+                <p className="text-sm uppercase tracking-[0.15em] text-[var(--color-gold)] mb-3 font-medium">
                   {lang === "es" ? member.roleEs : member.role}
                 </p>
+                {member.credential && (
+                  <p className="inline-flex items-center gap-1.5 mb-4 text-xs font-medium text-[var(--color-navy)] bg-[var(--color-gold)]/10 border border-[var(--color-gold)]/40 rounded-full px-2.5 py-1">
+                    <ShieldCheck
+                      className="h-3.5 w-3.5 text-[var(--color-gold)]"
+                      aria-hidden
+                      strokeWidth={1.75}
+                    />
+                    {lang === "es" ? member.credentialEs : member.credential}
+                  </p>
+                )}
                 <p className="text-[var(--color-body-dark)] leading-relaxed text-sm md:text-base opacity-90">
                   {lang === "es" ? member.bioEs : member.bio}
                 </p>

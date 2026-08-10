@@ -13,6 +13,7 @@ const en = {
   nav_home: "Home",
   nav_services: "Services",
   nav_about: "About",
+  nav_pricing: "Pricing",
   nav_cta: "Start Your Intake",
   nav_lang_toggle: "Español",
   nav_menu_open: "Open menu",
@@ -77,7 +78,7 @@ const en = {
   // CTA banner
   cta_heading: "Ready to Get Your Documents Prepared?",
   cta_sub:
-    "Start with a free consultation — tell us what you need and we'll take care of the rest. Pricing provided after intake — your consultation is free.",
+    "Start with a free consultation — flat-fee pricing, court-ready documents, and a same-day response. No obligation.",
   cta_button: "Start Your Intake",
 
   // Footer
@@ -108,7 +109,7 @@ const en = {
   intake_eyebrow: "Start Your Intake",
   intake_heading: "Tell us what you need.",
   intake_sub:
-    "We'll review your intake and follow up with pricing, required information, and next steps — usually within 1 business day. Pricing provided after intake — your consultation is free.",
+    "We'll review your intake and follow up with your exact flat-fee quote, required information, and next steps — usually within 1 business day. Your consultation is free.",
 
   // Intake form — steps & nav
   intake_step_label: "Step",
@@ -483,6 +484,7 @@ const es: Dict = {
   nav_home: "Inicio",
   nav_services: "Servicios",
   nav_about: "Nosotros",
+  nav_pricing: "Precios",
   nav_cta: "Comenzar Solicitud",
   nav_lang_toggle: "English",
   nav_menu_open: "Abrir menú",
@@ -548,7 +550,7 @@ const es: Dict = {
   // CTA banner
   cta_heading: "¿Listo para Preparar Sus Documentos?",
   cta_sub:
-    "Comience con una consulta gratuita — díganos lo que necesita y nosotros nos encargamos del resto. Precios después de la solicitud — su consulta es gratuita.",
+    "Comience con una consulta gratuita — tarifa fija, documentos listos para la corte y respuesta el mismo día. Sin compromiso.",
   cta_button: "Comenzar Solicitud",
 
   // Footer
@@ -579,7 +581,7 @@ const es: Dict = {
   intake_eyebrow: "Comenzar Solicitud",
   intake_heading: "Díganos lo que necesita.",
   intake_sub:
-    "Revisaremos su solicitud y haremos un seguimiento con precios, información requerida y próximos pasos — generalmente dentro de 1 día hábil. Precios después de la solicitud — su consulta es gratuita.",
+    "Revisaremos su solicitud y haremos un seguimiento con su presupuesto exacto de tarifa fija, información requerida y próximos pasos — generalmente dentro de 1 día hábil. Su consulta es gratuita.",
 
   // Intake form — steps & nav
   intake_step_label: "Paso",

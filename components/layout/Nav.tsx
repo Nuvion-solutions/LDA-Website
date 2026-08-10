@@ -33,6 +33,7 @@ export function Nav() {
   const links = [
     { href: "/", label: t("nav_home") },
     { href: "/services", label: t("nav_services") },
+    { href: "/pricing", label: t("nav_pricing") },
     { href: "/about", label: t("nav_about") },
   ];
 

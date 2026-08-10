@@ -19,6 +19,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const pages: Page[] = [
     { path: "/", changeFrequency: "monthly", priority: 1.0 },
     { path: "/services", changeFrequency: "monthly", priority: 0.9 },
+    { path: "/pricing", changeFrequency: "monthly", priority: 0.85 },
     ...SERVICES.map((s) => ({
       path: `/services/${s.slug}`,
       changeFrequency: "monthly" as const,

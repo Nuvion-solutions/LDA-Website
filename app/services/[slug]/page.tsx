@@ -1,16 +1,9 @@
 import type { Metadata } from "next";
 import { LocaleLink as Link } from "@/components/LocaleLink";
 import { notFound } from "next/navigation";
-import {
-  ArrowRight,
-  ArrowLeft,
-  Check,
-  BadgeCheck,
-  Scale,
-  FileCheck2,
-  Zap,
-} from "lucide-react";
+import { ArrowRight, ArrowLeft, Check } from "lucide-react";
 import { SERVICES, localized } from "@/lib/services";
+import { STARTING_AT } from "@/lib/pricing";
 import {
   SERVICE_CHECKLISTS,
   checklistTitle,
@@ -21,6 +14,7 @@ import {
 import { BUSINESS } from "@/lib/utils";
 import { SITE_URL } from "@/lib/site";
 import { CTABanner } from "@/components/sections/CTABanner";
+import { OfferGuarantees } from "@/components/sections/OfferGuarantees";
 import { QuickConsultForm } from "@/components/forms/QuickConsultForm";
 import { translations } from "@/lib/translations";
 import { getServerLocale } from "@/lib/server-locale";
@@ -261,6 +255,25 @@ export default async function ServiceDetailPage({
                   <p className="mt-5 text-[var(--color-body-light)] text-base md:text-lg leading-relaxed">
                     {localized(service, "short", lang)}
                   </p>
+                  {STARTING_AT[service.id] != null && (
+                    <p className="mt-4 flex flex-wrap items-baseline gap-x-2 gap-y-1">
+                      <span className="text-sm text-[var(--color-muted-light)]">
+                        {lang === "es" ? "Desde" : "Starting at"}
+                      </span>
+                      <span className="font-serif text-2xl text-[var(--color-gold)]">
+                        ${STARTING_AT[service.id].toLocaleString("en-US")}
+                      </span>
+                      <span className="text-sm text-[var(--color-muted-light)]">
+                        · {lang === "es" ? "tarifa fija" : "flat fee"}
+                      </span>
+                      <Link
+                        href="/pricing"
+                        className="text-sm text-[var(--color-gold-light)] underline underline-offset-2 hover:text-[var(--color-gold)] transition-colors"
+                      >
+                        {lang === "es" ? "Ver todos los precios" : "See all pricing"}
+                      </Link>
+                    </p>
+                  )}
                 </div>
               </div>
               <p className="mt-6 text-xs text-[var(--color-muted-light)] max-w-2xl">
@@ -275,64 +288,9 @@ export default async function ServiceDetailPage({
         </div>
       </section>
 
-      {/* Value strip — answers the two biggest conversion blockers for the paid
-          clicks that land here (trust + price) right under the hero form. */}
-      <section className="bg-[var(--color-offwhite)] border-b border-[var(--color-border-light)]">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 md:py-7">
-          <ul className="grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-5">
-            {[
-              {
-                Icon: BadgeCheck,
-                title: lang === "es" ? "Registrado y Afianzado" : "Registered & Bonded",
-                sub: lang === "es" ? "LDA #87 · Condado de Sonoma" : "LDA #87 · Sonoma County",
-              },
-              {
-                Icon: Scale,
-                title:
-                  lang === "es"
-                    ? "Una fracción del costo de un abogado"
-                    : "A Fraction of Attorney Fees",
-                sub:
-                  lang === "es"
-                    ? "Consulta gratis, presupuesto claro"
-                    : "Free consultation, clear quote",
-              },
-              {
-                Icon: FileCheck2,
-                title: lang === "es" ? "Documentos listos para la corte" : "Court-Ready Documents",
-                sub:
-                  lang === "es"
-                    ? "Preparados correctamente y a tiempo"
-                    : "Prepared right, filed on time",
-              },
-              {
-                Icon: Zap,
-                title: lang === "es" ? "Respuesta el mismo día" : "Same-Day Response",
-                sub:
-                  lang === "es"
-                    ? "A menudo en menos de una hora, Lun–Sáb"
-                    : "Often within the hour, Mon–Sat",
-              },
-            ].map(({ Icon: ValueIcon, title: vTitle, sub }) => (
-              <li key={vTitle} className="flex items-start gap-3">
-                <ValueIcon
-                  className="h-5 w-5 mt-0.5 text-[var(--color-gold)] shrink-0"
-                  aria-hidden
-                  strokeWidth={1.5}
-                />
-                <div>
-                  <p className="text-sm font-medium text-[var(--color-navy)] leading-snug">
-                    {vTitle}
-                  </p>
-                  <p className="mt-0.5 text-xs text-[var(--color-body-dark)] opacity-75 leading-snug">
-                    {sub}
-                  </p>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
+      {/* Our promise — the four guarantees that turn a paid ad click into a
+          lead, right under the hero form. */}
+      <OfferGuarantees lang={lang} />
 
       {/* Detail */}
       <section className="bg-white py-16 md:py-24">

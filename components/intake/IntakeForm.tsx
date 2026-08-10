@@ -284,21 +284,19 @@ const intakeSchema = z
       .max(30, "err_phone_long")
       .regex(/^[0-9+()\-.\s]+$/, "err_phone_invalid"),
     email: z.email("err_email_invalid"),
-    contactMethod: requiredEnum(
-      ["Phone", "Email", "Text"],
-      "err_contact_method",
-    ),
-    bestTime: requiredEnum(
-      ["Morning", "Afternoon", "LateAfternoon"],
-      "err_best_time",
-    ),
+    // Contact preference + timing help the client reach out efficiently, but
+    // they're not essential to capture a reachable lead — keeping them optional
+    // trims the required-field count on the critical first step (higher
+    // completion). Still recorded to the CRM whenever the visitor fills them.
+    contactMethod: z.enum(["Phone", "Email", "Text"]).or(z.literal("")).optional(),
+    bestTime: z
+      .enum(["Morning", "Afternoon", "LateAfternoon"])
+      .or(z.literal(""))
+      .optional(),
 
     // Step 2
     primaryService: requiredEnum(PRIMARY_SERVICES, "err_choose_service"),
-    needsMoreServices: requiredEnum(
-      ["Yes", "No"],
-      "err_yes_no",
-    ),
+    needsMoreServices: z.enum(["Yes", "No"]).or(z.literal("")).optional(),
     additionalServices: z.array(z.string()).optional(),
 
     // Step 3 — Divorce
@@ -1091,7 +1089,7 @@ export function IntakeForm() {
 
               <fieldset className="mt-7">
                 <legend className={labelBase}>
-                  {t("intake_f_contact_method")} <Req />
+                  {t("intake_f_contact_method")}
                 </legend>
                 <div className="flex flex-wrap gap-3 mt-1">
                   {(
@@ -1119,7 +1117,7 @@ export function IntakeForm() {
 
               <div className="mt-7">
                 <label htmlFor="bestTime" className={labelBase}>
-                  {t("intake_f_best_time")} <Req />
+                  {t("intake_f_best_time")}
                 </label>
                 <select
                   id="bestTime"
@@ -1172,7 +1170,7 @@ export function IntakeForm() {
 
               <fieldset className="mt-6">
                 <legend className={labelBase}>
-                  {t("intake_f_needs_more")} <Req />
+                  {t("intake_f_needs_more")}
                 </legend>
                 <div className="flex flex-wrap gap-3 mt-1">
                   {(

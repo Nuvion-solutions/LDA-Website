@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { motion } from "framer-motion";
-import { Phone, MessageSquareText, CheckCircle2 } from "lucide-react";
+import { Phone, MessageSquareText, CheckCircle2, Lock } from "lucide-react";
 import { BUSINESS } from "@/lib/utils";
 import { CallLink } from "@/components/analytics/CallLink";
 import { sendGAEvent } from "@next/third-parties/google";
@@ -220,6 +220,13 @@ export function QuickConsultForm({
               ? "Solicitar Consulta Gratis"
               : "Get My Free Consultation"}
         </button>
+
+        <p className="mt-2.5 flex items-center justify-center gap-1.5 text-[11px] text-[var(--color-body-dark)]/55">
+          <Lock className="h-3 w-3 shrink-0" aria-hidden />
+          {es
+            ? "Su información es privada y confidencial."
+            : "Your information is private & confidential."}
+        </p>
       </form>
 
       {/* Two even lower-friction paths for people who'd rather talk now. */}

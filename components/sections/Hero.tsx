@@ -34,7 +34,7 @@ export function Hero() {
         <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-10 lg:gap-16 items-center">
         <motion.div
           variants={staggerContainer}
-          initial="hidden"
+          initial={false}
           animate="visible"
           className="max-w-2xl"
         >
@@ -101,11 +101,7 @@ export function Hero() {
           </motion.p>
         </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.15, duration: 0.5 }}
-        >
+        <motion.div initial={false} animate={{ opacity: 1, y: 0 }}>
           <QuickConsultForm />
         </motion.div>
         </div>

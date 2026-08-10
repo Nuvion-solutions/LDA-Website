@@ -14,6 +14,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Loader2,
+  Lock,
 } from "lucide-react";
 import { BUSINESS } from "@/lib/utils";
 import { CallLink } from "@/components/analytics/CallLink";
@@ -275,15 +276,18 @@ const optDate = z.string().optional().or(z.literal(""));
 
 const intakeSchema = z
   .object({
-    // Step 1
+    // Step 1. Only first name + phone are required to capture a reachable lead
+    // — last name and email are optional so the critical first step stays as
+    // short as possible (fewer required fields = higher completion). Email is
+    // still format-checked when provided, and is recorded whenever supplied.
     firstName: z.string().min(1, "err_first_name").max(100),
-    lastName: z.string().min(1, "err_last_name").max(100),
+    lastName: z.string().max(100).optional().or(z.literal("")),
     phone: z
       .string()
       .min(7, "err_phone_invalid")
       .max(30, "err_phone_long")
       .regex(/^[0-9+()\-.\s]+$/, "err_phone_invalid"),
-    email: z.email("err_email_invalid"),
+    email: z.email("err_email_invalid").or(z.literal("")).optional(),
     // Contact preference + timing help the client reach out efficiently, but
     // they're not essential to capture a reachable lead — keeping them optional
     // trims the required-field count on the critical first step (higher
@@ -1046,8 +1050,7 @@ export function IntakeForm() {
                 </Field>
                 <Field
                   id="lastName"
-                  label={t("intake_f_last")}
-                  required
+                  label={`${t("intake_f_last")} (${lang === "es" ? "opcional" : "optional"})`}
                   error={tErr(errors.lastName?.message, t)}
                 >
                   <input
@@ -1073,8 +1076,7 @@ export function IntakeForm() {
                 </Field>
                 <Field
                   id="email"
-                  label={t("intake_f_email")}
-                  required
+                  label={`${t("intake_f_email")} (${lang === "es" ? "opcional" : "optional"})`}
                   error={tErr(errors.email?.message, t)}
                 >
                   <input
@@ -1136,6 +1138,16 @@ export function IntakeForm() {
                   <p className={errorBase}>{tErr(errors.bestTime.message, t)}</p>
                 )}
               </div>
+
+              <p className="mt-7 flex items-center gap-2 text-xs text-[var(--color-body-dark)] opacity-70">
+                <Lock
+                  className="h-3.5 w-3.5 shrink-0 text-[var(--color-gold)]"
+                  aria-hidden
+                />
+                {lang === "es"
+                  ? "Su información es privada y confidencial. Solo la usamos para ayudarle con sus documentos."
+                  : "Your information is private and confidential — we only use it to help with your documents."}
+              </p>
             </StepWrap>
           )}
 

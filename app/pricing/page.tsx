@@ -127,8 +127,8 @@ export default async function PricingPage() {
             </p>
             <p className="text-sm text-[var(--color-body-dark)] leading-relaxed">
               {es
-                ? "Una tarifa fija por servicio, cotizada por adelantado después de su consulta gratis. Los precios a continuación son el máximo para un asunto estándar — su presupuesto exacto depende de la complejidad y nunca sube más de lo cotizado. Los cargos de gobierno, corte, presentación, registro y de terceros (si aplican) son aparte."
-                : "One flat fee per service, quoted up front after your free consultation. The prices below are the maximum for a standard matter — your exact quote depends on complexity and never goes higher than what we quote you. Government, court, filing, recording, and any third-party charges are separate."}
+                ? "Una tarifa fija por servicio, cotizada por adelantado después de su consulta gratis. Cada servicio muestra un precio inicial para un asunto simple y un paquete completo de servicio total — su presupuesto exacto depende de su caso y nunca sube más de lo cotizado. Los cargos de gobierno, corte, presentación, registro y de terceros (si aplican) son aparte."
+                : "One flat fee per service, quoted up front after your free consultation. Each service shows a starting price for a simple matter and a complete, full-service package — your exact quote depends on your case and never goes higher than what we quote you. Government, court, filing, recording, and any third-party charges are separate."}
             </p>
           </div>
         </div>

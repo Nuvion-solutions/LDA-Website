@@ -6,14 +6,14 @@ import { Scale, ScrollText, Landmark, Home, Building2, Globe } from "lucide-reac
 // flat-fee schedule — the lowest standard package a client would actually buy,
 // so the anchor is attractive without being misleading.
 export const STARTING_AT: Record<string, number> = {
-  divorce: 1500,
+  divorce: 900,
   eviction: 750,
-  "living-trust": 2000,
+  "living-trust": 700,
   "power-of-attorney": 1250,
   dmv: 1000,
   "tax-organization": 1500,
   wills: 1250,
-  probate: 2000,
+  probate: 1500,
   "name-change": 1500,
   "small-claims": 1250,
   guardianship: 3000,
@@ -58,6 +58,15 @@ export const PRICING_CATEGORIES: PricingCategory[] = [
       "Divorcio sin disputa, presentaciones, custodia y documentos de la corte familiar — preparados y listos para la corte.",
     icon: Scale,
     packages: [
+      {
+        name: "Uncontested Divorce — Documents Prepared",
+        nameEs: "Divorcio Sin Disputa — Documentos Preparados",
+        price: 900,
+        from: true,
+        desc: "All your divorce documents prepared and ready — you file and serve. For simple, agreed cases.",
+        descEs:
+          "Todos sus documentos de divorcio preparados y listos — usted los presenta y notifica. Para casos simples y de mutuo acuerdo.",
+      },
       {
         name: "Complete Uncontested Divorce",
         nameEs: "Divorcio Completo Sin Disputa",
@@ -111,6 +120,15 @@ export const PRICING_CATEGORIES: PricingCategory[] = [
       "Proteja a su familia con un fideicomiso en vida, testamento y directivas — por una fracción del costo de un abogado.",
     icon: ScrollText,
     packages: [
+      {
+        name: "Living Trust — Document Preparation",
+        nameEs: "Fideicomiso en Vida — Preparación de Documentos",
+        price: 700,
+        from: true,
+        desc: "Your revocable living trust prepared and ready to sign — the essentials, done for you.",
+        descEs:
+          "Su fideicomiso revocable en vida preparado y listo para firmar — lo esencial, hecho por usted.",
+      },
       {
         name: "Complete Individual Estate Plan",
         nameEs: "Plan Patrimonial Individual Completo",
@@ -178,7 +196,8 @@ export const PRICING_CATEGORIES: PricingCategory[] = [
       {
         name: "Initial Petition for Probate",
         nameEs: "Petición Inicial de Sucesión",
-        price: 2000,
+        price: 1500,
+        from: true,
         desc: "Open a probate case with a properly prepared petition.",
         descEs: "Abra un caso sucesorio con una petición correctamente preparada.",
       },

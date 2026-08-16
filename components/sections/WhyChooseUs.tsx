@@ -5,7 +5,7 @@ import {
   Sparkles,
   BadgeDollarSign,
   MessageSquareText,
-  Scale,
+  Clock,
 } from "lucide-react";
 import { fadeUp, staggerContainer, viewportOnce } from "@/lib/animations";
 import { useLanguage } from "@/lib/language-context";
@@ -25,7 +25,7 @@ export function WhyChooseUs() {
       body: t("why_3_body"),
     },
     {
-      icon: Scale,
+      icon: Clock,
       title: t("why_4_title"),
       body: t("why_4_body"),
     },

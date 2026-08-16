@@ -25,13 +25,13 @@ const en = {
   hero_headline_2: "Preparation You Can",
   hero_headline_3: "Count On.",
   hero_subhead:
-    "California Legal Document Excellence, LLC helps individuals and families prepare court forms, documents, and administrative paperwork — accurately, professionally, and at your direction.",
+    "California Legal Document Excellence, LLC helps individuals and families prepare court forms, documents, and administrative paperwork — accurately, at your direction, and fast, with most matters court-ready in as little as 48 hours.",
   hero_cta_primary: "Start Your Intake",
   hero_cta_secondary: "Call",
   hero_trust_1: "Registered & Bonded LDA #87",
   hero_trust_2: "Locally Owned · Sonoma County",
   hero_trust_3: "Free Consultation",
-  hero_trust_4: "Same-Day Response",
+  hero_trust_4: "Court-Ready in 48 Hours",
   hero_trust_5: "Attorney Referrals Available",
 
   // Services preview
@@ -67,9 +67,9 @@ const en = {
   why_3_title: "Clear Communication",
   why_3_body:
     "We keep you informed at every step so you always know where your documents stand.",
-  why_4_title: "Attorney Referrals When You Need Them",
+  why_4_title: "Fast Turnaround",
   why_4_body:
-    "Most document matters never need a lawyer — but if yours does, you're not left to figure it out alone. We're not a law firm and don't give legal advice, but when a case calls for legal representation we'll connect you with a licensed California attorney. You always have a path forward.",
+    "Deadlines don't wait, so we don't either. We expedite your preparation, with most matters court-ready in as little as 48 hours — done accurately the first time, so you can sign and file on schedule.",
 
   // FAQ
   faq_eyebrow: "Common Questions",
@@ -496,13 +496,13 @@ const es: Dict = {
   hero_headline_2: "de Documentos en la que",
   hero_headline_3: "Puede Confiar.",
   hero_subhead:
-    "California Legal Document Excellence, LLC ayuda a individuos y familias a preparar formularios judiciales, documentos y trámites administrativos — con precisión, profesionalismo y según sus instrucciones.",
+    "California Legal Document Excellence, LLC ayuda a individuos y familias a preparar formularios judiciales, documentos y trámites administrativos — con precisión, según sus instrucciones y con rapidez, con la mayoría de los casos listos para la corte en tan solo 48 horas.",
   hero_cta_primary: "Comenzar Solicitud",
   hero_cta_secondary: "Llamar",
   hero_trust_1: "LDA #87 Registrado y con Fianza",
   hero_trust_2: "Empresa Local · Condado de Sonoma",
   hero_trust_3: "Consulta Gratuita",
-  hero_trust_4: "Respuesta el Mismo Día",
+  hero_trust_4: "Listos para la Corte en 48 Horas",
   hero_trust_5: "Referencias a Abogados Disponibles",
 
   // Services preview
@@ -539,9 +539,9 @@ const es: Dict = {
   why_3_title: "Comunicación Clara",
   why_3_body:
     "Le mantenemos informado en cada paso para que siempre sepa el estado de sus documentos.",
-  why_4_title: "Referencias a Abogados Cuando Las Necesite",
+  why_4_title: "Entrega Rápida",
   why_4_body:
-    "La mayoría de los trámites de documentos nunca necesitan un abogado — pero si el suyo lo necesita, no lo dejamos resolverlo solo. No somos un bufete de abogados y no damos asesoría legal, pero cuando un caso requiere representación legal, lo conectamos con un abogado con licencia en California. Siempre tiene un camino a seguir.",
+    "Los plazos no esperan, y nosotros tampoco. Agilizamos la preparación de sus documentos, con la mayoría de los casos listos para la corte en tan solo 48 horas — bien hechos desde la primera vez, para que pueda firmar y presentar a tiempo.",
 
   // FAQ
   faq_eyebrow: "Preguntas Comunes",

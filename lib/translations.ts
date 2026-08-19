@@ -46,14 +46,18 @@ const en = {
   process_heading: "How It Works",
   process_sub:
     "A clear, simple process from your first call to the final filing — so you always know what comes next.",
-  process_1_title: "Free Consultation",
-  process_1_body: "Tell us what documents you need prepared.",
-  process_2_title: "Document Preparation",
-  process_2_body: "We prepare your paperwork carefully and professionally.",
-  process_3_title: "Client Review & Signing",
-  process_3_body: "You review, approve, and sign your documents.",
-  process_4_title: "You Submit",
-  process_4_body: "You file and submit your documents directly.",
+  process_1_title: "Free Consultation & Quote",
+  process_1_body:
+    "Tell us what you need. We confirm your exact flat fee up front — no surprises, no hourly billing.",
+  process_2_title: "We Prepare Your Documents",
+  process_2_body:
+    "Every court-ready document, prepared accurately — most matters ready in as little as 48 hours.",
+  process_3_title: "Review & Sign",
+  process_3_body:
+    "We walk you through every page. You review, approve, and sign — notary available if you need it.",
+  process_4_title: "File With Confidence",
+  process_4_body:
+    "You get clear, step-by-step filing instructions, so there are no surprises at the courthouse.",
 
   // Why choose us
   why_eyebrow: "Why Choose Us",
@@ -517,15 +521,18 @@ const es: Dict = {
   process_heading: "Cómo Funciona",
   process_sub:
     "Un proceso claro y simple desde su primera llamada hasta la presentación final — para que siempre sepa qué sigue.",
-  process_1_title: "Consulta Gratuita",
-  process_1_body: "Díganos qué documentos necesita preparar.",
-  process_2_title: "Preparación de Documentos",
+  process_1_title: "Consulta y Presupuesto Gratis",
+  process_1_body:
+    "Díganos qué necesita. Confirmamos su tarifa fija exacta desde el inicio — sin sorpresas ni cobro por hora.",
+  process_2_title: "Preparamos Sus Documentos",
   process_2_body:
-    "Preparamos sus documentos con cuidado y profesionalismo.",
-  process_3_title: "Revisión y Firma del Cliente",
-  process_3_body: "Usted revisa, aprueba y firma sus documentos.",
-  process_4_title: "Usted Presenta",
-  process_4_body: "Usted presenta y entrega sus documentos directamente.",
+    "Cada documento listo para la corte, preparado con precisión — la mayoría en tan solo 48 horas.",
+  process_3_title: "Revisión y Firma",
+  process_3_body:
+    "Le explicamos cada página. Usted revisa, aprueba y firma — notario disponible si lo necesita.",
+  process_4_title: "Presente con Confianza",
+  process_4_body:
+    "Recibe instrucciones claras, paso a paso, para presentar — sin sorpresas en la corte.",
 
   // Why choose us
   why_eyebrow: "Por Qué Elegirnos",

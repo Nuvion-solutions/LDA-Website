@@ -15,6 +15,7 @@ import { BUSINESS } from "@/lib/utils";
 import { SITE_URL } from "@/lib/site";
 import { CTABanner } from "@/components/sections/CTABanner";
 import { OfferGuarantees } from "@/components/sections/OfferGuarantees";
+import { ProcessSteps } from "@/components/sections/ProcessSteps";
 import { QuickConsultForm } from "@/components/forms/QuickConsultForm";
 import { translations } from "@/lib/translations";
 import { getServerLocale } from "@/lib/server-locale";
@@ -425,6 +426,8 @@ export default async function ServiceDetailPage({
           )}
         </div>
       </section>
+
+      <ProcessSteps />
 
       <CTABanner />
     </>

@@ -4,6 +4,7 @@ import { BadgeDollarSign, Scale, Phone, BadgeCheck } from "lucide-react";
 import { BUSINESS, cn } from "@/lib/utils";
 import { CTABanner } from "@/components/sections/CTABanner";
 import { OfferGuarantees } from "@/components/sections/OfferGuarantees";
+import { ProcessSteps } from "@/components/sections/ProcessSteps";
 import { CallLink } from "@/components/analytics/CallLink";
 import { PRICING_CATEGORIES } from "@/lib/pricing";
 import { translations } from "@/lib/translations";
@@ -226,6 +227,9 @@ export default async function PricingPage() {
           </section>
         );
       })}
+
+      {/* How it works — the concrete process, right before the final CTA */}
+      <ProcessSteps />
 
       {/* Closing CTA */}
       <section className="bg-[var(--color-navy)] text-white py-16 md:py-20">

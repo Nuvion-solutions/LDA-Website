@@ -1,4 +1,4 @@
-import { ShieldCheck, BadgeDollarSign, Zap, CalendarClock } from "lucide-react";
+import { ShieldCheck, BadgeDollarSign, Zap, CalendarClock, Headset } from "lucide-react";
 import { BUSINESS } from "@/lib/utils";
 
 // The client's four promises — the objection-killers that turn an ad click into
@@ -38,6 +38,13 @@ export function OfferGuarantees({ lang }: { lang: string }) {
         ? "Reserve esta semana y comenzamos en 2 días"
         : "Book this week, we begin in two days",
     },
+    {
+      Icon: Headset,
+      title: es ? "Soporte Ilimitado" : "Unlimited Support",
+      sub: es
+        ? "Pregunte lo que sea, cuando sea — sin cargos por pregunta"
+        : "Ask anything, anytime — no per-question fees",
+    },
   ];
 
   return (
@@ -46,7 +53,7 @@ export function OfferGuarantees({ lang }: { lang: string }) {
         <p className="text-[10px] tracking-[0.2em] uppercase text-[var(--color-navy)] opacity-55 mb-5">
           {es ? "Nuestra promesa" : "Our promise to you"}
         </p>
-        <ul className="grid grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-6">
+        <ul className="grid grid-cols-2 lg:grid-cols-5 gap-x-6 gap-y-6">
           {guarantees.map(({ Icon, title, sub }) => (
             <li key={title} className="flex items-start gap-3">
               <span className="shrink-0 flex items-center justify-center w-9 h-9 rounded-sm bg-white border border-[var(--color-gold)]/40">

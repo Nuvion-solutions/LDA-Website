@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Phone, MessageSquareText, CheckCircle2, Lock } from "lucide-react";
 import { BUSINESS } from "@/lib/utils";
 import { CallLink } from "@/components/analytics/CallLink";
+import { captureCallClick } from "@/components/forms/CallCaptureModal";
 import { sendGAEvent } from "@next/third-parties/google";
 import { useLanguage } from "@/lib/language-context";
 
@@ -112,6 +113,7 @@ export function QuickConsultForm({
         <div className="mt-5 flex flex-col sm:flex-row gap-3 justify-center">
           <CallLink
             source="quick_form_success"
+            capture={false}
             className="inline-flex items-center justify-center gap-2 bg-[var(--color-navy)] text-white px-5 py-2.5 rounded-sm text-sm font-medium"
           >
             <Phone className="h-4 w-4" aria-hidden /> {BUSINESS.phone}
@@ -239,7 +241,7 @@ export function QuickConsultForm({
         </CallLink>
         <a
           href={`sms:${BUSINESS.phoneTel}`}
-          onClick={() => {
+          onClick={(e) => {
             try {
               sendGAEvent("event", "text_click", { source: "quick_form" });
               // Texting is the same "Contact" conversion as a call click.
@@ -252,6 +254,7 @@ export function QuickConsultForm({
             } catch {
               /* never block */
             }
+            captureCallClick(e, "text");
           }}
           className="inline-flex items-center justify-center gap-1.5 border border-black/15 rounded-sm py-2 text-sm font-medium text-[var(--color-navy)] hover:border-[var(--color-gold)]"
         >

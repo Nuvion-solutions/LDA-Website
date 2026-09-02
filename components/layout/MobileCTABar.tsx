@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { Phone, MessageSquareText } from "lucide-react";
 import { BUSINESS } from "@/lib/utils";
 import { CallLink } from "@/components/analytics/CallLink";
+import { captureCallClick } from "@/components/forms/CallCaptureModal";
 import { sendGAEvent } from "@next/third-parties/google";
 import { useLanguage } from "@/lib/language-context";
 import { stripLocale } from "@/lib/i18n";
@@ -32,7 +33,7 @@ export function MobileCTABar() {
       </CallLink>
       <a
         href={`sms:${BUSINESS.phoneTel}`}
-        onClick={() => {
+        onClick={(e) => {
           try {
             sendGAEvent("event", "text_click", { source: "mobile_bar" });
             // Texting is the same "Contact" conversion as a call click.
@@ -44,6 +45,7 @@ export function MobileCTABar() {
           } catch {
             /* never block the SMS */
           }
+          captureCallClick(e, "text");
         }}
         className="flex-1 flex flex-col items-center justify-center gap-0.5 py-2.5 text-[var(--color-navy)] text-xs font-medium border-r border-[var(--color-border-light)]"
       >

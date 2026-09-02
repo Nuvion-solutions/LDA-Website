@@ -5,6 +5,7 @@ import "./globals.css";
 import { Nav } from "@/components/layout/Nav";
 import { Footer } from "@/components/layout/Footer";
 import { MobileCTABar } from "@/components/layout/MobileCTABar";
+import { CallCaptureModal } from "@/components/forms/CallCaptureModal";
 import { StructuredData } from "@/components/seo/StructuredData";
 import { Analytics } from "@/components/analytics/Analytics";
 import { GoogleAds } from "@/components/analytics/GoogleAds";
@@ -129,6 +130,7 @@ export default async function RootLayout({
           {/* Spacer so the fixed mobile bar never covers footer content. */}
           <div className="h-14 md:hidden" aria-hidden />
           <MobileCTABar />
+          <CallCaptureModal />
         </LanguageProvider>
         <VercelAnalytics />
         <SpeedInsights />

@@ -579,9 +579,13 @@ function spamReason(data: IntakeBody, partial: boolean): string | null {
   )
     return "link_spam";
   // Consent + service are markers the full multi-step intake always sends. The
-  // lightweight hero quick-form (name + phone + service) and the early partial
-  // ping legitimately omit them, so only enforce them on full submissions.
-  const lightweight = partial || data.source === "quick_consult_hero";
+  // lightweight hero quick-form (name + phone + service), the call-capture
+  // callback form (name + phone only), and the early partial ping legitimately
+  // omit them, so only enforce them on full submissions.
+  const lightweight =
+    partial ||
+    data.source === "quick_consult_hero" ||
+    data.source === "call_capture";
   if (!lightweight) {
     if (data.consentLDA !== true || data.consentContact !== true)
       return "missing_consent";
@@ -775,12 +779,23 @@ export async function POST(req: Request) {
     return Response.json({ success: true, mode: "local", submissionId });
   }
 
+  // A callback request comes from the call-capture modal: the visitor tapped
+  // Call/Text but asked to be called back instead. Frame the email so the
+  // business knows to dial out, not wait for an inbound call.
+  const isCallback = data.source === "call_capture";
+
   const sections = buildSections(data);
   const { html, text } = renderEmail(sections, {
-    urgencyLabel: partial ? "🟡 Intake started — contact captured" : urgencyLabel,
-    note: partial
-      ? "This visitor completed the contact step but may not have finished the full intake. Their details are below — reaching out is recommended. If they finish, you'll get a second email with full details under the same Lead ID."
-      : undefined,
+    urgencyLabel: isCallback
+      ? "📞 Callback requested — tapped Call/Text"
+      : partial
+        ? "🟡 Intake started — contact captured"
+        : urgencyLabel,
+    note: isCallback
+      ? "This visitor tapped Call or Text on the website and left their number for a callback instead. The site promises a same-day response — call them back."
+      : partial
+        ? "This visitor completed the contact step but may not have finished the full intake. Their details are below — reaching out is recommended. If they finish, you'll get a second email with full details under the same Lead ID."
+        : undefined,
     leadId: data.leadId,
     submissionId,
     submittedAt,
@@ -795,11 +810,13 @@ export async function POST(req: Request) {
 
   const isUrgent = urgencyTag !== "standard-lead";
   const name = `${data.firstName ?? "Unknown"} ${data.lastName ?? ""}`.trim();
-  const subject = partial
-    ? `🟡 Intake started — ${name}`
-    : `${isUrgent ? `${urgencyLabel} — ` : ""}New lead: ${name} (${
-        data.primaryService ?? "general"
-      })`.trim();
+  const subject = isCallback
+    ? `📞 Callback request — ${name}`
+    : partial
+      ? `🟡 Intake started — ${name}`
+      : `${isUrgent ? `${urgencyLabel} — ` : ""}New lead: ${name} (${
+          data.primaryService ?? "general"
+        })`.trim();
 
   const result = await sendLeadEmail(
     {

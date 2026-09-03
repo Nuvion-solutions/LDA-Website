@@ -74,14 +74,20 @@ export function QuickConsultForm({
         }),
       });
       if (!res.ok) throw new Error("failed");
+      // A spam-filtered submission gets a success-shaped response (mode
+      // "ignored") so bots get no signal to adapt — but nothing was delivered,
+      // so it must not count as a conversion anywhere. The visitor still sees
+      // the thank-you screen either way.
+      const result = await res.json().catch(() => null);
+      const delivered = result?.mode !== "ignored";
       // Mirror the full intake's conversion events so a quick lead counts too.
-      if (process.env.NEXT_PUBLIC_GA_ID) {
+      if (delivered && process.env.NEXT_PUBLIC_GA_ID) {
         sendGAEvent("event", "generate_lead", { service });
       }
-      if (process.env.NEXT_PUBLIC_FB_PIXEL_ID) {
+      if (delivered && process.env.NEXT_PUBLIC_FB_PIXEL_ID) {
         window.fbq?.("track", "Lead", { content_name: service }, { eventID: leadId });
       }
-      if (process.env.NEXT_PUBLIC_GOOGLE_ADS_CONVERSION_LABEL) {
+      if (delivered && process.env.NEXT_PUBLIC_GOOGLE_ADS_CONVERSION_LABEL) {
         window.gtag?.("event", "conversion", {
           send_to: process.env.NEXT_PUBLIC_GOOGLE_ADS_CONVERSION_LABEL,
         });

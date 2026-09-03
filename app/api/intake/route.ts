@@ -652,8 +652,13 @@ export async function POST(req: Request) {
   const emailFrom = process.env.INTAKE_EMAIL_FROM;
 
   if (honeypotTripped || tooFast || spam) {
+    const dropReason = honeypotTripped
+      ? "honeypot"
+      : tooFast
+        ? "too_fast"
+        : (spam as string);
     console.warn("[intake] Dropped likely-bot submission:", {
-      reason: honeypotTripped ? "honeypot" : tooFast ? "too_fast" : spam,
+      reason: dropReason,
       elapsedMs: data.elapsedMs,
       firstName: data.firstName,
       phone: data.phone,
@@ -700,6 +705,54 @@ export async function POST(req: Request) {
             html: alertHtml,
             text: alertText,
             ...(data.email ? { reply_to: data.email } : {}),
+          },
+          apiKey,
+        );
+      });
+    }
+
+    // Durable record of EVERY dropped submission — bots included. Console logs
+    // roll off Vercel's free tier within an hour, which once made a counted
+    // conversion untraceable ("the conversion fired but no email exists").
+    // These records go to a monitoring address — INTAKE_DROPPED_EMAIL_TO, or
+    // the existing INTAKE_EMAIL_BCC monitoring copy when that's not set — not
+    // the client's lead inbox, so bot noise never reaches the business while
+    // every submission stays recoverable.
+    const droppedTo = (
+      process.env.INTAKE_DROPPED_EMAIL_TO ??
+      process.env.INTAKE_EMAIL_BCC ??
+      ""
+    )
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+    if (droppedTo.length > 0 && apiKey && emailFrom) {
+      const who =
+        `${data.firstName ?? ""} ${data.lastName ?? ""}`.trim() || "Unknown";
+      const { html: recordHtml, text: recordText } = renderEmail(
+        buildSections(data),
+        {
+          urgencyLabel: `🚫 Blocked submission — ${dropReason}`,
+          note: `Auto-blocked by the spam filter (reason: ${dropReason}). This is a monitoring record so no submission is ever untraceable — if it looks like a real person, reach out.`,
+          submissionId: crypto.randomUUID(),
+          submittedAt: new Date().toISOString(),
+          contact: {
+            name: who,
+            phone: data.phone,
+            email: data.email,
+            preferredContact: data.contactMethod,
+            bestTime: data.bestTime,
+          },
+        },
+      );
+      after(async () => {
+        await sendLeadEmail(
+          {
+            from: emailFrom,
+            to: droppedTo,
+            subject: `🚫 Blocked submission (${dropReason}) — ${who}`,
+            html: recordHtml,
+            text: recordText,
           },
           apiKey,
         );

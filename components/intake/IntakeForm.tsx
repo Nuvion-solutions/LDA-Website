@@ -844,9 +844,15 @@ export function IntakeForm() {
         }),
       });
       if (!res.ok) throw new Error("Submission failed");
+      // A spam-filtered submission gets a success-shaped response (mode
+      // "ignored") so bots get no signal to adapt — but nothing was delivered,
+      // so it must not count as a conversion anywhere. The visitor still sees
+      // the thank-you screen either way.
+      const result = await res.json().catch(() => null);
+      const delivered = result?.mode !== "ignored";
       // GA4 conversion event. No-op if analytics isn't configured (the event
       // simply queues in the dataLayer with no consumer).
-      if (process.env.NEXT_PUBLIC_GA_ID) {
+      if (delivered && process.env.NEXT_PUBLIC_GA_ID) {
         sendGAEvent("event", "generate_lead", {
           service: data.primaryService,
         });
@@ -856,7 +862,7 @@ export function IntakeForm() {
       // eventID must be the leadId: the server sends the same value as
       // event_id on its Conversions API Lead event, and Meta deduplicates the
       // browser/server pair by (event name, event id).
-      if (process.env.NEXT_PUBLIC_FB_PIXEL_ID) {
+      if (delivered && process.env.NEXT_PUBLIC_FB_PIXEL_ID) {
         window.fbq?.(
           "track",
           "Lead",
@@ -867,7 +873,7 @@ export function IntakeForm() {
       // Google Ads "Submit lead form" conversion. Fires on a successful
       // submission (not just a button click), so only real leads count. The
       // full send_to value (AW-XXXX/label) lives in the env var.
-      if (process.env.NEXT_PUBLIC_GOOGLE_ADS_CONVERSION_LABEL) {
+      if (delivered && process.env.NEXT_PUBLIC_GOOGLE_ADS_CONVERSION_LABEL) {
         window.gtag?.("event", "conversion", {
           send_to: process.env.NEXT_PUBLIC_GOOGLE_ADS_CONVERSION_LABEL,
         });

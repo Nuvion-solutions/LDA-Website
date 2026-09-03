@@ -109,15 +109,19 @@ export function CallCaptureModal() {
         }),
       });
       if (!res.ok) throw new Error("failed");
+      // A spam-filtered submission gets a success-shaped response (mode
+      // "ignored") — never delivered, so it must not count as a conversion.
+      const result = await res.json().catch(() => null);
+      const delivered = result?.mode !== "ignored";
       // A callback request is a real lead — fire the same conversion set as
       // the quick-consult form so it counts like any other form lead.
-      if (process.env.NEXT_PUBLIC_GA_ID) {
+      if (delivered && process.env.NEXT_PUBLIC_GA_ID) {
         sendGAEvent("event", "generate_lead", { service: "Callback" });
       }
-      if (process.env.NEXT_PUBLIC_FB_PIXEL_ID) {
+      if (delivered && process.env.NEXT_PUBLIC_FB_PIXEL_ID) {
         window.fbq?.("track", "Lead", { content_name: "Callback" }, { eventID: leadId });
       }
-      if (process.env.NEXT_PUBLIC_GOOGLE_ADS_CONVERSION_LABEL) {
+      if (delivered && process.env.NEXT_PUBLIC_GOOGLE_ADS_CONVERSION_LABEL) {
         window.gtag?.("event", "conversion", {
           send_to: process.env.NEXT_PUBLIC_GOOGLE_ADS_CONVERSION_LABEL,
         });

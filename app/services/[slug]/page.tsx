@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { LocaleLink as Link } from "@/components/LocaleLink";
 import { notFound } from "next/navigation";
-import { ArrowRight, ArrowLeft, Check } from "lucide-react";
+import { ArrowRight, ArrowLeft, Check, Globe } from "lucide-react";
 import { SERVICES, localized } from "@/lib/services";
 import { STARTING_AT } from "@/lib/pricing";
 import {
@@ -59,6 +59,7 @@ const QUICK_FORM_SERVICE: Record<string, string> = {
 };
 
 const SERVICE_AREA = [
+  "California",
   "Sonoma County, California",
   "Napa County, California",
   "Marin County, California",
@@ -277,6 +278,13 @@ export default async function ServiceDetailPage({
                   )}
                 </div>
               </div>
+              <p className="mt-6 flex items-start gap-2.5 text-sm md:text-base text-[var(--color-body-light)] max-w-2xl">
+                <Globe
+                  className="h-4 w-4 md:h-5 md:w-5 mt-0.5 text-[var(--color-gold)] shrink-0"
+                  aria-hidden
+                />
+                {dict.remote_statewide}
+              </p>
               <p className="mt-6 text-xs text-[var(--color-muted-light)] max-w-2xl">
                 {dict.short_disclaimer}
               </p>

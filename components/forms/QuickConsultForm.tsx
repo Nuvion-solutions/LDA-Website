@@ -140,8 +140,8 @@ export function QuickConsultForm({
         </h3>
         <p className="text-sm text-[var(--color-body-dark)]/70 mt-1">
           {es
-            ? "Sin compromiso. Respuesta el mismo día — a menudo en menos de una hora."
-            : "No obligation. Same-day response — often within the hour."}
+            ? "Sin compromiso. Respuesta el mismo día, a menudo en menos de una hora — atendemos todo California de forma remota."
+            : "No obligation. Same-day response, often within the hour — serving all of California, remotely."}
         </p>
       </div>
 

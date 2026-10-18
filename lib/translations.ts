@@ -25,14 +25,16 @@ const en = {
   hero_headline_2: "Preparation You Can",
   hero_headline_3: "Count On.",
   hero_subhead:
-    "California Legal Document Excellence, LLC helps individuals and families prepare court forms, documents, and administrative paperwork — accurately, at your direction, and fast, with most matters court-ready in as little as 48 hours.",
+    "California Legal Document Excellence, LLC helps individuals and families prepare court forms, documents, and administrative paperwork — accurately, at your direction, and fast, with most matters court-ready in as little as 48 hours. We serve clients across California — in person in the North Bay or entirely remotely.",
   hero_cta_primary: "Start Your Intake",
   hero_cta_secondary: "Call",
   hero_trust_1: "Registered & Bonded LDA #87",
-  hero_trust_2: "Locally Owned · Sonoma County",
+  hero_trust_2: "Locally Owned · Serving All of California",
   hero_trust_3: "Free Consultation",
   hero_trust_4: "Court-Ready in 48 Hours",
   hero_trust_5: "Attorney Referrals Available",
+  remote_statewide:
+    "Serving clients across California — in the North Bay in person, or anywhere in the state remotely.",
 
   // Services preview
   services_eyebrow: "Our Services",
@@ -97,7 +99,7 @@ const en = {
   footer_link_terms: "Terms of Service",
   footer_payment_heading: "Payment Methods Accepted",
   footer_service_area:
-    "Serving Santa Rosa, Petaluma, Rohnert Park, Windsor, Sonoma, Napa, San Rafael, Fairfield, and neighbors across the North Bay. Remote services available.",
+    "Serving Santa Rosa, Petaluma, Rohnert Park, Windsor, Sonoma, Napa, San Rafael, Fairfield, and the greater North Bay in person — and clients across all of California remotely.",
   footer_disclosure_label: "Important Disclosure:",
   footer_rights: "All rights reserved.",
 
@@ -500,14 +502,16 @@ const es: Dict = {
   hero_headline_2: "de Documentos en la que",
   hero_headline_3: "Puede Confiar.",
   hero_subhead:
-    "California Legal Document Excellence, LLC ayuda a individuos y familias a preparar formularios judiciales, documentos y trámites administrativos — con precisión, según sus instrucciones y con rapidez, con la mayoría de los casos listos para la corte en tan solo 48 horas.",
+    "California Legal Document Excellence, LLC ayuda a individuos y familias a preparar formularios judiciales, documentos y trámites administrativos — con precisión, según sus instrucciones y con rapidez, con la mayoría de los casos listos para la corte en tan solo 48 horas. Atendemos a clientes en todo California — en persona en el North Bay o de forma totalmente remota.",
   hero_cta_primary: "Comenzar Solicitud",
   hero_cta_secondary: "Llamar",
   hero_trust_1: "LDA #87 Registrado y con Fianza",
-  hero_trust_2: "Empresa Local · Condado de Sonoma",
+  hero_trust_2: "Empresa Local · Servimos Todo California",
   hero_trust_3: "Consulta Gratuita",
   hero_trust_4: "Listos para la Corte en 48 Horas",
   hero_trust_5: "Referencias a Abogados Disponibles",
+  remote_statewide:
+    "Atendemos a clientes en todo California — en persona en el North Bay o de forma remota en cualquier parte del estado.",
 
   // Services preview
   services_eyebrow: "Nuestros Servicios",
@@ -572,7 +576,7 @@ const es: Dict = {
   footer_link_terms: "Términos de Servicio",
   footer_payment_heading: "Métodos de Pago Aceptados",
   footer_service_area:
-    "Atendemos Santa Rosa, Petaluma, Rohnert Park, Windsor, Sonoma, Napa, San Rafael, Fairfield y comunidades de todo el North Bay. Servicios remotos disponibles.",
+    "Atendemos Santa Rosa, Petaluma, Rohnert Park, Windsor, Sonoma, Napa, San Rafael, Fairfield y todo el North Bay en persona — y a clientes en todo California de forma remota.",
   footer_disclosure_label: "Divulgación Importante:",
   footer_rights: "Todos los derechos reservados.",
 
